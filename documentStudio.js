@@ -2,7 +2,133 @@ function doGet() {
   return HtmlService.createHtmlOutputFromFile('documentStudioIndex');
 }
 
-// DOCUMENTSTUDIO FUNCTIONS 1
+/*
+ * Gsuite Morph Tools - Morph Document Studio 1.9
+ * Developed by alsanchezromero
+ * Created on Mon Jul 25 2022
+ *
+ * Copyright (c) 2022 Morph Estudio
+*/
+
+// GET-MARKERS FUNCS
+
+function getDocItems(docID, identifier){
+  let body = DocumentApp.openById(docID).getBody();
+  let docText = body.getText();
+
+  // Check if search characters are to be included.
+  let startLen = identifier.start_include ? 0 : identifier.start.length;
+  let endLen = identifier.end_include ? 0 : identifier.end.length;
+
+  // Set up the reference loop
+  let textStart = 0;
+  let doc = docText;
+  let docList = [];
+
+  // Loop through text grab the identifier items. Start loop from last set of end identfiers.
+  while (textStart > -1){
+    textStart = doc.indexOf(identifier.start);
+
+    if (textStart === -1){
+      break;
+    } else {
+      let textEnd = doc.indexOf(identifier.end) + identifier.end.length;
+      let word = doc.substring(textStart, textEnd);
+
+      doc = doc.substring(textEnd);
+      docList.push(word.substring(startLen, word.length - endLen));
+    }
+  }
+
+  // Return a unique set of identifiers.
+  return [...new Set(docList)];
+}
+
+function getSlidesItems(docID, identifier){
+  var slides = SlidesApp.openById(docID).getSlides();
+
+  var sumaTextos = [];
+  slides.forEach(function(slide){
+    var shapes = (slide.getShapes());
+    shapes.forEach(function(shape){
+
+      var textito = shape.getText().asString();
+      sumaTextos.push(textito);
+    });
+  });
+
+  var docText = sumaTextos.toString();
+
+  // Check if search characters are to be included.
+  var startLen =  identifier.start_include ? 0 : identifier.start.length;
+  var endLen = identifier.end_include ? 0 : identifier.end.length;
+
+  // Set up the reference loop
+  var textStart = 0;
+  var doc = docText;
+  var docList = [];
+
+  // Loop through text grab the identifier items. Start loop from last set of end identfiers.
+  while(textStart > -1){
+    textStart = doc.indexOf(identifier.start);
+
+    if(textStart === -1){
+      break;
+    } else{
+      var textEnd = doc.indexOf(identifier.end) + identifier.end.length;
+      var word = doc.substring(textStart,textEnd);
+
+      doc = doc.substring(textEnd);
+      docList.push(word.substring(startLen,word.length - endLen));
+    }
+  }
+
+  // Return a unique set of identifiers.
+  return [...new Set(docList)];
+}
+
+function isGreenCell (lastCell){
+  var mycell = SpreadsheetApp.getActiveSheet().getRange(1,lastCell);
+  var bghex = mycell.getBackground();
+  if (bghex == "#ecfdf5"){
+    return true;
+  } else{
+    return false;
+  }
+}
+
+function columnRemover(sh, updatedValues, numberOfGreenCells){
+
+  var lastColHeaders = sh.getLastColumn() - numberOfGreenCells;
+  var headerRange = sh.getRange(1, 1, 1, lastColHeaders);
+  var headerValues = headerRange.getValues()[0];
+
+  var deleteColumn = [];
+  headerValues.forEach(function(a, index) {
+    var i = updatedValues.indexOf(a);
+    if (i === -1) {
+      deleteColumn.push(index+1);
+    }
+  });
+
+  for (var j=lastColHeaders; j > 0; j--) {
+    if (deleteColumn.indexOf(j) == -1) {
+    }
+    else{
+      var lastCol = sh.getLastColumn();
+      if (lastCol > 1){
+        sh.deleteColumn(j);
+      } else {
+        sh.insertColumnAfter(lastCol);
+        sh.deleteColumn(j);
+      }
+
+    }
+  }
+}
+
+
+// DOCUMENTSTUDIO FUNCTIONS
 
 function isValidHttpUrl(str) {
   const pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
@@ -129,7 +255,7 @@ function formatDropdown(){
   return ws.getRange(2,1,ws.getLastRow()-1,1).getValues();
 }
 
-// MORPH DOCUMENT STUDIO 1.9
+// GET MARKERS MAIN FUNCTION
 
 function getMarkers(rowData){
   // var ss = SpreadsheetApp.getActive();
@@ -211,9 +337,7 @@ function getMarkers(rowData){
   // ADD NEW MARKERS
 
   lastColmn = sh.getLastColumn();
-
   if (lastColmn >= 1){
-
     var newHeaderRange = sh.getRange(1, 1, 1, sh.getLastColumn());
     var headerValuesNew = newHeaderRange.getValues()[0];
 
@@ -571,123 +695,5 @@ function documentStudio(rowData) {
 
 
 
-
-
-// GET MARKERS FUNCTIONS
-
-function getDocItems(docID, identifier){
-  var body = DocumentApp.openById(docID).getBody();
-  var docText = body.getText();
-
-  // Check if search characters are to be included.
-  var startLen =  identifier.start_include ? 0 : identifier.start.length;
-  var endLen = identifier.end_include ? 0 : identifier.end.length;
-
-  // Set up the reference loop
-  var textStart = 0;
-  var doc = docText;
-  var docList = [];
-
-  // Loop through text grab the identifier items. Start loop from last set of end identfiers.
-  while(textStart > -1){
-    textStart = doc.indexOf(identifier.start);
-
-    if(textStart === -1){
-      break;
-    } else{
-      var textEnd = doc.indexOf(identifier.end) + identifier.end.length;
-      var word = doc.substring(textStart,textEnd);
-
-      doc = doc.substring(textEnd);
-      docList.push(word.substring(startLen,word.length - endLen));
-    }
-  }
-
-  // Return a unique set of identifiers.
-  return [...new Set(docList)];
-}
-
-function getSlidesItems(docID, identifier){
-  var slides = SlidesApp.openById(docID).getSlides();
-
-  var sumaTextos = [];
-  slides.forEach(function(slide){
-    var shapes = (slide.getShapes());
-    shapes.forEach(function(shape){
-
-      var textito = shape.getText().asString();
-      sumaTextos.push(textito);
-    });
-  });
-
-  var docText = sumaTextos.toString();
-
-  // Check if search characters are to be included.
-  var startLen =  identifier.start_include ? 0 : identifier.start.length;
-  var endLen = identifier.end_include ? 0 : identifier.end.length;
-
-  // Set up the reference loop
-  var textStart = 0;
-  var doc = docText;
-  var docList = [];
-
-  // Loop through text grab the identifier items. Start loop from last set of end identfiers.
-  while(textStart > -1){
-    textStart = doc.indexOf(identifier.start);
-
-    if(textStart === -1){
-      break;
-    } else{
-      var textEnd = doc.indexOf(identifier.end) + identifier.end.length;
-      var word = doc.substring(textStart,textEnd);
-
-      doc = doc.substring(textEnd);
-      docList.push(word.substring(startLen,word.length - endLen));
-    }
-  }
-
-  // Return a unique set of identifiers.
-  return [...new Set(docList)];
-}
-
-function isGreenCell (lastCell){
-  var mycell = SpreadsheetApp.getActiveSheet().getRange(1,lastCell);
-  var bghex = mycell.getBackground();
-  if (bghex == "#ecfdf5"){
-    return true;
-  } else{
-    return false;
-  }
-}
-
-function columnRemover(sh, updatedValues, numberOfGreenCells){
-
-  var lastColHeaders = sh.getLastColumn() - numberOfGreenCells;
-  var headerRange = sh.getRange(1, 1, 1, lastColHeaders);
-  var headerValues = headerRange.getValues()[0];
-
-  var deleteColumn = [];
-  headerValues.forEach(function(a, index) {
-    var i = updatedValues.indexOf(a);
-    if (i === -1) {
-      deleteColumn.push(index+1);
-    }
-  });
-
-  for (var j=lastColHeaders; j > 0; j--) {
-    if (deleteColumn.indexOf(j) == -1) {
-    }
-    else{
-      var lastCol = sh.getLastColumn();
-      if (lastCol > 1){
-        sh.deleteColumn(j);
-      } else {
-        sh.insertColumnAfter(lastCol);
-        sh.deleteColumn(j);
-      }
-
-    }
-  }
-}
 
 

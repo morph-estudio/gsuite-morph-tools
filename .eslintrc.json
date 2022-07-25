@@ -18,6 +18,7 @@
         "react"
     ],
     "rules": {
-        "space-before-blocks": "off"
+        "space-before-blocks": "off",
+        "linebreak-style": ["error", "windows"]
     }
 }
