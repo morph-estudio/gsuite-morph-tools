@@ -1,0 +1,85 @@
+<html>
+<head>
+  <base target="_top">
+
+  <!-- Remember to include jQuery :) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+
+  <!-- jQuery Modal -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+
+  <!-- SWAL -->
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+  <!-- Project CSS -->
+  <style>
+  ::-webkit-scrollbar {
+    width: 7px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background: rgba(0,0,0,0.1);
+  }
+  ::-webkit-scrollbar-thumb{
+    border-radius: 10px;
+    background: rgba(0,0,0,0.2);
+  }
+  ::-webkit-scrollbar-thumb:hover{
+    background: rgba(0,0,0,0.25);
+  }
+  ::-webkit-scrollbar-thumb:active{
+    background: rgba(0,0,0,0.3);
+  }
+  </style>
+
+  <?!= HtmlService.createHtmlOutputFromFile('stylesheet').getContent(); ?>
+
+</head>
+
+<body>
+
+  <!--<img src="https://i.ibb.co/H4tczNz/logo-morph-addons.png" class="morphlogo" alt="Logo">-->
+  <object data="https://mocarabes.com/wp-content/uploads/2021/11/MORPH-TOOLS-LOGO.svg" class="morphlogo"> </object>
+
+
+<div class="mt-5 mb-3">
+
+  <h4 class="changelogTitle chvmargin">Versión 1.5 <span class="badge rounded-pill text-bg-primary">Jul. 22</span></h4>
+
+  <ul class="list-group">
+    <li class="list-group-item">Nueva herramienta: generador de plantillas Document Studio by Morph en fase de desarrollo.</li>
+    <li class="list-group-item">Implementada pantalla de carga al abrir los menús de GMT.</li>
+    <li class="list-group-item">Herramienta: contador de celdas disponible en el menú Ayuda.</li>
+    <li class="list-group-item">Arreglados bugs en el código de congelación para cualquier cuadro de superficies.</li>
+    <li class="list-group-item">Generación de XLSX automático para archivos congelados.</li>
+    <li class="list-group-item">Añadida función 'Supercongelador' para cualquier tipo de archivo.</li>
+  </ul>
+
+  <h4 class="changelogTitle chvmargin">Versión 1.0 <span class="badge rounded-pill text-bg-primary">Jun. 22</span></h4>
+
+  <ul class="list-group">
+    <li class="list-group-item">Nueva función: generador de estructuras de carpetas.</li>
+    <li class="list-group-item">Nueva función: añadir paleta de colores Morph.</li>
+    <li class="list-group-item">Nueva función: eliminar todas las filas y columnas vacías.</li>
+    <li class="list-group-item">Añadidos botones del cuadro de superficies (actualizar/congelar).</li>
+    <li class="list-group-item">Implementación de la interfaz Morph Tools.</li>
+    <li class="list-group-item">Gsuite Morph Tools configurado en Google Marketplace.</li>
+  </ul>
+
+</div>
+
+
+
+</body>
+</html>

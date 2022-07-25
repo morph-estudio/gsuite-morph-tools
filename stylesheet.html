@@ -1,0 +1,407 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@900&display=swap');
+</style>
+
+<style>
+
+// GLOBAL VARIABLES
+
+// GENERAL STYLESHEET
+
+html {
+  width: 100%;
+  height: 100%;
+  perspective: 900;
+  overflow-y: scroll;
+  background-color: #dce7eb;
+  font-family: 'Inter', sans-serif !important;
+  color: rgba(48, 69, 92, 0.8);
+}
+
+body {
+  min-height: 0;
+  display: inline-block;
+  position: relative;
+  left: 50%;
+  margin: 90px 0;
+  transform: translate(-50%, 0);
+  box-shadow: 0 12px 0 0 #f1cb50 inset;
+  font-family: 'Inter', sans-serif !important;
+  background-image: linear-gradient(#edf1f2, #FFF);
+  max-width: 450px;
+  padding: 15px;
+}
+@media (max-width: 550px) {
+  body {
+    box-sizing: border-box;
+    transform: translate(0, 0);
+    max-width: 100%;
+    min-height: 100%;
+    margin: 0;
+    left: 0;
+  }
+}
+p {
+  color: #22313f;
+  font-size: 14px;
+  font-weight:500;
+  line-height: 1.3em;
+  //line-height: 18px;
+  letter-spacing: .5px;
+  position: relative;
+  overflow: hidden;
+  margin-top: 5px;
+  z-index: 2;
+}
+a {
+  color:#0D6EFD;
+  font-weight:bold;
+  text-decoration:none;
+}
+a:hover{
+  color:#3d8bfd;
+  text-decoration:underline;
+}
+img {
+}
+
+@keyframes flipdown {
+  0% {
+    opacity: 0;
+    transform-origin: top center;
+    transform: rotateX(-90deg);
+  }
+  5% {
+    opacity: 1;
+  }
+  80% {
+    transform: rotateX(8deg);
+  }
+  83% {
+    transform: rotateX(6deg);
+  }
+  92% {
+    transform: rotateX(-3deg);
+  }
+  100% {
+    transform-origin: top center;
+    transform: rotateX(0deg);
+  }
+}
+
+
+// ELEMENTS
+
+.morphlogo {
+  display: block;
+  max-width:100%;
+  max-height:100%;
+  width: 85%;
+  height: auto;
+  margin: 20px auto;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.docsicons {
+  display: block;
+  max-width:100%;
+  max-height:100%;
+  width: 20%;
+  height: auto;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.changelogTitle{
+ font-size: 22px;
+ color: #22313f;
+ line-height: 24px;
+ font-weight: 700;
+ margin: 20px 0px;
+}
+.chvmargin{padding-left:15px;}
+
+.fa-solid{margin-right:7px;}
+.fa-h-margin{margin-right:8px;}
+.fa-compatible{align-self: center;font-size:24px;margin:auto 10px;color:#6c7a89}
+
+
+// BUTTONS
+
+.button-68 {
+  width:100%;
+  background-color: transparent;
+  border-radius: 0px;
+  border: none;
+  border-bottom: 1px dotted #95a5a6;
+  font-weight: 600;
+  padding: 10px 9px;
+  margin-top: 0px;
+
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  text-align: left;
+  letter-spacing: normal;
+  line-height: 1.4em;
+  color: #22313f;
+  cursor: pointer;
+
+  position: relative;
+  text-decoration: none;
+  transform: translate3d(0, 0, 0);
+  transition: all .3s;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  vertical-align: top;
+
+  appearance: none;
+  backface-visibility: hidden;
+  box-sizing: border-box;
+  display: inline-block;
+  outline: none;
+  overflow: hidden;
+}
+.button-68:hover {
+  background-color: #22313f;
+  color:#fff;
+  opacity: 1;
+  border-bottom: 1px solid #22313f;
+}
+.button-68:active {
+  transform: translateY(2px);
+  transition-duration: .35s;
+}
+.button-68.ult{border-bottom:none !important;}
+.button-68.half{border-right: 1px dotted #95a5a6;}
+
+.button-68.sup {
+  padding: 9px 10px;
+  font-size:16px;
+  text-align: center;
+  margin-bottom: 3px;
+}
+.button-68.sup:hover {
+  padding: 12px 10px;
+}
+.button-68.sup.yellow {
+  background-color: #FFC107;
+  border: 2px solid #FFC107;
+  color: #263238;
+  border-radius: 10px 10px 0 0;
+}
+.button-68.sup.yellow:hover {
+  background-color: #FFCA2C;
+  border-color: #FFCA2C;
+}
+.button-68.blue {
+  background-color: #0D6EFD;
+  border: 2px solid #0D6EFD;
+  color: #fff;
+  border-radius: 0 0 10px 10px;
+}
+.button-68.blue:hover{
+  background-color:  #0B5ED7;
+  border-color:  #0B5ED7;
+}
+
+.button-68.frozen {
+  background-color: #0D6EFD;
+  border: 2px solid #0D6EFD;
+  border-radius: 5px;
+  color: #fff;
+  padding: 10px 8px;
+  letter-spacing: 1px;
+  font-size:16px;
+  font-weight:600;
+  text-align: center;
+}
+.button-68.frozen:hover{
+  background-color: #0B5ED7;
+  border-color: #0B5ED7;
+  color: #fff;
+}
+
+.button-68.sup.tpl {
+  background-color: #6c7a89;
+  border: 2px solid #6c7a89;
+  color: #fff;
+  border-radius: 10px 10px 0 0;
+}
+.button-68.sup.tpl:hover{
+  background-color: #8994a0;
+  border-color: #8994a0;
+  //color: #fff;
+}
+.button-68.sup.gen {
+  background-color: #DC3545;
+  border: 2px solid #DC3545;
+  color: #fff;
+  border-radius: 0 0 10px 10px;
+}
+.button-68.sup.gen:hover{
+  background-color: #BB2D3B;
+  border-color: #BB2D3B;
+}
+
+
+// BOOTSTRAP MENU
+
+.accordion{
+border: none;
+}
+.accordion-item{
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px dotted #95a5a6 !important;
+}
+.accordion-item.ultimo{
+  border-bottom: none !important;
+}
+.accordion-header{
+}
+.accordion-button{
+  font-size: 22px;
+  color: #95a5a6;
+  line-height: 24px;
+  font-weight: 700;
+  padding: 15px 0px;
+  background-color: transparent;
+}
+.accordion-button:not(.collapsed) {
+  background-color: transparent;
+  background:none;
+  box-shadow:none;
+  border:none;
+  color: #6c7a89;
+}
+.accordion-button:not(.collapsed)::after{
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%236c7a89'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+.accordion-button:link, .accordion-button:visited, .accordion-button:hover, .accordion-button:active{
+  background-color: transparent;
+  background:none;
+  box-shadow:none;
+  border:none;
+  color: #6c7a89;
+}
+.accordion-button::after{
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%2395a5a6'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+.accordion-button:focus {
+  background-color: transparent;
+  background:none;
+  box-shadow:none;
+  border:none;
+}
+.accordion-body{
+  padding: 0px 0px 25px 0px;
+  color: #22313f;
+  font-size: 14px;
+  font-weight:500;
+  line-height: 18px;
+  letter-spacing: .5px;
+  }
+.accordion-body p{
+}
+
+
+// BOOTSTRAP CUSTOM STYLING
+
+.pt-10{
+  padding-top:12rem;
+}
+.btn.btn-outline-primary{font-weight:600}
+.text-bg-primary{background-color:#0D6EFD;font-size:9px;position:relative;bottom:3px;left:3px;}
+.list-group-item{
+  color: #22313f;
+  font-size: 13px;
+  font-weight:500;
+  line-height: 16px;
+}
+.btn-lg{
+  font-size:16px;
+  font-weight:500;
+  width:100%;
+}
+.form-label{
+  font-weight:bold;font-size:16px;
+}
+.toast{
+}
+.me-auto{font-size:1rem;
+}
+.form-check-label{font-size:16px;}
+.form-control::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #dadfe1;
+  opacity: 1; /* Firefox */
+}
+
+
+// COUNT ANIMATED BAR
+
+.progress {
+  background-color: #dadfe1;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  position: relative;
+  height: 25px;
+}
+.progress span {
+    position: absolute;
+    display: block;
+    width: 100%;
+    font-weight:700;
+    font-size: 10px;
+    color: #22313f;
+ }
+
+
+// LOADING SPINNER
+
+.loading-spin{
+  background-color: #f1cb50;
+  width: 100%;
+  height: 100%;
+  position:fixed;
+  top:0;
+  left:0;
+  z-index:100;
+}
+.cargando-spin{
+  margin-top:15px;
+  position:relative;
+  left:3px;
+  font-weight:bold;
+  font-size:22px;
+}
+
+
+// SHEET DELETER STYLING
+
+.clsRowOdd{background-color:#fff}
+.clsTable{border:none}
+
+
+// SWAL STYLING
+
+.sweet-overlay, .sweet-alert{}
+body.swal2-shown {}
+.swal2-modal {
+}
+.swal2-watermark{
+  font-weight: 900;
+  color:#90A4AE;
+  letter-spacing:1px;
+  text-align: right !important;
+}
+.swal2-right{
+  text-align: right !important;
+}
+.swal-tt{text-align: left !important;}
+
+
+</style>

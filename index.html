@@ -1,0 +1,555 @@
+<html>
+<head>
+  <base target="_top">
+
+  <!-- Remember to include jQuery :) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+
+  <!-- jQuery Modal -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+
+  <!-- SWAL -->
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <script src="https://kit.fontawesome.com/a5769575cc.js" crossorigin="anonymous"></script>
+
+  <!-- Project CSS -->
+  <style>
+  ::-webkit-scrollbar {
+    width: 7px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background: rgba(0,0,0,0.1);
+  }
+  ::-webkit-scrollbar-thumb{
+    border-radius: 10px;
+    background: rgba(0,0,0,0.2);
+  }
+  ::-webkit-scrollbar-thumb:hover{
+    background: rgba(0,0,0,0.25);
+  }
+  ::-webkit-scrollbar-thumb:active{
+    background: rgba(0,0,0,0.3);
+  }
+  </style>
+
+  <link rel="stylesheet" href="stylesheet.html">
+  <?!= HtmlService.createHtmlOutputFromFile('stylesheet').getContent(); ?>
+
+</head>
+
+<body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+
+<!--<img src="https://i.ibb.co/H4tczNz/logo-morph-addons.png" class="morphlogo" alt="Logo">-->
+<object data="https://mocarabes.com/wp-content/uploads/2021/11/MORPH-TOOLS-LOGO.svg" class="morphlogo"> </object>
+<p>En esta app tienes las funciones implementadas por el equipo I+D para Google Suite.</p>
+
+<div class="accordion" id="accordionExample">
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingOne">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        Google Sheets
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+
+        <button style="margin-top:5px;margin-bottom:15px" class="button-68 frozen" role="button" onclick="morphf7009()">SUPERCONGELADOR</button>
+
+        <script>
+        function morphf7009() {
+          Swal.fire({
+            title: 'Congelar',
+            text: 'Una vez ejecutado no se puede detener. Confirma para continuar.',
+            icon: 'info',
+            allowOutsideClick: false,
+            showLoaderOnConfirm: true,
+            showDenyButton: false,
+            showCancelButton: true,
+            cancelButtonText: `Cancelar`,
+            confirmButtonText: `Continuar`,
+            confirmButtonColor: '#0D6EFD',
+            }).then((result) => {
+            if (result.isConfirmed) {
+              swaload()
+              google.script.run
+              .withSuccessHandler(swalsuccess)
+              .withFailureHandler(swalerror)
+              .congeladorMorph();
+            } else if (result.isDenied) {
+              return;
+            }
+            })
+        }
+        </script>
+
+<div class="btn-group d-flex" role="group" aria-label="...">
+        <button class="button-68 half" role="button" onclick="morphf8569()"><i class="fa-solid fa-palette"></i>Paleta Morph</button>
+        <button class="button-68" role="button" onclick="morphf3339()"><i class="fa-solid fa-fill-drip"></i>Color Morph</button>
+</div>
+
+        <script>
+        function morphf8569() {
+          swaload()
+          google.script.run
+          .withSuccessHandler(swalsuccess)
+          .withFailureHandler(swalerror)
+          .drawPalette();
+        }
+        </script>
+
+        <script>
+        function morphf3339() {
+          google.script.run
+          .colorMe();
+        }
+        </script>
+
+        <button class="button-68" role="button" onclick="morphf8194()"><i class="fa-solid fa-users"></i>Lista de miembros Morph</button>
+
+        <script>
+        function morphf8194() {
+          swaload()
+          google.script.run
+          .withSuccessHandler(swalsuccess)
+          .withFailureHandler(swalerror)
+          .getDomainUsersList();
+        }
+        </script>
+
+        <button class="button-68" role="button" onclick="morphf3554()"><i class="fa-solid fa-table-list"></i>Eliminar filas vacías</button>
+
+        <script>
+        function morphf3554() {
+          swaload()
+          google.script.run
+          .withSuccessHandler(swalsuccess)
+          .withFailureHandler(swalerror)
+          .deleteEmptyRows();
+        }
+        </script>
+
+        <button class="button-68" role="button" onclick="morphf3804()"><i class="fa-solid fa-table-columns"></i>Eliminar columnas vacías</button>
+
+        <script>
+        function morphf3804() {
+          swaload()
+          google.script.run
+          .withSuccessHandler(swalsuccess)
+          .withFailureHandler(swalerror)
+          .removeEmptyColumns();
+        }
+        </script>
+
+        <button class="button-68" style="border-bottom:none" role="button" onclick="morphf3994()"><i class="fa-solid fa-circle-h"></i>Unificar columnas con el mismo encabezado</button>
+
+        <script>
+        function morphf3994() {
+          swaload()
+          google.script.run
+          .withSuccessHandler(swalsuccess)
+          .withFailureHandler(swalerror)
+          .merge_Columns();
+        }
+        </script>
+
+        <!--
+        <button class="button-68" role="button" onclick="setTimeout(function() {
+            swalinfo();
+        }, 0)" >Función en desarrollo ⚙️</button>
+        -->
+
+      </div>
+    </div>
+  </div>
+
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingTwo">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+        Superficies
+      </button>
+    </h2>
+    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+
+        <p style="margin-bottom:20px">Solo funciona en el documento <b>NAVE NODRIZA</b> del cuadro de superficies.</p>
+
+        <button class="button-68 sup yellow" role="button" onclick="morphf9566()">Actualizar cuadro de superficies</button>
+
+        <script>
+        function morphf9566() {
+          Swal.fire({
+            title: 'Actualizar',
+            text: 'Una vez ejecutado no se puede detener. Confirma para continuar.',
+            icon: 'info',
+            allowOutsideClick: false,
+            //preConfirm: Swal.deleteEmptyRows(),
+            showLoaderOnConfirm: true,
+            showDenyButton: false,
+            showCancelButton: true,
+            cancelButtonText: `Cancelar`,
+            confirmButtonText: `Continuar`,
+            confirmButtonColor: '#0D6EFD',
+            }).then((result) => {
+            if (result.isConfirmed) {
+              swaload()
+              google.script.run
+              .withSuccessHandler(swalsuccess2)
+              .withFailureHandler(swalerror)
+              .actualizarCuadro();
+            } else if (result.isDenied) {
+              return;
+            }
+            })
+        }
+        </script>
+
+        <script>
+        function swaloadACS() {
+          Swal.fire({
+          titleText: "Ejecutando...",
+          text: 'Por favor, no modifiques ni cierres el documento.',
+          icon: 'warning',
+          allowOutsideClick: false,
+          preConfirm: Swal.showLoading(),
+          showLoaderOnConfirm: true,
+          showConfirmButton: false,
+          showDenyButton: true,
+          denyButtonText: `Detener`
+          }).then((result) => {
+          if (result.isConfirmed) {
+          } else if (result.isDenied) {
+             google.script.run
+            .withSuccessHandler(swalsuccess)
+            .withFailureHandler(swalerror)
+            .stopScript();
+          }
+          })
+        }
+        </script>
+
+        <button class="button-68 sup blue" role="button" onclick="morphf2574()">Congelar cuadro de superficies</button>
+
+
+        <script>
+        function morphf2574() {
+          Swal.fire({
+            title: 'Congelar',
+            text: 'Una vez ejecutado no se puede detener. Confirma para continuar.',
+            icon: 'info',
+            allowOutsideClick: false,
+            //preConfirm: Swal.deleteEmptyRows(),
+            showLoaderOnConfirm: true,
+            showDenyButton: false,
+            showCancelButton: true,
+            cancelButtonText: `Cancelar`,
+            confirmButtonText: `Continuar`,
+            confirmButtonColor: '#0D6EFD',
+            }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+              swaload()
+              google.script.run
+              .withSuccessHandler(swalsuccess)
+              .withFailureHandler(swalerror)
+              .congelarCuadro();
+            } else if (result.isDenied) {
+              return;
+            }
+            })
+        }
+        </script>
+
+
+      <p style="margin-top:25px;">Si tienes problemas con el actualizador automático puedes usar el <a href="https://sites.google.com/morphestudio.es/morph-pills/gsuite/flujo-de-trabajo-gsuite/gsuite-morph-tools#h.m7p008656a6i" target="_blank"><b>método manual</b></a>:</p>
+
+      <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
+      <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off" onclick="morphf8711()">
+      <label class="btn btn-outline-primary shadow-none" for="btncheck1">PLANTILLA</label>
+
+      <input type="checkbox" class="btn-check" id="btncheck2" autocomplete="off" onclick="morphf9092()">
+      <label class="btn btn-outline-primary shadow-none" for="btncheck2">ACT</label>
+
+      <input type="checkbox" class="btn-check" id="btncheck3" autocomplete="off" onclick="morphf1190()">
+      <label class="btn btn-outline-primary shadow-none" for="btncheck3">CON</label>
+      </div>
+
+        <script>
+          function morphf8711() {
+            if(swaload()){
+              return;
+            }
+            else {
+                google.script.run
+                .withSuccessHandler(swalsuccess)
+                .withFailureHandler(swalerror)
+                .tplActualizarCuadroManual()
+                ;
+            }
+          }
+        </script>
+
+        <script>
+          function morphf9092() {
+            if(swaload()){
+              return;
+            }
+            else {
+                google.script.run
+                .withSuccessHandler(swalsuccess2)
+                .withFailureHandler(swalerror)
+                .actualizarCuadroManual()
+                ;
+            }
+          }
+        </script>
+
+        <script>
+          function morphf1190() {
+            if(swaload()){
+              return;
+            }
+            else {
+                google.script.run
+                .withSuccessHandler(swalsuccess2)
+                .withFailureHandler(swalerror)
+                .congelarCuadroManual()
+                ;
+            }
+          }
+        </script>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingThree">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+        Estructura de carpetas
+      </button>
+    </h2>
+    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+
+      <p style="margin-bottom:20px">Para que funcione hay que seguir la <b>plantilla</b> que proporcionamos.</p>
+
+      <button class="button-68 sup tpl" role="button" onclick="morphf5629()">Crear plantilla</button>
+
+        <script>
+            function morphf5629() {
+              if(swaload()){
+                return;
+              }
+              else {
+                  google.script.run
+                  .withSuccessHandler(swalsuccess)
+                  .withFailureHandler(swalerror)
+                  .plantilla_AutoFolderTree()
+                  ;
+              }
+            }
+        </script>
+
+        <button class="button-68 sup gen" role="button" onclick="morphf2094()">Generar estructura de carpetas</button>
+
+        <script>
+        function morphf2094() {
+          swaload()
+          google.script.run
+          .withSuccessHandler(swalsuccess)
+          .withFailureHandler(swalerror)
+          .autoFolderTree();
+        }
+        </script>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="accordion-item ultimo">
+    <h2 class="accordion-header" id="headingFour">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+        Ayuda
+      </button>
+    </h2>
+    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+
+      <div class="progress">
+      <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: <?= cellCounter() ?>%"><span class="justify-content-center d-flex position-absolute w-100"><?= cellCounter() ?>%</span></div>
+      </div>
+
+      <p style="margin-top:15px;" id="test">Cargando...</p>
+      <script type="text/javascript">
+        function onSuccess(cellCounter2) {
+          document.getElementById('test').innerHTML = cellCounter2;
+        }
+        google.script.run.withSuccessHandler(onSuccess).cellCounter2();
+        document.getElementById('test').innerHTML = "Cargando...";
+      </script>
+
+      <p>
+        💊 Accede a documentación acerca de las herramientas en la página de <a href="https://sites.google.com/morphestudio.es/morph-pills/gsuite/flujo-de-trabajo-gsuite/gsuite-morph-tools" target="_blank"><b>Morph Pills</b></a>.
+      </p>
+      <p>Si tienes cualquier duda, consulta al departamento I+D.</p>
+      <p><b>esanchez@morphestudio.es</b></p>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<script>
+
+  document.addEventListener("DOMContentLoaded", afterSidebarLoads);
+
+    function removeFadeOut( el, speed ) {
+      var seconds = speed/1000;
+      el.style.transition = "opacity "+seconds+"s ease";
+
+      el.style.opacity = 0;
+      setTimeout(function() {
+          el.parentNode.removeChild(el);
+      }, speed);
+    }
+
+  function wait(ms){
+     var start = new Date().getTime();
+     var end = start;
+     while(end < start + ms) {
+       end = new Date().getTime();
+    }
+  }
+
+  function afterSidebarLoads(){
+    setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 500);
+  }
+
+</script>
+
+
+<script>
+  function swalsuccess(e) {
+    Swal.fire({
+      title: '¡Listo!',
+      text: 'La función se ha ejecutado corectamente.',
+      icon: 'success',
+      confirmButtonColor: '#0D6EFD',
+      confirmButtonText: 'Continuar'
+    });
+  }
+</script>
+
+<script>
+  function swalsuccess2(e) {
+    Swal.fire({
+      title: '¡Listo!',
+      text: 'El cuadro de superficies se ha actualizado.',
+      icon: 'success',
+      confirmButtonColor: '#0D6EFD',
+      confirmButtonText: 'Continuar'
+    });
+  }
+</script>
+
+<script>
+  function swalerror(e) {
+    Swal.fire({
+      title: 'Error!',
+      text: 'La función no ha podido ejecutarse.',
+      icon: 'error',
+      confirmButtonColor: '#0D6EFD',
+      confirmButtonText: 'Entendido'
+    });
+  }
+</script>
+
+<script>
+  function swalinfo(e) {
+    Swal.fire({
+      title: 'Atención',
+      text: 'Esta función aún está en desarrollo...',
+      icon: 'info',
+      confirmButtonColor: '#0D6EFD',
+      confirmButtonText: 'Continuar'
+    });
+  }
+</script>
+
+<script>
+  function swaload() {
+    Swal.fire({
+      template: '#swaloadTemplate',
+      padding: '1.2em 0em 2em 0em',
+      showConfirmButton: false,
+      allowOutsideClick: false,
+    }).then((result) => {
+    if (result.isConfirmed) {
+      return true;
+    } else if (result.isDenied) {
+      return false;
+    }
+    })
+  }
+</script>
+
+<template id="swaloadTemplate">
+  <swal-title><div class="swal-tt" ><span class="loading">Ejecutando<span></div></swal-title>
+  <swal-html><div class="swal-tt">Por favor, no modifiques ni cierres el documento.</div></swal-html>
+  <swal-html><div class="swal2-watermark">MORPH I+D</div></swal-html>
+
+  <swal-image src="https://raw.githubusercontent.com/Codelessly/FlutterLoadingGIFs/master/packages/cupertino_activity_indicator_selective.gif" width="35%" height="auto" />
+  <swal-param name="allowEscapeKey" value="false" />
+  <swal-param
+    name="customClass"
+    value='{ "popup": "my-popup" }' />
+</template>
+
+<style>
+    .loading::after {
+      display: inline-block;
+      animation: dotty steps(1,end) 2s infinite;
+      content: '';
+      text-align:left !important;
+    }
+    @keyframes dotty {
+        0%   { content: ''; }
+        25%  { content: '.'; }
+        50%  { content: '..'; }
+        75%  { content: '...'; }
+        100% { content: ''; }
+    }
+</style>
+
+
+<div id="loading-spin" class="loading-spin pt-10">
+  <div class="d-flex justify-content-center">
+    <div>
+      <div class="spinner-border text-dark" style="width:8rem;height:8rem" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <div class="cargando-spin d-flex justify-content-center">Cargando...</div>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>
