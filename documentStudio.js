@@ -2,7 +2,7 @@ function doGet() {
   return HtmlService.createHtmlOutputFromFile('documentStudioIndex');
 }
 
-// DOCUMENTSTUDIO FUNCTIONS
+// DOCUMENTSTUDIO FUNCTIONS 1
 
 function isValidHttpUrl(str) {
   const pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
