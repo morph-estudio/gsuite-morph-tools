@@ -44,15 +44,12 @@
   }
   </style>
 
-  <link rel="stylesheet" href="stylesheet.html">
-  <?!= HtmlService.createHtmlOutputFromFile('stylesheet').getContent(); ?>
+  <link rel="stylesheet" href="client/stylesheet.html">
+  <?!= HtmlService.createHtmlOutputFromFile('client/stylesheet').getContent(); ?>
 
 </head>
 
 <body>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-
 
 <!--<img src="https://i.ibb.co/H4tczNz/logo-morph-addons.png" class="morphlogo" alt="Logo">-->
 <object data="https://mocarabes.com/wp-content/uploads/2021/11/MORPH-TOOLS-LOGO.svg" class="morphlogo"> </object>
@@ -66,7 +63,7 @@
       </button>
     </h2>
     <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-      <div class="accordion-body">
+      <div class="accordion-body pb-2">
 
         <button style="margin-top:5px;margin-bottom:15px" class="button-68 frozen" role="button" onclick="morphf7009()">SUPERCONGELADOR</button>
 
@@ -340,12 +337,14 @@
   <div class="accordion-item">
     <h2 class="accordion-header" id="headingThree">
       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-        Estructura de carpetas
+        Archivos y carpetas
       </button>
     </h2>
     <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
       <div class="accordion-body">
 
+
+      <h3 class="menu-h3 mt-3">Generar estructura de carpetas</h3>
       <p style="margin-bottom:20px">Para que funcione hay que seguir la <b>plantilla</b> que proporcionamos.</p>
 
       <button class="button-68 sup tpl" role="button" onclick="morphf5629()">Crear plantilla</button>
@@ -376,6 +375,93 @@
           .autoFolderTree();
         }
         </script>
+
+      <h3 class="menu-h3 mt-4">Listar archivos</h3>
+      <p style="margin-bottom:10px">Genera una lista con nombres y links de archivos en una carpeta.</p>
+
+<form novalidate>
+<div id="userform3">
+<div class="mb-2 pt-3">
+  <label for="list-files" class="form-label"><i class="fa-regular fa-folder fa-h-margin"></i>LINK/ID de la carpeta</label>
+  <input type="text" class="form-control" id="list-files" placeholder="ej: https://drive.google.com/drive/folders/1DHirb56iLf-T_n6Idq2MP8f8Ok765JuZ?usp=sharing" aria-describedby="template-id-2-help" required>
+    <div class="invalid-feedback">
+    Introduce una ID correcta.
+    </div>
+    <div id="template-id-2-help" class="form-text mt-2">Esta herramienta eliminará el contenido de la hoja activa para crear la lista.</div>
+
+    <div class="form-check form-switch mt-3">
+      <input class="form-check-input" type="checkbox" onchange="document.getElementById('list-files').disabled = this.checked" role="switch" id="use-a1" >
+      <label class="form-check-label" for="use-a1" style="position:relative;top:1px;">Usar celda A1</label>
+    </div>
+
+<div class="">
+  <button class="btn btn-primary btn-lg mt-3" id="listButton">Listar archivos</button>
+</div>
+</div>
+</div>
+</form>
+
+<script>
+
+function afterButtonClicked(){
+
+  if(validate()){
+
+    var listFolderID = document.getElementById("list-files");
+    var useA1 = document.getElementById("use-a1");
+    var useA1Value = useA1.checked;
+    var rowData = {
+      listFolderID: listFolderID.value,
+      useA1: useA1Value,
+    };
+
+      swaload();
+      google.script.run.withSuccessHandler(e => {swalsuccess(e), afterSubmit(e)}).withFailureHandler(swalerror).linksArchivos(rowData);
+
+  } else{
+    //$("#errorNotification").toast("show");
+  }
+}
+
+function afterSubmit(e){
+  clearFields(["list-files"]);
+  //$("#successNotification").toast("show");
+}
+
+function clearFields(feilds){
+  feilds.forEach(function(feild){
+    var el = document.getElementById(feild);
+    el.value = "";
+  });
+}
+
+function validate(){
+  var fieldsToValidate = document.querySelectorAll("#userform3 input");
+
+  //is-invalid
+
+  Array.prototype.forEach.call(fieldsToValidate, function(el){
+    if (el.checkValidity()){
+      el.classList.remove("is-invalid");
+    } else{
+      el.classList.add("is-invalid");
+    }
+  });
+
+  return Array.prototype.every.call(fieldsToValidate,function(el){
+  return el.checkValidity();
+  });
+
+}
+document.getElementById("listButton").addEventListener("click",afterButtonClicked);
+</script>
+
+
+
+
+
+
+
 
       </div>
     </div>
@@ -416,33 +502,7 @@
 </div>
 
 
-<script>
 
-  document.addEventListener("DOMContentLoaded", afterSidebarLoads);
-
-    function removeFadeOut( el, speed ) {
-      var seconds = speed/1000;
-      el.style.transition = "opacity "+seconds+"s ease";
-
-      el.style.opacity = 0;
-      setTimeout(function() {
-          el.parentNode.removeChild(el);
-      }, speed);
-    }
-
-  function wait(ms){
-     var start = new Date().getTime();
-     var end = start;
-     while(end < start + ms) {
-       end = new Date().getTime();
-    }
-  }
-
-  function afterSidebarLoads(){
-    setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 500);
-  }
-
-</script>
 
 
 <script>
@@ -539,6 +599,36 @@
 </style>
 
 
+
+
+<script>
+
+  document.addEventListener("DOMContentLoaded", afterSidebarLoads);
+
+    function removeFadeOut( el, speed ) {
+      var seconds = speed/1000;
+      el.style.transition = "opacity "+seconds+"s ease";
+
+      el.style.opacity = 0;
+      setTimeout(function() {
+          el.parentNode.removeChild(el);
+      }, speed);
+    }
+
+  function wait(ms){
+     var start = new Date().getTime();
+     var end = start;
+     while(end < start + ms) {
+       end = new Date().getTime();
+    }
+  }
+
+  function afterSidebarLoads(){
+    setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 500);
+  }
+
+</script>
+
 <div id="loading-spin" class="loading-spin pt-10">
   <div class="d-flex justify-content-center">
     <div>
@@ -550,6 +640,9 @@
   </div>
 </div>
 
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
 
 </body>
 </html>

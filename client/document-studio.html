@@ -44,8 +44,8 @@
   }
   </style>
 
-  <?!= HtmlService.createHtmlOutputFromFile('stylesheet').getContent(); ?>
-  <link rel="stylesheet" href="stylesheet.html">
+  <?!= HtmlService.createHtmlOutputFromFile('client/stylesheet').getContent(); ?>
+  <link rel="stylesheet" href="client/stylesheet.html">
 
 </head>
 
@@ -53,8 +53,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
-
-  <!-- <img src="https://i.ibb.co/H4tczNz/logo-morph-addons.png" class="morphlogo" alt="Logo"> -->
   <object data="https://mocarabes.com/wp-content/uploads/morph/MORPH-TOOLS-LOGO.svg" class="morphlogo"> </object>
   <p>Morph Document Studio te permite crear archivos en masa a partir de plantillas con DOCS y SLIDES.</p>
 
@@ -239,7 +237,7 @@ document.getElementById("firstButton").addEventListener("click",afterButtonClick
 
 <div class="mb-3">
   <label for="destination-folder" class="form-label"><i class="fa-regular fa-folder fa-h-margin"></i>LINK Carpeta de destino</label>
-  <input type="text" class="form-control" id="destination-folder" placeholder="ej: https://docs.google.com/document/d/1Gs4Gd4JtVMrI-nu6ELZtS71kebUU9CN3II2Xz5-Q2F8/edit?usp=sharing" aria-describedby="destination-folder-help">
+  <input type="text" class="form-control" id="destination-folder" placeholder="ej: https://drive.google.com/drive/folders/1DHirb56iLf-T_n6Idq2MP8f8Ok765JuZ?usp=sharing" aria-describedby="destination-folder-help">
       <div class="invalid-feedback">
       Introduce una ID correcta.
       </div>
