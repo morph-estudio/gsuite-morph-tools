@@ -14,12 +14,12 @@ const barTitle2 = '📑 Document Studio by Morph (I+D)';
 const barTitle3 = '📑 Trituradora de papel by Morph (I+D)';
 
 function loadSidebar1() {
-  const hs1 = HtmlService.createTemplateFromFile('client/index').evaluate().setTitle(barTitle1);
+  const hs1 = HtmlService.createTemplateFromFile('html/index').evaluate().setTitle(barTitle1);
   ui.showSidebar(hs1);
 }
 
 function loadSidebar2() {
-  const hs2 = HtmlService.createTemplateFromFile('client/document-studio').evaluate().setTitle(barTitle2);
+  const hs2 = HtmlService.createTemplateFromFile('html/document-studio').evaluate().setTitle(barTitle2);
   ui.showSidebar(hs2);
 }
 
@@ -29,8 +29,24 @@ function loadSidebar3() {
 }
 
 function loadSidebarX() {
-  const hsx = HtmlService.createTemplateFromFile('client/changelog').evaluate().setTitle(barTitle1);
-  ui.showSidebar(hsx);
+  let url = 'https://gist.github.com/juampynr/4c18214a8eb554084e21d6e288a18a2c';
+  let html = HtmlService.createHtmlOutput('<html><script>'
+  + 'window.close = function(){window.setTimeout(function() {google.script.host.close()},9)};'
+  + `var a = document.createElement("a"); a.href="${url}"; a.target="_blank";`
+  + 'if(document.createEvent){'
+  + 'var event=document.createEvent("MouseEvents");'
+  + 'if(navigator.userAgent.toLowerCase().indexOf("firefox")>-1){window.document.body.append(a)}'
+  + 'event.initEvent("click",true,true); a.dispatchEvent(event);'
+  + '}else{ a.click() }'
+  + 'close();'
+  + '</script>'
+  // Offer URL as clickable link in case above code fails.
+  // eslint-disable-next-line max-len
+  + `<body style="word-break:break-word;font-family:sans-serif;">Failed to open automatically. <a href="${url}" target="_blank" onclick="window.close()">Click here to proceed</a>.</body>`
+  + '<script>google.script.host.setHeight(40);google.script.host.setWidth(410) </script>'
+  + '</html>')
+    .setWidth(110).setHeight(1);
+  SpreadsheetApp.getUi().showModalDialog(html, 'Opening Changelog... make sure the pop up is not blocked.');
 }
 
 /**/

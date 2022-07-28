@@ -1,5 +1,5 @@
 function doGet() {
-  return HtmlService.createHtmlOutputFromFile('client/document-studio');
+  return HtmlService.createHtmlOutputFromFile('html/document-studio');
 }
 
 /*

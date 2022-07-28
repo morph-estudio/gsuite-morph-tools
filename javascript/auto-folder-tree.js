@@ -2,7 +2,7 @@
 /* eslint-disable no-restricted-syntax */
 
 function doGet() {
-  return HtmlService.createHtmlOutputFromFile('client/index');
+  return HtmlService.createHtmlOutputFromFile('html/index');
 }
 
 /*
@@ -83,17 +83,18 @@ function plantilla_AutoFolderTree() {
 
   let list = [['LEVEL 1', '', 'LEVEL 2', '', 'LEVEL 3', '', 'LEVEL 4', '', 'LEVEL 5', '', 'LEVEL 6', '', 'LEVEL 7']];
   ws.getRange(1, 3, 1, 13).setValues(list).setBackground('#434343').setFontColor('#fff');
-  ws.getRange('B1').setValue('ID BASE FOLDER').setBackground('#6AA84F').setBorder(true, true, true, true, true, true, '#6AA84F', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+  ws.getRange('B1').setValue('ID BASE FOLDER').setBackground('#BF9000').setBorder(true, true, true, true, true, true, '#BF9000', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
     .setFontColor('#fff');
-  ws.getRange('B3').setBackground('#D9EAD3').setBorder(true, true, true, true, true, true, '#6AA84F', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontColor('#6AA84F');
+  ws.getRange('B3').setBackground('#FFF2CC').setBorder(true, true, true, true, true, true, '#BF9000', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+    .setFontColor('#BF9000');
 
   ws.hideColumns(4); ws.hideColumns(6); ws.hideColumns(8); ws.hideColumns(10);
   ws.hideColumns(12); ws.hideColumns(14); ws.hideColumns(16);
 
   let list2 = [['CODE 1', 'CODE 2', 'CODE 3', 'CLIENT', 'LOCATION', 'PROJECT NAME'], ['P00000', '01', 'AEI', 'Cliente', 'Madrid', 'El Encinar']];
   ws.getRange(1, 18, 2, 6).setValues(list2);
-  ws.getRange(1, 18, 1, 6).setBackground('#BF9000').setBorder(true, true, true, true, true, true, '#BF9000', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontColor('#fff');
-  ws.getRange(2, 18, 1, 6).setBackground('#FFF2CC').setBorder(true, true, true, true, true, true, '#BF9000', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontColor('#A61C00')
+  ws.getRange(1, 18, 1, 6).setBackground('#6AA84F').setBorder(true, true, true, true, true, true, '#6AA84F', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontColor('#fff');
+  ws.getRange(2, 18, 1, 6).setBackground('#D9EAD3').setBorder(true, true, true, true, true, true, '#6AA84F', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontColor('#6AA84F')
     .setHorizontalAlignment('center');
 
   let cell = ws.getRange('T2');

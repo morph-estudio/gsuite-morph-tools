@@ -1,5 +1,5 @@
 function doGet() {
-  return HtmlService.createHtmlOutputFromFile('client/index');
+  return HtmlService.createHtmlOutputFromFile('html/index');
 }
 
 // List files in folder

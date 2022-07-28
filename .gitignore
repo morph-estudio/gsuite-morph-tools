@@ -138,3 +138,4 @@ dist
 .eslintrc.json
 .clasp.json
 test/
+.vscode/
