@@ -3,7 +3,7 @@ function doGet() {
 }
 
 /*
- * Gsuite Morph Tools - CS Updater 1.3
+ * Gsuite Morph Tools - CS Updater 1.4
  * Developed by alsanchezromero
  * Created on Mon Jul 25 2022
  *

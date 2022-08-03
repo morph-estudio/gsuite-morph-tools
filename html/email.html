@@ -1,0 +1,36 @@
+<html>
+<head>
+  <base target="_top">
+  <!-- Required meta tagss -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <?!= HtmlService.createHtmlOutputFromFile('html/helpers/header').getContent(); ?>
+  <?!= HtmlService.createHtmlOutputFromFile('html/stylesheet').getContent(); ?>
+
+</head>
+
+<body>
+
+<?!= HtmlService.createHtmlOutputFromFile('html/helpers/navbar').getContent(); ?>
+
+<div class="bodyPadding">
+
+<?!= HtmlService.createHtmlOutputFromFile('html/helpers/form-ds3').getContent(); ?>
+
+</div>
+
+<script>
+
+  function afterSidebarLoads(){
+    setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 50);
+  }
+
+</script>
+
+<?!= HtmlService.createHtmlOutputFromFile('html/helpers/swal').getContent(); ?>
+<?!= HtmlService.createHtmlOutputFromFile('html/helpers/footer').getContent(); ?>
+
+</div>
+</body>
+</html>

@@ -3,7 +3,7 @@ function doGet() {
 }
 
 /*
- * Gsuite Morph Tools - Morph Document Studio 1.5
+ * Gsuite Morph Tools - Morph Document Studio 1.9
  * Developed by alsanchezromero
  * Created on Mon Jul 25 2022
  *
@@ -12,10 +12,15 @@ function doGet() {
 
 function documentStudio(rowData) {
   const ss = SpreadsheetApp.getActive();
-  const sh = SpreadsheetApp.getActiveSheet();
+  const sh = ss.getActiveSheet();
 
   let formData = [
+    rowData.dsActivate,
+    rowData.emailActivate,
+
+    rowData.greenCells,
     rowData.templateID,
+
     rowData.destFolder,
     rowData.fileName,
     rowData.exportFormat,
@@ -23,10 +28,25 @@ function documentStudio(rowData) {
     rowData.permission2,
     rowData.permission3,
     rowData.numSwitch,
-    rowData.greenCells,
+
+    rowData.emailField,
+    rowData.emailSpecific,
+    rowData.emailSender,
+    rowData.emailSubject,
+    rowData.emailBCC,
+    rowData.emailReplyTo,
+    rowData.emailMessage,
+    rowData.emailAttach,
+    rowData.emailAttachField,
+
   ];
 
-  let [docURL, destFolderURL, fileName,exportFormat, permission1, permission2, permission3, numSwitch, greenCells] = formData;
+  let [dsActivate, emailActivate, greenCells, docURL, destFolderURL, fileName, exportFormat, permission1, permission2, permission3, numSwitch, emailField, emailSpecific, emailSender, emailSubject, emailBCC, emailReplyTo, emailMessage, emailAttach, emailAttachField] = formData;
+
+  Logger.log(dsActivate); Logger.log(emailActivate);
+
+  let userMail = Session.getActiveUser().getEmail();
+  let dateNow = Utilities.formatDate(new Date(), 'GMT+2', 'dd/MM/yyyy - HH:mm:ss');
 
   let rows = sh.getDataRange().getValues();
   let lastColmn = sh.getLastColumn();
@@ -34,15 +54,13 @@ function documentStudio(rowData) {
   let nameCell = urlCell - 1;
   let fin = nameCell - 1;
 
-  let userMail = Session.getActiveUser().getEmail();
-  let dateNow = Utilities.formatDate(new Date(), 'GMT+2', 'dd/MM/yyyy - HH:mm:ss');
-  let destFolderID; let docID;
+  let docID; let destFolderID;
 
   if (greenCells) {
-    docURL = sh.getRange(1, nameCell).getValue();
-    docID = getIdFromUrl(docURL);
-    destFolderURL = sh.getRange(1, urlCell).getValue();
-    destFolderID = getIdFromUrl(destFolderURL);
+    docURL = sh.getRange(1, nameCell).getNotes();
+    docID = getIdFromUrl(docURL[0][0]);
+    destFolderURL = sh.getRange(1, urlCell).getNotes();
+    destFolderID = getIdFromUrl(destFolderURL[0][0]);
   } else {
     docID = getIdFromUrl(docURL);
     destFolderID = getIdFromUrl(destFolderURL);
@@ -50,9 +68,9 @@ function documentStudio(rowData) {
 
   // Create temporal folder if destFolder is empty
 
-  var destinationFolder;
+  let destinationFolder;
   if (destFolderID === '') {
-    var rootFolder = DriveApp.getRootFolder();
+    let rootFolder = DriveApp.getRootFolder();
     destinationFolder = rootFolder.createFolder('Morph Tools Files');
   } else {
     destinationFolder = DriveApp.getFolderById(destFolderID);
@@ -60,32 +78,19 @@ function documentStudio(rowData) {
 
   // Get Markers Internally
 
-  let identifier = {
-    start: '{{',
-    start_include: true,
-    end: '}}',
-    end_include: true,
-  };
+  let dataReturn = getInternallyMarkers(docID);
 
-  let gDocTemplate = DriveApp.getFileById(docID);
-  let fileType = gDocTemplate.getMimeType();
-  let docMarkers;
+  let markersData = [
+    dataReturn.docMarkers,
+    dataReturn.gDocTemplate,
+    dataReturn.fileType,
+  ];
 
-  switch (fileType) {
-    case MimeType.GOOGLE_DOCS:
-      docMarkers = getDocItems(docID, identifier).sort();
-      break;
-    case MimeType.GOOGLE_SLIDES:
-      docMarkers = getSlidesItems(docID, identifier).sort();
-      break;
-    default:
-  }
+  let [docMarkers, gDocTemplate, fileType] = markersData;
 
-  let rw1 = [docMarkers];
-  // let rw2 = rw1[0].map((col, i) => rw1.map(row => row[i]));
+  if (dsActivate) {
 
   // Body Iteration
-
   var doc; var newNames; var headerValues; var value;
 
   rows.forEach((row, index) => {
@@ -250,4 +255,124 @@ function documentStudio(rowData) {
       doc.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
     }
   });
+  } // if ds-activate bracket
+
+  if (emailActivate) {
+    // Get index of selected columns
+
+    let dropdownValues = emailDropdown();
+    dropdownValues = flatten(dropdownValues);
+
+    let indexEmail; let indexFile; let indexNumber;
+
+    indexEmail = fieldIndex(dropdownValues, emailField);
+    indexFile = fieldIndex(dropdownValues, emailAttachField);
+
+    //let emailValues = getColumn(sh, indexEmail); Logger.log('emval' + emailValues);
+    //let fileValues = getColumn(sh, indexFile); Logger.log('fileval' + fileValues);
+
+    // Replace in subject and message
+
+    let headerValues; let fileID; let file; let adress; let emailSubjectReplaced; let emailMessageReplaced;
+
+    let dropdownValuesWithMarker = dropdownValues.map(i => '{{' + i + '}}');
+    //Logger.log('Con marcadores: '+ dropdownValuesWithMarker);
+
+    rows.forEach((row, index) => {
+      Logger.log(row[indexEmail]);
+      Logger.log(row[indexFile]);
+      if (index === 0) return; // Check if this row is the headers, if so we skip it
+      if (row[indexEmail] === '') return;
+
+      if (dropdownValuesWithMarker.some(v => emailSubject.includes(v)) || dropdownValuesWithMarker.some(v => emailMessage.includes(v))) {
+        for (var i = 0; i < lastColmn; i += 1) {
+          headerValues = sh.getRange(1, i + 1).getValue();
+          headerValues = `${`{{${headerValues}}}`}`;
+          if (emailSubject.indexOf(headerValues) > -1) {
+            emailSubjectReplaced = emailSubject.replace(headerValues, row[i]);
+          }
+          if (emailMessage.indexOf(headerValues) > -1) {
+            emailMessageReplaced = emailMessage.replace(headerValues, row[i]);
+          }
+        };
+      } else {
+        emailSubjectReplaced = emailSubject;
+        emailMessageReplaced = emailMessage;
+      }
+
+      // Set emails
+
+      adress = row[indexEmail];
+      fileID = getIdFromUrl(row[indexFile]); // Logger.log(fileID);
+      file = DriveApp.getFileById(fileID[0]);
+
+      MailApp.sendEmail({
+        to: adress,
+        subject: emailSubjectReplaced || 'Morph Document Studio',
+        name: emailSender || 'Morph Estudio',
+        cc: emailSpecific,
+        bcc: emailBCC,
+        replyTo: emailReplyTo,
+        htmlBody: emailMessageReplaced || 'Este correo ha sido enviado automáticamente desde el Google Workspace de Morph Estudio.',
+        attachments: [file],
+      });
+      
+    });
+
+  } // if email-activate bracket
+}
+
+function getInternallyMarkers(docID) {
+  let identifier = {
+    start: '{{',
+    start_include: true,
+    end: '}}',
+    end_include: true,
+  };
+
+  let gDocTemplate = DriveApp.getFileById(docID);
+  let fileType = gDocTemplate.getMimeType();
+  let docMarkers;
+
+  switch (fileType) {
+    case MimeType.GOOGLE_DOCS:
+      docMarkers = getDocItems(docID, identifier).sort();
+      break;
+    case MimeType.GOOGLE_SLIDES:
+      docMarkers = getSlidesItems(docID, identifier).sort();
+      break;
+    default:
+  }
+
+  let dataReturn = {
+    docMarkers,
+    gDocTemplate,
+    fileType,
+  };
+  return dataReturn;
+}
+
+function emailDropdown() { // If dropdown options are in a Google Sheet
+  const ss = SpreadsheetApp.getActive();
+  let sh = ss.getActiveSheet();
+  let dropdownValues = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues(); 
+  dropdownValues = transpose(dropdownValues);
+  return dropdownValues;
+}
+
+function fieldIndex(dropdownValues, fieldName) {
+  dropdownValues.forEach((col, index) => {
+    if (col.indexOf(fieldName) > -1) {
+      indexNumber = index;
+    }
+  });
+  return indexNumber;
+}
+
+function getColumn(sh, index) {
+  let values = sh.getRange(2, index + 1, sh.getLastRow() - 1, 1).getValues();
+  values = values.filter(String).length;
+  values = sh.getRange(2, index + 1, values, 1).getValues();
+  values = flatten(values);
+  return values;
 }

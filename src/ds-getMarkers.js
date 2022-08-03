@@ -25,14 +25,14 @@ function getMarkers(rowData) {
 
   // Data + Variables
 
-  const formData = [rowData.templateID, rowData.greenCells1, rowData.purgeMarkers];
-  let [docURL, greenCells1, purgeMarkers] = formData;
+  const formData = [rowData.templateID, rowData.greenCells, rowData.purgeMarkers];
+  let [docURL, greenCells, purgeMarkers] = formData;
 
   let urlCell = sh.getLastColumn();
   let nameCell = urlCell - 1;
   let docID;
 
-  if (greenCells1) {
+  if (greenCells) {
     docURL = sh.getRange(1, nameCell).getValue();
     docID = getIdFromUrl(docURL);
   } else {
@@ -123,23 +123,23 @@ function getMarkers(rowData) {
   semiLastCell = lastColmn - 1;
   semiIsGrCell = isGreenCell(semiLastCell);
 
-  sh.getRange(1, 1, 1, sh.getMaxColumns()).setFontWeight('bold');
+  sh.getRange(1, 1, 1, sh.getMaxColumns()).setFontWeight('bold').setHorizontalAlignment('center');
   sh.setFrozenRows(1);
 
   if (lastColmn === 0) {
     sh.insertColumns(1);
-    sh.getRange(1, 1).setBackground('#ECFDF5').setFontColor('#34a853').setValue('[DS] File-links');
+    sh.getRange(1, 1).setBackground('#ECFDF5').setFontColor('#34a853').setValue('[DS] File-links')
+      .setNote('Celdas verdes: para usar la opción "usar celdas verdes" debes introducir en esta casilla una nota con la URL de la carpeta de destino.');
     sh.insertColumns(1);
     sh.getRange(1, 1).setBackground('#ECFDF5').setFontColor('#34a853').setValue('[DS] Files')
-      // eslint-disable-next-line max-len
       .setNote('Celdas verdes: para utilizar la opción "usar celdas verdes" debes introducir en esta celda el LINK de la plantilla y en la siguiente columna el LINK de la carpeta de destino.');
   } else if (isGrCell == false) {
     sh.insertColumnAfter(lastColmn);
-    sh.getRange(1, lastColmn + 1).setBackground('#ECFDF5').setFontColor('#34a853').setValue('[DS] File-links');
+    sh.getRange(1, lastColmn + 1).setBackground('#ECFDF5').setFontColor('#34a853').setValue('[DS] File-links')
+      .setNote('Celdas verdes: para usar la opción "usar celdas verdes" debes introducir en esta casilla una nota con la URL de la carpeta de destino.');
     sh.insertColumnAfter(lastColmn);
     sh.getRange(1, lastColmn + 1).setBackground('#ECFDF5').setFontColor('#34a853').setValue('[DS] Files')
-      // eslint-disable-next-line max-len
-      .setNote('Celdas verdes: para utilizar la opción "usar celdas verdes" debes introducir en esta celda el LINK de la plantilla y en la siguiente columna el LINK de la carpeta de destino.');
+      .setNote('Celdas verdes: para usar la opción "usar celdas verdes" debes introducir en esta casilla una nota con la URL de la plantilla.');
   } else if (isGrCell == true && semiIsGrCell == false) {
     sh.insertColumnAfter(lastColmn);
     sh.getRange(1, lastColmn + 1).setBackground('#ECFDF5').setFontColor('#34a853').setValue('[DS]');

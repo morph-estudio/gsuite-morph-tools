@@ -1,0 +1,36 @@
+<div id="loading-spin" class="loading-spin pt-10">
+  <div class="d-flex justify-content-center">
+    <div>
+      <div class="spinner-border text-dark" style="width:8rem;height:8rem" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <div class="cargando-spin d-flex justify-content-center">Cargando...</div>
+    </div>
+  </div>
+</div>
+
+<nav class="navbar navbar-light navbar-custom">
+  <div class="container-fluid" >
+<img src="https://i.ibb.co/H4tczNz/logo-morph-addons.png" class="morphlogo" alt="Logo">
+    <button class="nav-tog-cus shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon nav-tog-i-cus"></span>
+    </button>
+  </div>
+</nav>
+
+
+<div class="collapse" id="navbarToggleExternalContent">
+  <div class="bg-light">
+    <button class="btn btn-primary index navMenu shadow-none" role="button" onclick="execDirect('loadSidebar1')">Gsuite Morph Tools</button>
+    <button class="btn btn-primary index navMenu shadow-none" role="button" onclick="execDirect('loadSidebar2')">Morph Document Studio</button>
+  </div>
+</div>
+
+<!--
+<script type="text/javascript">
+  function onSuccess(navBarTitle) {
+    document.getElementById('testi').innerHTML = navBarTitle;
+  }
+  google.script.run.withSuccessHandler(onSuccess).navBarTitle();
+  document.getElementById('testi').innerHTML = navBarTitle;
+</script> -->

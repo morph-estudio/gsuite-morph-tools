@@ -1,9 +1,6 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@900&display=swap');
-</style>
-
-<style>
 
 /* Basic Styles */
 
@@ -22,13 +19,16 @@ body {
   display: inline-block;
   position: relative;
   left: 50%;
-  margin: 90px 0;
+  margin: none;
   transform: translate(-50%, 0);
   box-shadow: 0 12px 0 0 #f1cb50 inset;
   font-family: 'Inter', sans-serif !important;
   background-image: linear-gradient(#edf1f2, #FFF);
   max-width: 450px;
-  padding: 15px;
+}
+.bodyPadding{
+  padding-left: 15px;
+  padding-right: 15px;
 }
 @media (max-width: 550px) {
   body {
@@ -64,6 +64,9 @@ a:hover{
   font-size:18px;
   font-weight: bold;
 }
+.col100px {
+  width: 50px!important;
+}
 
 @keyframes flipdown {
   0% {
@@ -93,11 +96,11 @@ a:hover{
 
 .morphlogo {
   display: block;
-  max-width:100%;
+  max-width:85%;
   max-height:100%;
-  width: 85%;
+  width: 100%;
   height: auto;
-  margin: 20px auto;
+  padding: 8px 0px;
   -moz-user-select: none;
   -webkit-user-select: none;
   user-select: none;
@@ -126,11 +129,17 @@ a:hover{
 .fa-h-margin{margin-right:8px;}
 .fa-compatible{align-self: center;font-size:24px;margin:auto 10px;color:#6c7a89}
 
-
 /* Buttons */
 
-.button-68 {
+.btn{
   width:100%;
+}
+.btn-lg{
+  font-size:16px;
+  font-weight:500;
+  width:100%;
+}
+.btn.btn-primary.index {
   background-color: transparent;
   border-radius: 0px;
   border: none;
@@ -138,107 +147,90 @@ a:hover{
   font-weight: 600;
   padding: 10px 9px;
   margin-top: 0px;
-  font-family: 'Inter', sans-serif;
   font-size: 14px;
   text-align: left;
-  letter-spacing: normal;
   line-height: 1.4em;
   color: #22313f;
-  cursor: pointer;
-  position: relative;
-  text-decoration: none;
   transform: translate3d(0, 0, 0);
   transition: all .3s;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  vertical-align: top;
-  appearance: none;
-  backface-visibility: hidden;
-  box-sizing: border-box;
-  display: inline-block;
-  outline: none;
-  overflow: hidden;
 }
-.button-68:hover {
+.btn.btn-primary.index:hover {
   background-color: #22313f;
   color:#fff;
   opacity: 1;
   border-bottom: 1px solid #22313f;
 }
-.button-68:active {
+.btn.btn-primary.index:active {
   transform: translateY(2px);
   transition-duration: .35s;
 }
-.button-68.ult{border-bottom:none !important;}
-.button-68.half{border-right: 1px dotted #95a5a6;}
+.btn.btn-primary.index.ult{border-bottom:none !important;}
+.btn.btn-primary.index.half{border-right: 1px dotted #95a5a6;}
 
-.button-68.sup {
+.btn.btn-primary.sup {
   padding: 9px 10px;
-  font-size:16px;
+  font-size: 16px;
   text-align: center;
   margin-bottom: 3px;
 }
-.button-68.sup:hover {
+.btn.btn-primary.sup:hover {
   padding: 12px 10px;
 }
-.button-68.sup.yellow {
+.btn.btn-primary.sup.yellow {
   background-color: #FFC107;
   border: 2px solid #FFC107;
   color: #263238;
   border-radius: 10px 10px 0 0;
 }
-.button-68.sup.yellow:hover {
+.btn.btn-primary.sup.yellow:hover {
   background-color: #FFCA2C;
   border-color: #FFCA2C;
 }
-.button-68.blue {
+.btn.btn-primary.sup.blue {
   background-color: #0D6EFD;
   border: 2px solid #0D6EFD;
   color: #fff;
   border-radius: 0 0 10px 10px;
 }
-.button-68.blue:hover{
+.btn.btn-primary.sup.blue:hover{
   background-color:  #0B5ED7;
   border-color:  #0B5ED7;
 }
-
-.button-68.frozen {
-  background-color: #0D6EFD;
-  border: 2px solid #0D6EFD;
-  border-radius: 5px;
-  color: #fff;
-  padding: 10px 8px;
-  letter-spacing: 1px;
-  font-size:16px;
-  font-weight:600;
-  text-align: center;
-}
-.button-68.frozen:hover{
-  background-color: #0B5ED7;
-  border-color: #0B5ED7;
-  color: #fff;
-}
-
-.button-68.sup.tpl {
+.btn.btn-primary.sup.tpl {
   background-color: #6c7a89;
   border: 2px solid #6c7a89;
   color: #fff;
   border-radius: 10px 10px 0 0;
 }
-.button-68.sup.tpl:hover{
+.btn.btn-primary.sup.tpl:hover{
   background-color: #8994a0;
   border-color: #8994a0;
 }
-.button-68.sup.gen {
+.btn.btn-primary.sup.gen {
   background-color: #DC3545;
   border: 2px solid #DC3545;
   color: #fff;
   border-radius: 0 0 10px 10px;
 }
-.button-68.sup.gen:hover{
+.btn.btn-primary.sup.gen:hover{
   background-color: #BB2D3B;
   border-color: #BB2D3B;
+}
+
+.btn.btn-primary.index.navMenu{
+  border: none;
+  border-top: 1px solid #000;
+  padding: 15px 8px 13px 20px;
+  background-color: #f1cb50;
+  font-size: 16px;
+  shadow: none;
+}
+.btn.btn-primary.index.navMenu:hover{
+  padding: 15px 8px 13px 20px;
+  background-color: #22313f;
+  border: none;
+  border-top: 1px solid #22313f;
+  color: #fff;
 }
 
 /* Bootstrap Menu */
@@ -249,7 +241,7 @@ border: none;
 .accordion-item{
   background-color: transparent;
   border: none;
-  border-bottom: 1px dotted #95a5a6 !important;
+  border-bottom: 1px solid #B0BEC5 !important;
 }
 .accordion-item.ultimo{
   border-bottom: none !important;
@@ -259,7 +251,7 @@ border: none;
   color: #95a5a6;
   line-height: 24px;
   font-weight: 700;
-  padding: 15px 0px;
+  padding: 15px 15px;
   background-color: transparent;
 }
 .accordion-button:not(.collapsed) {
@@ -289,7 +281,7 @@ border: none;
   border:none;
 }
 .accordion-body{
-  padding: 0px 0px 25px 0px;
+  padding: 0px 15px 25px 15px;
   color: #22313f;
   font-size: 14px;
   font-weight:500;
@@ -318,13 +310,8 @@ border: none;
   font-weight:500;
   line-height: 16px;
 }
-.btn-lg{
-  font-size:16px;
-  font-weight:500;
-  width:100%;
-}
 .form-label{
-  font-weight:bold;font-size:16px;
+  font-weight:600;font-size:16px;
 }
 .me-auto{
   font-size:1rem;
@@ -333,6 +320,26 @@ border: none;
 .form-control::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
   color: #dadfe1;
   opacity: 1; /* Firefox */
+}
+.form-text{
+  margin-left: 8px;
+}
+
+.navbar-custom {
+  height: auto;
+  background-color: #f1cb50;
+  font-weight: 500;
+
+}
+.nav-tog-cus {
+  height: 32px;
+  border: none;
+  background: none;
+}
+.nav-tog-i-cus {
+  font-size:14px;
+  position: relative;
+  bottom: 1px;
 }
 
 /* Count Animated Bar */
@@ -375,10 +382,10 @@ border: none;
 /* SheetDeleter Styling */
 
 .clsRowOdd{
-  background-color:#fff
+  background-color:#000;
 }
 .clsTable{
-  border:none
+  border:none;
 }
 
 /* Swal Styling */
@@ -395,5 +402,108 @@ border: none;
 .swal-tt{
   text-align: left !important;
 }
+
+.mce-content-body[data-mce-placeholder]::before {
+  color: #dadfe1 !important;
+}
+.mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before {
+  color: #dadfe1 !important;
+}
+
+
+
+
+
+
+
+
+
+.switch {
+  position: relative;
+  display: flex;
+  width: 260px;
+  height: 24px;
+}
+
+.switch input {display:none;}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ca2222;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2ab934;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(235px);
+  -ms-transform: translateX(235px);
+  transform: translateX(235px);
+}
+
+/*------ ADDED CSS ---------*/
+.on
+{
+  display: none;
+}
+
+.on, .off
+{
+  color: white;
+  width: 100%;
+  position: absolute;
+  transform: translate(-50%,-50%);
+  top: 50%;
+  left: 50%;
+  text-align: center;
+  font-size: 10px;
+}
+
+input:checked+ .slider .on
+{display: block;}
+
+input:checked + .slider .off
+{display: none;}
+
+/*--------- END --------*/
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;}
+
+
+
+
+
+
+
 
 </style>

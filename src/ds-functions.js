@@ -117,20 +117,6 @@ function isGreenCell(lastCell) {
 
 // DOCUMENT-STUDIO FUNCTIONS
 
-function isValidHttpUrl(str) {
-  let pattern = new RegExp('^(https?:\\/\\/)?' // protocol
-    + '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' // domain name
-    + '((\\d{1,3}\\.){3}\\d{1,3}))' // OR ip (v4) address
-    + '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' // port and path
-    + '(\\?[;&a-z\\d%_.~+=-]*)?' // query string
-    + '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
-  return !!pattern.test(str);
-}
-
-function isImage(url) {
-  return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
-}
-
 function imageFromTextDocs(body, searchText, image) {
   let next = body.findText(searchText);
   let atts = body.getAttributes();
@@ -222,10 +208,4 @@ function replaceSlideText(slides, replaceText, markerText, copyId) {
   });
 }
 
-function formatDropdown() { // If dropdown options are in a Google Sheet
-  const ss = SpreadsheetApp.getActive();
-  let sh = SpreadsheetApp.getActiveSheet();
-  let ws = ss.getSheetByName('DS OPTIONS') || ss.insertSheet('DS OPTIONS', 1);
 
-  return ws.getRange(2, 1, ws.getLastRow() - 1, 1).getValues();
-}

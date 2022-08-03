@@ -1,61 +1,22 @@
 <html>
 <head>
   <base target="_top">
-
-  <!-- Remember to include jQuery :) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
-
-  <!-- jQuery Modal -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
-
-  <!-- SWAL -->
-  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-  <script src="https://kit.fontawesome.com/a5769575cc.js" crossorigin="anonymous"></script>
-
-  <!-- Project CSS -->
-  <style>
-  ::-webkit-scrollbar {
-    width: 7px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    border-radius: 10px;
-    background: rgba(0,0,0,0.1);
-  }
-  ::-webkit-scrollbar-thumb{
-    border-radius: 10px;
-    background: rgba(0,0,0,0.2);
-  }
-  ::-webkit-scrollbar-thumb:hover{
-    background: rgba(0,0,0,0.25);
-  }
-  ::-webkit-scrollbar-thumb:active{
-    background: rgba(0,0,0,0.3);
-  }
-  </style>
-
+  <?!= HtmlService.createHtmlOutputFromFile('html/helpers/header').getContent(); ?>
   <?!= HtmlService.createHtmlOutputFromFile('html/stylesheet').getContent(); ?>
-  <link rel="stylesheet" href="html/stylesheet.html">
 
 </head>
 
 <body>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<?!= HtmlService.createHtmlOutputFromFile('html/helpers/navbar').getContent(); ?>
 
-  <object data="https://mocarabes.com/wp-content/uploads/morph/MORPH-TOOLS-LOGO.svg" class="morphlogo"> </object>
+<div class="bodyPadding mt-3">
+
   <p>Morph Document Studio te permite crear archivos en masa a partir de plantillas con DOCS y SLIDES.</p>
-
   <div class="d-flex mb-3">
     <object data="https://mocarabes.com/wp-content/uploads/morph/google-sheets-icon.svg" class="docsicons"> </object>
     <i class="fa-solid fa-arrow-right fa-compatible"></i>
@@ -64,149 +25,24 @@
     <i class="fa-solid fa-wand-magic-sparkles fa-compatible"></i>
   </div>
 
+</div>
+
 <div class="accordion" id="accordionExample">
 
-    <div class="accordion-item">
+  <div class="accordion-item">
     <h2 class="accordion-header" id="headingOne">
       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-        Marcadores
+        Inicio
       </button>
     </h2>
     <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
       <div class="accordion-body">
 
-
-
-<div>
-
-<!--<form autocomplete="off">-->
-<form novalidate>
-
-<div id="userform1">
-
-
-<div class="mb-4 pt-3">
-  <label for="template-id-2" class="form-label"><i class="fa-regular fa-note-sticky fa-h-margin"></i>LINK Plantilla</label>
-  <input type="text" class="form-control" id="template-id-2" placeholder="ej: https://docs.google.com/document/d/1Gs4Gd4JtVMrI-nu6ELZtS71kebUU9CN3II2Xz5-Q2F8/edit?usp=sharing" aria-describedby="template-id-2-help" required>
-    <div class="invalid-feedback">
-    Introduce una ID correcta.
-    </div>
-    <div id="template-id-2-help" class="form-text mt-2">El archivo debe tener formato <b>.doc</b> y contener marcadores <b>{{marker}}</b>.</div>
-
-    <div class="form-check form-switch mt-3">
-      <input class="form-check-input" type="checkbox" onchange="document.getElementById('template-id-2').disabled = this.checked" role="switch" id="green-cells-1" >
-      <label class="form-check-label" for="green-cells-1" style="position:relative;top:1px;">Usar celdas verdes</label>
-    </div>
-    <div class="form-check form-switch">
-      <input class="form-check-input" type="checkbox" role="switch" id="purge-markers" >
-      <label class="form-check-label" for="purge-markers" style="position:relative;top:1px;">Purgar marcadores obsoletos</label>
-    </div>
-
-</div>
-
-
-<div class="">
-  <button class="btn btn-primary btn-lg" id="firstButton">Obtener marcadores</button>
-</div>
-
-</div>
-</form>
-</div>
-
-
-<script>
-
-function afterButtonClicked(){
-
-  if(validate()){
-
-    var tplID = document.getElementById("template-id-2");
-    var greenCells1 = document.getElementById("green-cells-1");
-    var purgeMarkers = document.getElementById("purge-markers");
-    var greenCells1Value = greenCells1.checked;
-    var purgeMarkersValue = purgeMarkers.checked;
-    var rowData = {
-      templateID: tplID.value,
-      greenCells1: greenCells1Value,
-      purgeMarkers: purgeMarkersValue
-    };
-
-    if (purgeMarkersValue == true){
-
-      Swal.fire({
-        title: 'Purgar',
-        text: 'Si seleccionas purgar, se eliminarán los datos de las columnas que no correspondan con algún marcador de la plantilla. Confirma para continuar.',
-        icon: 'info',
-        allowOutsideClick: false,
-        showLoaderOnConfirm: true,
-        showDenyButton: false,
-        showCancelButton: true,
-        cancelButtonText: `Cancelar`,
-        confirmButtonText: `Continuar`,
-        confirmButtonColor: '#0D6EFD',
-        }).then((result) => {
-        if (result.isConfirmed) {
-          swaload();
-          google.script.run.withSuccessHandler(e => {swalsuccess(e), afterSubmit(e)}).withFailureHandler(swalerror).getMarkers(rowData);
-        } else if (result.isDenied) {
-          return;
-        }
-        })
-    } else{
-      swaload();
-      google.script.run.withSuccessHandler(e => {swalsuccess(e), afterSubmit(e)}).withFailureHandler(swalerror).getMarkers(rowData);
-    }
-
-  } else{
-    //$("#errorNotification").toast("show");
-  }
-}
-
-function afterSubmit(e){
-  clearFields(["template-id-2", "purge-markers"]);
-  //$("#successNotification").toast("show");
-}
-
-function clearFields(feilds){
-  feilds.forEach(function(feild){
-    var el = document.getElementById(feild);
-    el.value = "";
-  });
-}
-
-function validate(){
-  var fieldsToValidate = document.querySelectorAll("#userform1 input");
-
-  //is-invalid
-
-  Array.prototype.forEach.call(fieldsToValidate, function(el){
-    if (el.checkValidity()){
-      el.classList.remove("is-invalid");
-    } else{
-      el.classList.add("is-invalid");
-    }
-  });
-
-  return Array.prototype.every.call(fieldsToValidate,function(el){
-  return el.checkValidity();
-  });
-
-
-}
-
-document.getElementById("firstButton").addEventListener("click",afterButtonClicked);
-
-
-</script>
-
-
-
-
+        <?!= HtmlService.createHtmlOutputFromFile('html/helpers/form-ds1').getContent(); ?>
 
       </div>
     </div>
   </div>
-
 
   <div class="accordion-item">
     <h2 class="accordion-header" id="headingTwo">
@@ -217,190 +53,218 @@ document.getElementById("firstButton").addEventListener("click",afterButtonClick
     <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
       <div class="accordion-body">
 
+      <?!= HtmlService.createHtmlOutputFromFile('html/helpers/form-ds2').getContent(); ?>
 
-
-
-<div>
-
-<form novalidate>
-
-<div id="userform">
-<div class="mb-3 pt-3">
-  <label for="template-id" class="form-label"><i class="fa-regular fa-note-sticky fa-h-margin"></i>LINK Plantilla</label>
-  <input type="text" class="form-control" id="template-id" placeholder="ej: https://docs.google.com/document/d/1Gs4Gd4JtVMrI-nu6ELZtS71kebUU9CN3II2Xz5-Q2F8/edit?usp=sharing" required>
-      <div class="invalid-feedback">
-      Introduce una ID correcta.
       </div>
-<!--  <div id="help01" class="form-text">La plantilla se rellenará con los campos seleccionados.</div> -->
+    </div>
+  </div>
 
-</div>
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingThree">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+        Enviar e-mails
+      </button>
+    </h2>
+    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
 
-<div class="mb-3">
-  <label for="destination-folder" class="form-label"><i class="fa-regular fa-folder fa-h-margin"></i>LINK Carpeta de destino</label>
-  <input type="text" class="form-control" id="destination-folder" placeholder="ej: https://drive.google.com/drive/folders/1DHirb56iLf-T_n6Idq2MP8f8Ok765JuZ?usp=sharing" aria-describedby="destination-folder-help">
-      <div class="invalid-feedback">
-      Introduce una ID correcta.
+      <?!= HtmlService.createHtmlOutputFromFile('html/helpers/form-ds3').getContent(); ?>
+
       </div>
-      <div id="destination-folder-help" class="form-text mt-2">Si dejas el campo en blanco se creará una carpeta temporal en <b>Mi Unidad</b>.</div>
+    </div>
+  </div>
 
-<div class="form-check form-switch mt-3">
-  <input class="form-check-input" type="checkbox" onchange="document.getElementById('template-id').disabled = this.checked;document.getElementById('destination-folder').disabled = this.checked" role="switch" id="green-cells" >
-  <label class="form-check-label" for="folder-id-switch" style="position:relative;top:1px;">Usar celdas verdes</label>
-</div>
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingFour">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+        Finalizar
+      </button>
+    </h2>
+    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
 
-</div>
+        <?!= HtmlService.createHtmlOutputFromFile('html/helpers/help').getContent(); ?>
 
-<div class="mb-4 mt-4">
-  <label for="file-name" class="form-label"><i class="fa-regular fa-pen-to-square fa-h-margin"></i>Nombre de archivo</label>
-  <input type="text" class="form-control" id="file-name" required>
-      <div class="invalid-feedback">
-      Introduce un nombre válido.
       </div>
-<div id="destination-folder-help" class="form-text mt-2">Puedes añadir cualquiera de los <b>{{marcadores}}</b> disponibles.</div>
+    </div>
+  </div>
 
-<div class="form-check form-switch mt-3">
-  <input class="form-check-input" type="checkbox" role="switch" id="numeration-switch">
-  <label class="form-check-label" for="numeration-switch" style="position:relative;top:1px;">Añadir autonumeración</label>
-</div>
+  <div class="accordion-item ultimo">
+    <h2 class="accordion-header" id="headingFive">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+        Ayuda
+      </button>
+    </h2>
+    <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
 
-</div>
+        <?!= HtmlService.createHtmlOutputFromFile('html/helpers/help').getContent(); ?>
 
-<div class="mb-4">
-<label for="export-select" class="form-label"><i class="fa-solid fa-file-export fa-h-margin"></i>Formato de exportación</label>
-<select class="form-select" id="export-format" >
-  <option value="PDF">PDF</option>
-  <option value="KEEP">Mantener formato</option>
-</select>
-</div>
+      </div>
+    </div>
+  </div>
 
+  </div>
 
-<div class="mb-4">
-<label for="destination-folder" class="form-label"><i class="fa-solid fa-share-from-square fa-h-margin"></i>Permisos de archivo</label>
+<form>
+    <div class="d-flex justify-content-center pt-3 bodyPadding">
+      <button class="btn btn-primary btn-lg" id="mainButton">Crear documentos</button>
+    </div>
 
-<div class="form-check mt-2">
-  <input class="form-check-input" type="radio" name="file_permission" id="permission-1" checked>
-  <label class="form-check-label" style="position:relative !important;top:1px;" for="permission-1">
-    Restringido
-  </label>
-
-</div>
-<div class="form-check">
-  <input class="form-check-input" type="radio" name="file_permission" id="permission-2" >
-  <label class="form-check-label"  for="permission-2">
-    Architecture Meets Engineering SL
-  </label>
-</div>
-
-</div>
-<div class="form-check"style="position:relative !important;bottom:9px;">
-  <input class="form-check-input" type="radio" name="file_permission" id="permission-3" >
-  <label class="form-check-label"  for="permission-3">
-    Cualquier persona con el enlace
-  </label>
-</div>
-</div>
-
-
-
-<div class="d-flex justify-content-center pt-3">
-  <button class="btn btn-primary btn-lg" id="mainButton">Crear documentos</button>
-</div>
-
-</div>
 </form>
+  
+
+
+
+
+<!-- Flexbox container for aligning the toasts -->
+
+<div class="toast-container mt-3">
+
+  <div id="errorNotFunctions" class="toast shadow-sm" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      
+      <strong class="me-auto" style="color:#FF9800">Advertencia</strong>
+      <img src="https://morphestudio.es/wp-content/uploads/2018/10/logo-morph-estudio.png" class="rounded me-2" width="30" heigth="auto">
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      No se ha activado ninguna función de Morph Document Studio.
+    </div>
+  </div>
+
+  <div id="errorNotFields" class="toast shadow-sm" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      
+      <strong class="me-auto" style="color:#FF9800">Advertencia</strong>
+      <img src="https://morphestudio.es/wp-content/uploads/2018/10/logo-morph-estudio.png" class="rounded me-2" width="30" heigth="auto">
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      Revisa todos los campos obligatorios para continuar.
+    </div>
+  </div>
+
 </div>
 
 
-<!--
-<div id ="notifications" class="mt-3">
 
-<div id="errorNotification" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
-  <div class="toast-header">
-    <strong class="me-auto" style="color:#D50000">Error!</strong>
-
-    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-  </div>
-  <div class="toast-body">
-    No se han rellenado todos los campos obligatorios.
-  </div>
-</div>
-
-<div id="successNotification" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
-  <div class="toast-header">
-    <strong class="me-auto" style="color:#7CB342">Perfect!</strong>
-    <small>MORPH</small>
-    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-  </div>
-  <div class="toast-body">
-    Los datos se han enviado correctamente.
-  </div>
-</div>
-
-</div>
-
--->
 
 
 <script>
 
-function afterButtonClicked2(){
+function afterButtonClicked() {
 
-  if(validate2()){
+  var dsActivate = document.getElementById("ds-activate").checked;
+  var emailActivate = document.getElementById("email-activate").checked;
+  var fieldsToValidate;
+
+  if (dsActivate) {
+    fieldsToValidate = document.querySelectorAll("#userform input, #userform2 input, #userform select");
+  } else if (emailActivate) {
+    fieldsToValidate = document.querySelectorAll("#userform3 input, #userform3 select, #userform2 input");
+  }
+
+  if (dsActivate || emailActivate) {
+
+    if(validate(fieldsToValidate)) {
+      
+      var tplID = document.getElementById("template-id");
+      var destFolder = document.getElementById("destination-folder");
+      var fileName = document.getElementById("file-name");
+      var exportFMT = document.getElementById("export-format");
+      var permCheck1 = document.getElementById("permission-1");
+      var permCheck2 = document.getElementById("permission-2");
+      var permCheck3 = document.getElementById("permission-3");
+      var numSwitch = document.getElementById("numeration-switch");
+      var greenCells = document.getElementById("green-cells");
+
+      var emailField = document.getElementById("email-field");
+      var emailSpecific = document.getElementById("email-specific");
+      var emailSender = document.getElementById("email-sender");
+      var emailSubject = document.getElementById("email-subject");
+      var emailBCC = document.getElementById("email-bcc");
+      var emailReplyTo = document.getElementById("email-replyto");
+      var emailMessage = tinymce.activeEditor.getContent();
+      var emailAttach = document.getElementById("email-addblob");
+      var emailAttachField = document.getElementById("email-blob-field");
+
+      var rowData = {
+            dsActivate: dsActivate,
+            emailActivate: emailActivate,
+            greenCells: greenCells.checked,
+            templateID: tplID.value,
+
+            destFolder: destFolder.value,
+            fileName: fileName.value,
+            exportFormat: exportFMT.value,
+            permission1: permCheck1.checked,
+            permission2: permCheck2.checked,
+            permission3: permCheck3.checked,
+            numSwitch: numSwitch.checked,
+
+            emailField: emailField.value,
+            emailSpecific: emailSpecific.value,
+            emailSender: emailSender.value,
+            emailSubject: emailSubject.value,
+            emailBCC: emailBCC.value,
+            emailReplyTo: emailReplyTo.value,
+            emailMessage: emailMessage,
+            emailAttach: emailAttach.checked,
+            emailAttachField: emailAttachField.value,
+          };
+
+      swaload();
+      google.script.run.withSuccessHandler(e => {swalsuccess('Se han generado todos los archivos.'), afterSubmit2(e)}).withFailureHandler(swalerror).documentStudio(rowData);
+
+    } else{ $("#errorNotFields").toast("show"); }
+
+  } else{ $("#errorNotFunctions").toast("show"); }
+
+}
+
+function afterButtonClickedMarkers() {
+
+  var fieldsToValidate = document.querySelectorAll("#userform2 input");
+
+  if(validate(fieldsToValidate)) {
+
     var tplID = document.getElementById("template-id");
-    var destFolder = document.getElementById("destination-folder");
-    var fileName = document.getElementById("file-name");
-    var exportFMT = document.getElementById("export-format");
-    var permCheck1 = document.getElementById("permission-1");
-    var permCheck2 = document.getElementById("permission-2");
-    var permCheck3 = document.getElementById("permission-3");
-    var numSwitch = document.getElementById("numeration-switch");
     var greenCells = document.getElementById("green-cells");
-
-    var permCheck1Value = permCheck1.checked;
-    var permCheck2Value = permCheck2.checked;
-    var permCheck3Value = permCheck3.checked;
-    var numSwitchValue = numSwitch.checked;
-    var greenCellsValue =  greenCells.checked;
+    var purgeMarkers = document.getElementById("purge-markers").checked;
 
     var rowData = {
-          templateID: tplID.value,
-          destFolder: destFolder.value,
-          fileName: fileName.value,
-          exportFormat: exportFMT.value,
-          permission1: permCheck1Value,
-          permission2: permCheck2Value,
-          permission3: permCheck3Value,
-          numSwitch: numSwitchValue,
-          greenCells: greenCellsValue
-        };
+      templateID: tplID.value,
+      greenCells: greenCells.checked,
+      purgeMarkers: purgeMarkers,
+    };
 
+    if (purgeMarkers) {
+      swalConfirm('getMarkers', 'Los marcadores se han actualizado en la hoja.', 'Purgar', 'Si seleccionas purgar, se eliminarán los datos de las columnas que no correspondan con algún marcador de la plantilla. Confirma para continuar.', rowData);
+    } else{
+      swaload();
+      google.script.run.withSuccessHandler(e => {swalsuccess('Los marcadores se han actualizado en la hoja.'), afterSubmit(e)}).withFailureHandler(swalerror).getMarkers(rowData);
+    }
 
-    swaload();
-    google.script.run.withSuccessHandler(e => {swalsuccess2(e), afterSubmit2(e)}).withFailureHandler(swalerror).documentStudio(rowData);
-  } else{
-    //$("#errorNotification").toast("show");
-}
+  } else{ $("#errorNotFields").toast("show"); }
+
 }
 
-function afterSubmit2(e){
-
-  clearFields2(["template-id", "destination-folder", "file-name"]);
+function afterSubmit(e) {
+  clearFields(["template-id", "destination-folder", "file-name"]);
   var exportFMT = document.getElementById("export-format");
   exportFMT.value = "PDF";
   //$("#successNotification").toast("show");
 }
 
-function clearFields2(feilds){
+function clearFields(feilds) {
   feilds.forEach(function(feild){
     var el = document.getElementById(feild);
     el.value = "";
   });
 }
 
-function validate2(){
-  var fieldsToValidate = document.querySelectorAll("#userform input, #userform select");
-
-  //is-invalid
+function validate(fieldsToValidate) {
 
   Array.prototype.forEach.call(fieldsToValidate, function(el){
     if (el.checkValidity()){
@@ -413,226 +277,23 @@ function validate2(){
   return Array.prototype.every.call(fieldsToValidate,function(el){
     return el.checkValidity();
   });
-
-
 }
 
-
-/*
-function afterSidebarLoads(){
-  google.script.run.withSuccessHandler(afterDropDrownArrayReturned).formatDropdown();
-}
-
-function afterDropDrownArrayReturned(arrayOfArrays){
-  var exportFMT = document.getElementById("export-format");
-
-  arrayOfArrays.forEach(function(r){
-    var option = document.createElement("option");
-    option.textContent = r[0];
-    exportFMT.appendChild(option);
-  });
-
-  function removeFadeOut( el, speed ) {
-    var seconds = speed/1000;
-    el.style.transition = "opacity "+seconds+"s ease";
-
-    el.style.opacity = 0;
-    setTimeout(function() {
-        el.parentNode.removeChild(el);
-    }, speed);
-  }
-
-  removeFadeOut(document.getElementById('loading-spin'), 400);
-
-}
-*/
-
-
-document.getElementById("mainButton").addEventListener("click",afterButtonClicked2);
-
-document.addEventListener("DOMContentLoaded", afterSidebarLoads);
-
-  function removeFadeOut( el, speed ) {
-    var seconds = speed/1000;
-    el.style.transition = "opacity "+seconds+"s ease";
-
-    el.style.opacity = 0;
-    setTimeout(function() {
-        el.parentNode.removeChild(el);
-    }, speed);
-  }
-
-function wait(ms){
-   var start = new Date().getTime();
-   var end = start;
-   while(end < start + ms) {
-     end = new Date().getTime();
-  }
-}
-
-function afterSidebarLoads(){
-  setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 50);
-}
-
+document.getElementById("mainButton").addEventListener("click", afterButtonClicked);
+document.getElementById("markerButton").addEventListener("click", afterButtonClickedMarkers);
 
 </script>
 
 
-      </div>
-    </div>
+<script>
 
+  function afterSidebarLoads(){
+    setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 50);
+  }
+</script>
 
-
-
-  <div class="accordion-item ultimo">
-    <h2 class="accordion-header" id="headingFour">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-        Ayuda
-      </button>
-    </h2>
-    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
-      <div class="accordion-body">
-
-      <p>
-        💊 Accede a documentación acerca de las herramientas en la página de <a href="https://sites.google.com/morphestudio.es/morph-pills/gsuite/flujo-de-trabajo-gsuite/gsuite-morph-tools" target="_blank"><b>Morph Pills</b></a>.
-      </p>
-      <p>Si tienes cualquier duda, consulta al departamento I+D.</p>
-      <p><b>esanchez@morphestudio.es</b></p>
-
-
-      </div>
-    </div>
-  </div>
-
-
-
-
-
-  </div>
-
-
-
-
-
-
-
-
-
-  <script>
-    function swalsuccess(e) {
-      Swal.fire({
-        title: '¡Listo!',
-        text: 'Los marcadores se han importado en la hoja.',
-        icon: 'success',
-        confirmButtonColor: '#0D6EFD',
-        confirmButtonText: 'Continuar'
-      });
-    }
-  </script>
-
-  <script>
-    function swalsuccess2(e) {
-      Swal.fire({
-        title: '¡Listo!',
-        text: 'Se han generado todos los archivos.',
-        icon: 'success',
-        confirmButtonColor: '#0D6EFD',
-        confirmButtonText: 'Continuar'
-      });
-    }
-  </script>
-
-  <script>
-    function swalerror(e) {
-      Swal.fire({
-        title: 'Error!',
-        text: 'La función no ha podido ejecutarse.',
-        icon: 'error',
-        confirmButtonColor: '#0D6EFD',
-        confirmButtonText: 'Entendido'
-      });
-    }
-  </script>
-
-  <script>
-    function swalinfo(e) {
-      Swal.fire({
-        title: 'Atención',
-        text: 'Esta función aún está en desarrollo...',
-        icon: 'info',
-        confirmButtonColor: '#0D6EFD',
-        confirmButtonText: 'Continuar'
-      });
-    }
-  </script>
-
-  <script>
-    function swaload() {
-      Swal.fire({
-        template: '#swaloadTemplate',
-        padding: '1.2em 0em 2em 0em',
-        showConfirmButton: false,
-        allowOutsideClick: false,
-      }).then((result) => {
-      if (result.isConfirmed) {
-        return true;
-      } else if (result.isDenied) {
-        return false;
-      }
-      })
-    }
-  </script>
-
-<template id="swaloadTemplate">
-  <swal-title><div class="swal-tt" ><span class="loading">Ejecutando<span></div></swal-title>
-  <swal-html><div class="swal-tt">Por favor, no modifiques ni cierres el documento.</div></swal-html>
-  <swal-html><div class="swal2-watermark">MORPH I+D</div></swal-html>
-
-  <swal-image src="https://raw.githubusercontent.com/Codelessly/FlutterLoadingGIFs/master/packages/cupertino_activity_indicator_selective.gif" width="35%" height="auto" />
-  <swal-param name="allowEscapeKey" value="false" />
-  <swal-param
-    name="customClass"
-    value='{ "popup": "my-popup" }' />
-</template>
-
-<style>
-    .loading::after {
-      display: inline-block;
-      animation: dotty steps(1,end) 2s infinite;
-      content: '';
-      text-align:left !important;
-    }
-
-    @keyframes dotty {
-        0%   { content: ''; }
-        25%  { content: '.'; }
-        50%  { content: '..'; }
-        75%  { content: '...'; }
-        100% { content: ''; }
-    }
-</style>
-
-
-
-<div id="loading-spin" class="loading-spin pt-10">
-  <div class="d-flex justify-content-center">
-    <div >
-      <div class="spinner-border text-dark" style="width:8rem;height:8rem" role="status">
-        <span class="visually-hidden">Cargando...</span>
-      </div>
-      <div class="cargando-spin d-flex justify-content-center">Cargando...</div>
-    </div>
-
-  </div>
-</div>
-
-
-
-
-
-
-
-
+<?!= HtmlService.createHtmlOutputFromFile('html/helpers/swal').getContent(); ?>
+<?!= HtmlService.createHtmlOutputFromFile('html/helpers/footer').getContent(); ?>
 
 
 </body>

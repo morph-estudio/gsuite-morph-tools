@@ -1,0 +1,122 @@
+<script>
+
+function execFunction(fa, sc) {
+          swaload()
+          google.script.run
+          .withSuccessHandler(e => {swalsuccess(sc)})
+          .withFailureHandler(swalerror)
+          [fa]();
+        }
+
+function execDirect(fa) {
+  google.script.run
+  [fa]();
+}
+
+function swalsuccess(e) {
+  e = typeof e !== 'undefined' ? e : 'Función ejecutada correctamente.';
+  Swal.fire({
+    title: '¡Listo!',
+    text: e,
+    icon: 'success',
+    confirmButtonColor: '#0D6EFD',
+    confirmButtonText: 'Continuar'
+  });
+}
+
+function swalerror(e) {
+  Swal.fire({
+    title: 'Error!',
+    text: 'La función no ha podido ejecutarse.',
+    icon: 'error',
+    confirmButtonColor: '#0D6EFD',
+    confirmButtonText: 'Entendido'
+  });
+}
+
+function swalinfo(e) {
+  Swal.fire({
+    title: 'Atención',
+    text: 'Esta función aún está en desarrollo...',
+    icon: 'info',
+    confirmButtonColor: '#0D6EFD',
+    confirmButtonText: 'Continuar'
+  });
+}
+
+function swalConfirm(fa, sc, tl, tx, rw) {
+  Swal.fire({
+    title: tl,
+    text: tx,
+    icon: 'info',
+    allowOutsideClick: false,
+    showLoaderOnConfirm: true,
+    showDenyButton: false,
+    showCancelButton: true,
+    cancelButtonText: `Cancelar`,
+    confirmButtonText: `Continuar`,
+    confirmButtonColor: '#0D6EFD',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      swaload()
+      google.script.run
+      .withSuccessHandler(e => {swalsuccess(sc)})
+      .withFailureHandler(swalerror)
+      [fa](rw);
+    } else if (result.isDenied) {
+      return;
+    }
+  })
+}
+
+</script>
+
+<!-- Swal Loading -->
+
+<script>
+
+  function swaload() {
+    Swal.fire({
+      template: '#swaloadTemplate',
+      padding: '1.2em 0em 2em 0em',
+      showConfirmButton: false,
+      allowOutsideClick: false,
+    }).then((result) => {
+    if (result.isConfirmed) {
+      return true;
+    } else if (result.isDenied) {
+      return false;
+    }
+    })
+  }
+
+</script>
+
+<template id="swaloadTemplate">
+  <swal-title><div class="swal-tt" ><span class="loading">Ejecutando<span></div></swal-title>
+  <swal-html><div class="swal-tt">Por favor, no modifiques ni cierres el documento.</div></swal-html>
+  <swal-html><div class="swal2-watermark">MORPH I+D</div></swal-html>
+
+  <swal-image src="https://raw.githubusercontent.com/Codelessly/FlutterLoadingGIFs/master/packages/cupertino_activity_indicator_selective.gif" width="35%" height="auto" />
+  <swal-param name="allowEscapeKey" value="false" />
+  <swal-param
+    name="customClass"
+    value='{ "popup": "my-popup" }' />
+</template>
+
+<style>
+  .loading::after {
+    display: inline-block;
+    animation: dotty steps(1,end) 2s infinite;
+    content: '';
+    text-align:left !important;
+  }
+  @keyframes dotty {
+      0%   { content: ''; }
+      25%  { content: '.'; }
+      50%  { content: '..'; }
+      75%  { content: '...'; }
+      100% { content: ''; }
+  }
+</style>
+
