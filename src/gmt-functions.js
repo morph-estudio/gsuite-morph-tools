@@ -1,7 +1,3 @@
-function doGet() {
-  return HtmlService.createHtmlOutputFromFile('html/index');
-}
-
 // List files in folder
 
 function linksArchivos(rowData) {
@@ -9,6 +5,8 @@ function linksArchivos(rowData) {
   let sh = ss.getActiveSheet();
   let maxR = sh.getMaxRows();
   let maxC = sh.getMaxColumns();
+
+  sh.getRange(2, 1, 1, 3).setFontWeight('bold');
 
   let formData = [rowData.listFolderID, rowData.useA1];
   let [listFolderID, useA1] = formData;
@@ -33,7 +31,6 @@ function linksArchivos(rowData) {
   }
   let result = [['Filename', 'File URL', 'Type'], ...names.sort()];
   sh.getRange(2, 1, names.length + 1, 3).setValues(result);
-  sh.getRange(2, 1, 1, 3).setFontWeight('bold');
 }
 
 // New Google Sheet
@@ -180,4 +177,31 @@ function merge_Columns() {
   let res = transpose(temp);
   sh.clearContents();
   sh.getRange(1, 1, res.length, res[0].length).setValues(res);
+}
+
+
+
+
+
+function fExportXML() {
+
+  let ss = SpreadsheetApp.getActive();
+  let sh = ss.getActiveSheet();
+  let values = sh.getDataRange().getValues();
+  return '<sheet>' + values.map(function(row, i) {
+    return '<row>' + row.map(function(v) {
+      return '<cell>' + v + '</cell>';
+    }).join('') + '</row>';
+  }).join('') + '</sheet>';
+}
+
+function exportXML() {
+  var content;
+  try {
+    content = fExportXML();
+  } catch(err) {
+    content = '<error>' + (err.message || err) + '</error>';
+  }
+  return ContentService.createTextOutput(content)
+    .setMimeType(ContentService.MimeType.XML).downloadAsFile('Hola');
 }

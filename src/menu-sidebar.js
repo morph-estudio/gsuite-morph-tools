@@ -4,7 +4,6 @@ function onOpen() {
     .addItem('Panel G-Suite Morph Tools', 'loadSidebar1')
     .addItem('Document Studio', 'loadSidebar2')
     .addItem('Gestor de hojas', 'loadSidebar3')
-    .addItem('Email', 'loadSidebar4')
     .addSeparator()
     .addItem('Changelog', 'loadSidebarCL')
     .addToUi();
@@ -26,7 +25,7 @@ function loadSidebar2() {
   ui.showSidebar(hs2);
 }
 function loadSidebar3() {
-  var hs3 = HtmlService.createTemplateFromFile('test/sheetDeleterIndex').evaluate().setTitle(barTitle3);
+  var hs3 = HtmlService.createTemplateFromFile('sheetDeleterIndex').evaluate().setTitle(barTitle3);
   ui.showSidebar(hs3);
 }
 function loadSidebar4() {
@@ -45,6 +44,10 @@ function navBarTitle() {
 }
 
 /**/
+
+function doGet(htmlimport) {
+  return HtmlService.createHtmlOutputFromFile(htmlimport);
+}
 
 let size;
 function cellCounter() {

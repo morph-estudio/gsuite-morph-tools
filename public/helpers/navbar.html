@@ -1,0 +1,63 @@
+<div id="loading-spin" class="spinner-loading pt-10">
+  <div class="d-flex justify-content-center">
+    <div>
+      <div class="spinner-border text-dark spinner-loading-circle" style="width:8rem; height:8rem" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <div class="spinner-loading-text d-flex justify-content-center">Cargando...</div>
+    </div>
+  </div>
+</div>
+
+<nav class="navbar navbar-light navbar-custom">
+  <div class="container-fluid ">
+
+    <img src="https://i.ibb.co/br4Mm9M/gmt-logo.png" class="morphlogo"> 
+    
+    <!-- <svg class="morphlogo d-flex justify-content-center" viewBox="0 0 2387 1422" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+          <g transform="matrix(1,0,0,1,5.05977,-132.486)">
+              <g transform="matrix(2.64412,0,0,2.64412,251.532,1256.75)">
+                  <path d="M0,-78.331L20.051,-78.331L35.945,-36.466L52.775,-78.331L73.033,-78.331L84.876,0L64.514,0L58.8,-45.087L58.593,-45.087L39.789,0L31.686,0L13.713,-45.087L13.505,-45.087L6.96,0L-13.298,0L0,-78.331Z" style="fill-rule:nonzero;"/>
+              </g>
+              <g transform="matrix(2.64412,0,0,2.64412,761.61,1156.77)">
+                  <path d="M0,-2.704C0,10.803 9.973,20.672 22.128,20.672C34.284,20.672 44.256,10.803 44.256,-2.704C44.256,-13.507 34.284,-23.377 22.128,-23.377C9.973,-23.377 0,-13.507 0,-2.704M65.45,-2.807C65.45,22.541 47.269,40.41 22.128,40.41C-3.012,40.41 -21.193,22.541 -21.193,-2.807C-21.193,-26.493 -0.416,-43.114 22.128,-43.114C44.672,-43.114 65.45,-26.493 65.45,-2.807" style="fill-rule:nonzero;"/>
+              </g>
+              <g transform="matrix(2.64412,0,0,2.64412,1230.76,1163.91)">
+                  <path d="M0,-8.107L1.975,-8.107C8.623,-8.107 16.103,-9.353 16.103,-17.871C16.103,-26.389 8.623,-27.636 1.975,-27.636L0,-27.636L0,-8.107ZM44.775,35.112L19.426,35.112L0.208,4.984L0,4.984L0,35.112L-20.362,35.112L-20.362,-43.219L10.076,-43.219C25.556,-43.219 37.296,-35.844 37.296,-19.119C37.296,-8.314 31.271,1.037 20.154,3.009L44.775,35.112Z" style="fill-rule:nonzero;"/>
+              </g>
+              <g transform="matrix(2.64412,0,0,2.64412,1667.5,1161.71)">
+                  <path d="M0,-6.441L3.428,-6.441C10.805,-6.441 18.076,-6.441 18.076,-16C18.076,-25.87 11.324,-25.972 3.428,-25.972L0,-25.972L0,-6.441ZM-20.362,-42.386L10.805,-42.386C27.635,-42.386 39.269,-34.595 39.269,-16.622C39.269,1.87 29.296,9.973 11.531,9.973L0,9.973L0,35.945L-20.362,35.945L-20.362,-42.386Z" style="fill-rule:nonzero;"/>
+              </g>
+              <g transform="matrix(2.64412,0,0,2.64412,2176.76,1176.82)">
+                  <path d="M0,-17.869L0,-48.1L20.362,-48.1L20.362,30.231L0,30.231L0,-1.872L-29.4,-1.872L-29.4,30.231L-49.763,30.231L-49.763,-48.1L-29.4,-48.1L-29.4,-17.869L0,-17.869Z" style="fill-rule:nonzero;"/>
+              </g>
+              <g transform="matrix(2.64412,0,0,2.64412,486.358,479.579)">
+                  <path d="M0,115.147C-59.006,115.835 -109.779,170.654 -143.356,206.343C-151.602,215.106 -159.677,224.02 -167.638,233.043C-171.849,237.815 -176.026,242.617 -180.175,247.442C-181.114,248.534 -182.051,249.627 -182.986,250.722C-183.808,251.683 -186.938,255.647 -185.464,253.594C-183.786,251.254 -182.112,248.91 -180.443,246.564C-165.81,225.984 -151.579,205.145 -137.708,184.044C-110.902,143.269 -87.196,100.615 -60.324,59.878C-48.009,41.209 -18.46,1.494 11.542,12.064C33.691,19.867 57.793,54.44 70.017,70.465C85.88,91.262 102.714,110.462 123.193,127.055C150.876,149.485 172.296,149.057 201.051,128.964C238.168,103.029 281.984,48.09 309.122,13.779C338.222,-23.011 378.82,-79.869 415.861,-110.633C436.935,-128.135 460.191,-140.5 486.801,-122.307C510.062,-106.401 523.876,-84.575 538.967,-62.341C571.171,-14.895 596.893,36.367 629.32,83.688C645.343,107.07 662.879,128.804 682.785,149.03C690.533,156.902 698.545,164.465 706.832,171.766C708.902,173.59 710.987,175.396 713.088,177.183C714.138,178.077 715.191,178.967 716.25,179.852C717.458,180.861 714.937,178.984 714.299,178.52C709.84,175.268 705.472,171.905 701.181,168.433C663.389,137.843 633.599,101.601 604.756,63.196C580.266,30.586 526.612,-50.541 495.767,-78.998C478.334,-95.08 457.52,-108.745 431.622,-99.273C405.95,-89.882 391.459,-71.709 375.592,-51.943C338.245,-5.421 310.813,46.59 280.453,97.189C267.239,119.214 255.225,140.816 233.976,157.333C208.563,177.084 186.657,172.753 159.271,164.516C117.967,152.092 47.178,114.632 0,115.147" style="fill-rule:nonzero;"/>
+              </g>
+              <g transform="matrix(1,0,0,1,428.625,147.441)">
+                  <text x="34.186px" y="1373.25px" style="font-family:'CenturyGothic', 'Century Gothic', sans-serif;font-size:190px;">G<tspan x="218.88px 332.509px 475.918px 537.872px 637.77px 758.636px 830.238px 930.137px 1114.27px 1298.41px 1405.17px " y="1373.25px 1373.25px 1373.25px 1373.25px 1373.25px 1373.25px 1373.25px 1373.25px 1373.25px 1373.25px 1373.25px ">SUITE TOOLS</tspan></text>
+              </g>
+          </g>
+      </svg> -->
+
+    <button class="nav-tog-cus shadow-none align-items-end flex-column" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon nav-tog-i-cus align-items-end flex-column"></span>
+    </button>
+  </div>
+</nav>
+
+<div class="collapse" id="navbarToggleExternalContent">
+  <div class="bg-light">
+    <button class="btn btn-primary index navMenu w-100 shadow-none" onclick="execDirect('loadSidebar1')">Gsuite Morph Tools</button>
+    <button class="btn btn-primary index navMenu w-100 shadow-none" onclick="execDirect('loadSidebar2')">Morph Document Studio</button>
+  </div>
+</div>
+
+<!--
+<script type="text/javascript">
+  function onSuccess(navBarTitle) {
+    document.getElementById('testi').innerHTML = navBarTitle;
+  }
+  google.script.run.withSuccessHandler(onSuccess).navBarTitle();
+  document.getElementById('testi').innerHTML = navBarTitle;
+</script> -->

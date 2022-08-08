@@ -7,14 +7,14 @@
 
   <?!= HtmlService.createHtmlOutputFromFile('html/helpers/header').getContent(); ?>
   <?!= HtmlService.createHtmlOutputFromFile('html/stylesheet').getContent(); ?>
-
+<script src="https://www.tutorialspoint.com/jquery/jquery-3.6.0.js"></script>
 </head>
 
 <body>
 
 <?!= HtmlService.createHtmlOutputFromFile('html/helpers/navbar').getContent(); ?>
 
-<div class="bodyPadding mt-3">
+<div class="body-padding mt-3">
 
   <p>Morph Document Studio te permite crear archivos en masa a partir de plantillas con DOCS y SLIDES.</p>
   <div class="d-flex mb-3">
@@ -83,13 +83,13 @@
     <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
       <div class="accordion-body">
 
-        <?!= HtmlService.createHtmlOutputFromFile('html/helpers/help').getContent(); ?>
+        <?!= HtmlService.createHtmlOutputFromFile('html/helpers/form-ds4').getContent(); ?>
 
       </div>
     </div>
   </div>
 
-  <div class="accordion-item ultimo">
+  <div class="accordion-item last">
     <h2 class="accordion-header" id="headingFive">
       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
         Ayuda
@@ -104,52 +104,7 @@
     </div>
   </div>
 
-  </div>
-
-<form>
-    <div class="d-flex justify-content-center pt-3 bodyPadding">
-      <button class="btn btn-primary btn-lg" id="mainButton">Crear documentos</button>
-    </div>
-
-</form>
-  
-
-
-
-
-<!-- Flexbox container for aligning the toasts -->
-
-<div class="toast-container mt-3">
-
-  <div id="errorNotFunctions" class="toast shadow-sm" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="toast-header">
-      
-      <strong class="me-auto" style="color:#FF9800">Advertencia</strong>
-      <img src="https://morphestudio.es/wp-content/uploads/2018/10/logo-morph-estudio.png" class="rounded me-2" width="30" heigth="auto">
-      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-    </div>
-    <div class="toast-body">
-      No se ha activado ninguna función de Morph Document Studio.
-    </div>
-  </div>
-
-  <div id="errorNotFields" class="toast shadow-sm" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="toast-header">
-      
-      <strong class="me-auto" style="color:#FF9800">Advertencia</strong>
-      <img src="https://morphestudio.es/wp-content/uploads/2018/10/logo-morph-estudio.png" class="rounded me-2" width="30" heigth="auto">
-      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-    </div>
-    <div class="toast-body">
-      Revisa todos los campos obligatorios para continuar.
-    </div>
-  </div>
-
 </div>
-
-
-
-
 
 <script>
 
@@ -160,10 +115,11 @@ function afterButtonClicked() {
   var fieldsToValidate;
 
   if (dsActivate) {
-    fieldsToValidate = document.querySelectorAll("#userform input, #userform2 input, #userform select");
-  } else if (emailActivate) {
-    fieldsToValidate = document.querySelectorAll("#userform3 input, #userform3 select, #userform2 input");
-  }
+    fieldsToValidate = document.querySelectorAll("#userform2 input, #userform select");
+  };
+  if (emailActivate) {
+    fieldsToValidate = document.querySelectorAll("#userform3 input, #userform3 select");
+  };
 
   if (dsActivate || emailActivate) {
 
@@ -189,6 +145,9 @@ function afterButtonClicked() {
       var emailAttach = document.getElementById("email-addblob");
       var emailAttachField = document.getElementById("email-blob-field");
 
+      var allDocuments = document.getElementById("all-documents");
+      var allEmails = document.getElementById("all-emails");
+
       var rowData = {
             dsActivate: dsActivate,
             emailActivate: emailActivate,
@@ -212,14 +171,17 @@ function afterButtonClicked() {
             emailMessage: emailMessage,
             emailAttach: emailAttach.checked,
             emailAttachField: emailAttachField.value,
+
+            allDocuments: allDocuments.checked,
+            allEmails: allEmails.checked,
           };
 
       swaload();
-      google.script.run.withSuccessHandler(e => {swalsuccess('Se han generado todos los archivos.'), afterSubmit2(e)}).withFailureHandler(swalerror).documentStudio(rowData);
+      google.script.run.withSuccessHandler(e => {swalsuccess('El programa se ha ejecutado correctamente.'), afterSubmit2(e)}).withFailureHandler(swalerror).documentStudio(rowData);
 
-    } else{ $("#errorNotFields").toast("show"); }
+    } else{ $('#errorNotFields').toast({delay: 2000}).toast("show");  }
 
-  } else{ $("#errorNotFunctions").toast("show"); }
+  } else{ $('#errorNotFunctions').toast({delay: 2000}).toast("show"); }
 
 }
 
@@ -284,6 +246,19 @@ document.getElementById("markerButton").addEventListener("click", afterButtonCli
 
 </script>
 
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#hideWhenBothSwitchOff').show();
+        $('.hideWhenBothSwitchOff').click(function () {
+            var checks = $("#ds-activate, #email-activate");
+            if (checks.filter(':checked').length == 0) {
+                $('#hideWhenBothSwitchOff').hide();
+            } else {
+                $('#hideWhenBothSwitchOff').show();
+            }
+        });
+    });
+</script>
 
 <script>
 

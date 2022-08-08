@@ -21,5 +21,24 @@ function wait(ms){
 
 </script>
 
+<script>
+      
+    // Select required elements from the DOM
+    const modal = document.querySelector("#modal");
+    const body = document.querySelector("body");
+
+    const showModal = function (e) {
+        modal.classList.toggle("hidden");
+
+        if (!modal.classList.contains("hidden")) {
+            // Disable scroll
+            body.style.overflow = "hidden";
+        } else {
+            // Enable scroll
+            body.style.overflow = "auto";
+        }
+    };
+</script>
+
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>

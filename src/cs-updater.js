@@ -1,29 +1,25 @@
-function doGet() {
-  return HtmlService.createHtmlOutputFromFile('html/index');
-}
-
-/*
+/**
  * Gsuite Morph Tools - CS Updater 1.4
  * Developed by alsanchezromero
  * Created on Mon Jul 25 2022
  *
  * Copyright (c) 2022 Morph Estudio
-*/
+ */
 
-function actualizarCuadro() {
+function actualizarCuadro(btnID) {
   const ss = SpreadsheetApp.getActive();
-  let ws = ss.getSheetByName('ACTUALIZAR') || ss.insertSheet('ACTUALIZAR', 1);
+  let sh = ss.getSheetByName('ACTUALIZAR') || ss.insertSheet('ACTUALIZAR', 1);
   let ss_id = ss.getId();
-
-  /* TESTvar ss = SpreadsheetApp.openById('1v5f3X1ShmVCGdT6NdWvmJHcfeP01ptuwHfT1iqM6UQI');
-  var ws = ss.getSheetByName('ACTUALIZAR')
-  let ss_id = '1v5f3X1ShmVCGdT6NdWvmJHcfeP01ptuwHfT1iqM6UQI';*/
+  let userMail = Session.getActiveUser().getEmail();
+  const dateNow = Utilities.formatDate(new Date(), 'GMT+1', 'yyyyMMdd');
 
   let file = DriveApp.getFileById(ss_id);
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
 
-  ws.clear().clearFormats();
-  sheetFormatter(ws); // Formato de celdas
+  if (btnID === 'csUpdater') {
+    sh.clear().clearFormats();
+    sheetFormatter(sh); // Formato de celdas
+  }
 
   // Carpeta Cuadro de Superficies
 
@@ -33,58 +29,23 @@ function actualizarCuadro() {
 
   // Panel de control
 
-  let fldrA = [];
-  parents = file.getParents();
-  while (parents.hasNext()) {
-    let f = parents.next();
-    let f_id = f.getId();
-    fldrA.push(f_id);
-    parents = f.getParents();
-  };
+  let filA = getControlPanel(sh, file, btnID);
+  let [filePanelName, filePanelId, filePanelUrl, folderPanelcId] = filA; Logger.log(filA); Logger.log(filePanelId,);
+  Logger.log('manualfolderid: ' + folderPanelcId + 'id: ' + filePanelId);
 
-  let filA = [];
-  let pcMask = 'Panel de control';
-  for (let i = 0; i < fldrA.length; i++) {
-    let files = DriveApp.getFolderById(fldrA[i]).getFilesByType(MimeType.GOOGLE_SHEETS);
-    while (files.hasNext()) {
-      let filePC = files.next();
-      if (filePC.getName().includes(pcMask)) {
-        filA.push([filePC.getName()], [filePC.getId()], [filePC.getUrl()], [fldrA[i]]);
-      }
-    }
-  }
-
-  let [filePanelName, filePanelId, filePanelUrl, folderPanelcId] = filA;
   let panelControl = DriveApp.getFileById(filePanelId);
   let folderPanelcName = DriveApp.getFolderById(folderPanelcId);
-
   panelControl.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
 
   // Set Template Values
 
-  tplText(ws);
+  tplText(sh);
 
-  ws.getRange('B1').setValue(filePanelUrl);
-  ws.getRange('B3').setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${carpetaBaseID}";"${carpetaBase}")`).setFontColor('#4A86E8');
-  ws.getRange('B4').setValue(carpetaBaseID);
-  ws.getRange('B5').setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${folderPanelcId}";"${folderPanelcName}")`).setFontColor('#4A86E8');
-  ws.getRange('B6').setValue(folderPanelcId);
-
-  /**/
-  /* Versión obsoleta del buscador
-  var searchFor ='title contains "Panel"';
-  var names =[];
-  var filePanelIds=[];
-  var filesPanel = folderPanelcName.searchFiles(searchFor);
-    while (filesPanel.hasNext()) {
-  var filePanel = filesPanel.next();
-  var filePanelId = filePanel.getId();// To get FileId of the file
-  filePanelIds.push(filePanelId);
-  var filePanelname = filePanel.getName();
-  var filePanelUrl = filePanel.getUrl();
-  names.push(filePanelname);
-  }
-  */
+  sh.getRange('B1').setValue(filePanelUrl);
+  sh.getRange('B3').setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${carpetaBaseID}";"${carpetaBase}")`).setFontColor('#4A86E8');
+  sh.getRange('B4').setValue(carpetaBaseID);
+  sh.getRange('B5').setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${folderPanelcId}";"${folderPanelcName}")`).setFontColor('#4A86E8');
+  sh.getRange('B6').setValue(folderPanelcId);
 
   // ImportRange Permission
 
@@ -93,51 +54,72 @@ function actualizarCuadro() {
   importRangeToken(ss_id, carpetaBaseID);
   importRangeToken(ss_id, sectoresID);
 
-  ws.getRange('C1').setValue('=IMPORTRANGE(B1;"Instrucciones!A1")');
-  ws.getRange('D1').setValue('=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1CuMcYrtT6NXwxa9fMEIOTgRfkPySnNwKvA_1dyarCro";"DB-SI!B2")');
+  sh.getRange('C1').setValue('=IMPORTRANGE(B1;"Instrucciones!A1")');
+  sh.getRange('D1').setValue('=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1CuMcYrtT6NXwxa9fMEIOTgRfkPySnNwKvA_1dyarCro";"DB-SI!B2")');
 
   Utilities.sleep(250);
 
   // Localizar archivos TXT exportados
 
-  let rangeClear = ws.getRange(3, 3, 6, 2);
-  rangeClear.clearContent().clearFormat();
-
-  let searchFor = 'title contains "Exportaciones"';
-  let names =[];
-  let expFolderIds=[];
-  let expFolder = carpetaBase.searchFolders(searchFor);
-  let expFolderDef; let expFolderId; let expFolderName;
-  while (expFolder.hasNext()) {
-    expFolderDef = expFolder.next();
-    expFolderId = expFolderDef.getId();
-    expFolderIds.push(expFolderId);
-    expFolderName = expFolderDef.getName();
-    names.push(expFolderName);
-  }
-
-  let sufix = 'TXT'; // mask
   let list = [];
-  let files = expFolderDef.getFiles();
-  while (files.hasNext()) {
-    file = files.next();
-    list.push([file.getName(), file.getId(), file.getName().slice(0, -4).replace('Sheets ', '').toUpperCase()]);
+
+  if (btnID === 'csUpdater') {
+    Logger.log('fileslistauto: ');
+    let rangeClear = sh.getRange(3, 3, 6, 2);
+    rangeClear.clearContent().clearFormat();
+
+    let searchFor = 'title contains "Exportaciones"';
+    let names =[];
+    let expFolderIds=[];
+    let expFolder = carpetaBase.searchFolders(searchFor);
+    let expFolderDef; let expFolderId; let expFolderName;
+    while (expFolder.hasNext()) {
+      expFolderDef = expFolder.next();
+      expFolderId = expFolderDef.getId();
+      expFolderIds.push(expFolderId);
+      expFolderName = expFolderDef.getName();
+      names.push(expFolderName);
+    }
+
+    let sufix = 'TXT'; // mask
+    let files = expFolderDef.getFiles();
+    while (files.hasNext()) {
+      file = files.next();
+      list.push([file.getName(), file.getId(), file.getName().slice(0, -4).replace('Sheets ', '').toUpperCase()]);
+    }
+
+    let result = [['Archivos exportados', 'IDs', 'Hoja'], ...list.filter((r) => r[0].includes(sufix)).sort()];
+    let resultCrop = result.map((val) => val.slice(0, -1));
+    sh.getRange(2, 3, result.length, 2).setValues(resultCrop);
+
+    // Filelist Styling
+
+    sh.getRange(3, 3, list.length, 1).setBorder(true, true, true, true, true, true, '#CCCCCC', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+      .setFontColor('#B7B7B7').setFontWeight('bold');
+    sh.getRange(3, 4, list.length, 1).setBorder(true, true, true, true, true, true, '#CCCCCC', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+      .setFontColor('#B7B7B7').setBackground('#F3F3F3');
+    sh.getRange(3, 3, list.length, 2).setFontSize(13).setFontFamily('Montserrat').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
+      .setVerticalAlignment('middle');
+
+  } else if (btnID === 'csManual2') {
+    Logger.log('fileslistmanual: ');
+    let txtFileId_FT = sh.getRange(3, 4).getValue();
+    let txtFile_FT = DriveApp.getFileById(txtFileId_FT);
+    let txtFileId_SP = sh.getRange(4, 4).getValue();
+    let txtFile_SP = DriveApp.getFileById(txtFileId_SP);
+    let txtFileId_VN = sh.getRange(5, 4).getValue();
+    let txtFile_VN = DriveApp.getFileById(txtFileId_VN);
+    let files = [txtFile_FT, txtFile_SP, txtFile_VN];
+
+    txtFile_FT.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    txtFile_SP.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    txtFile_VN.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+    files.forEach((file) => {
+      list.push([file.getName(), file.getId(), file.getName().slice(0, -4).replace('Sheets ', '').toUpperCase()]);
+    });
+
   }
-
-  let result = [['Archivos exportados', 'IDs', 'Hoja'], ...list.filter((r) => r[0].includes(sufix)).sort()];
-  let resultCrop = result.map((val) => val.slice(0, -1));
-  ws.getRange(2, 3, result.length, 2).setValues(resultCrop);
-
-  // Filelist Styling
-
-  ws.getRange(3, 3, list.length, 1).setBorder(true, true, true, true, true, true, '#CCCCCC', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-    .setFontColor('#B7B7B7').setFontWeight('bold');
-  ws.getRange(3, 4, list.length, 1).setBorder(true, true, true, true, true, true, '#CCCCCC', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-    .setFontColor('#B7B7B7').setBackground('#F3F3F3');
-  ws.getRange(3, 3, list.length, 2).setFontSize(13).setFontFamily('Montserrat').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
-    .setVerticalAlignment('middle');
-
-  Utilities.sleep(100);
 
   // Copy data in Sheets
 
@@ -148,66 +130,96 @@ function actualizarCuadro() {
     let tsvContent = UrlFetchApp.fetch(tsvUrl, {muteHttpExceptions: true }).getContentText();
     let tsvData = Utilities.parseCsv(tsvContent, '\t');
     let sheetPaste = ss.getSheetByName(`${txtFileSheet}`) || ss.insertSheet(`${txtFileSheet}`, 100);
-    ws.activate();
+    sh.activate();
     sheetPaste.setTabColor('F1C232').hideSheet();
     sheetPaste.clear();
     sheetPaste.getRange(1, 1, tsvData.length, tsvData[0].length).setValues(tsvData);
   };
+
+  sh.getRange(2, 3).setNote(null).setNote(`Última actualización: ${dateNow} por ${userMail}.`); // Last Update Note
 }
 
-function tplText(ws) {
-  ws.getRange('A1').setValue('URL PANEL DE CONTROL');
-  ws.getRange('B2').setValue('Carpetas referentes');
-  ws.getRange('A3').setValue('CARPETA CUADRO SUP.');
-  ws.getRange('A4').setValue('ID CARPETA CUADRO SUP.');
-  ws.getRange('A5').setValue('CARPETA PANEL DE CONTROL');
-  ws.getRange('A6').setValue('ID CARPETA PANEL DE CONTROL');
-  ws.getRange('A7').setValue('CARPETA BACKUP');
-  ws.getRange('A8').setValue('ID CARPETA BACKUP');
-  ws.getRange('A9').setValue('DESCARGAR ARCHIVO XLSX');
+function getControlPanel(sh, file, btnID) {
+  let filA = [];
+
+  if (btnID === 'csUpdater') {
+    let parents = file.getParents();
+    let fldrA = [];
+    while (parents.hasNext()) {
+      let f = parents.next();
+      let f_id = f.getId();
+      fldrA.push(f_id);
+      parents = f.getParents();
+    };
+
+    let pcMask = 'Panel de control';
+    for (let i = 0; i < fldrA.length; i++) {
+      let files = DriveApp.getFolderById(fldrA[i]).getFilesByType(MimeType.GOOGLE_SHEETS);
+      while (files.hasNext()) {
+        let filePC = files.next();
+        if (filePC.getName().includes(pcMask)) {
+          filA.push(filePC.getName(), filePC.getId(), filePC.getUrl(), fldrA[i]);
+        }
+      }
+    }
+    Logger.log('brutas: ' + filePanelId)
+  } else if (btnID === 'csManual2') {
+    filePanelUrl = sh.getRange(1, 2).getValue();
+    filePanelId = getIdFromUrl(filePanelUrl);
+    filePC = DriveApp.getFileById(filePanelId);
+    filA.push(filePC.getName(), filePanelId, filePanelUrl, filePC.getParents().next().getId());
+    Logger.log('frutas: ' + filePanelId);
+  }
+  return filA;
 }
 
-function sheetFormatter(ws) {
+function tplText(sh) {
+  sh.getRange('A1').setValue('URL PANEL DE CONTROL');
+  sh.getRange('B2').setValue('Carpetas referentes');
+  sh.getRange('A3').setValue('CARPETA CUADRO SUP.');
+  sh.getRange('A4').setValue('ID CARPETA CUADRO SUP.');
+  sh.getRange('A5').setValue('CARPETA PANEL DE CONTROL');
+  sh.getRange('A6').setValue('ID CARPETA PANEL DE CONTROL');
+  sh.getRange('A7').setValue('CARPETA BACKUP');
+  sh.getRange('A8').setValue('ID CARPETA BACKUP');
+  sh.getRange('A9').setValue('DESCARGAR ARCHIVO XLSX');
+}
+
+function sheetFormatter(sh) {
   // Estilo global
-  ws.getRange(1, 1, ws.getMaxRows(), ws.getMaxColumns()).setFontSize(13).setFontFamily('Montserrat').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
+  sh.getRange(1, 1, sh.getMaxRows(), sh.getMaxColumns()).setFontSize(13).setFontFamily('Montserrat').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
     .setVerticalAlignment('middle')
     .setFontColor('#B7B7B7');
   // Col A
-  ws.getRange(1, 1, 9, 1).setBorder(true, true, true, true, true, true, '#CCCCCC', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontWeight('bold');
+  sh.getRange(1, 1, 9, 1).setBorder(true, true, true, true, true, true, '#CCCCCC', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontWeight('bold');
   // Row 2
-  ws.getRange(2, 1, 1, 4).setFontFamily('Inconsolata').setFontSize(16).setBorder(true, true, true, true, true, true, '#CCCCCC', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+  sh.getRange(2, 1, 1, 4).setFontFamily('Inconsolata').setFontSize(16).setBorder(true, true, true, true, true, true, '#CCCCCC', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
     .setFontColor('#999999')
     .setFontWeight('bold')
     .setHorizontalAlignment('center');
   // Col B
-  ws.getRange(3, 2, 7, 1).setBackground('#F3F3F3').setBorder(true, true, true, true, true, true, '#CCCCCC', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+  sh.getRange(3, 2, 7, 1).setBackground('#F3F3F3').setBorder(true, true, true, true, true, true, '#CCCCCC', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
   // ImportRanges
-  ws.getRange(1, 3, 1, 2).setBackground('#EAD1DC').setBorder(true, true, true, true, true, true, '#A64D79', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontColor('#A64D79')
+  sh.getRange(1, 3, 1, 2).setBackground('#EAD1DC').setBorder(true, true, true, true, true, true, '#A64D79', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontColor('#A64D79')
     .setFontWeight('bold')
     .setHorizontalAlignment('center');
   // Control Panel
-  ws.getRange('B1').setBackground('#D9EAD3').setBorder(true, true, true, true, true, true, '#6AA886', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+  sh.getRange('B1').setBackground('#D9EAD3').setBorder(true, true, true, true, true, true, '#6AA886', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
     .setFontColor('#6AA886')
     .setFontWeight('bold');
   // Folders Bold
-  let rangeListBold = ws.getRangeList(['B3', 'B5', 'B7', 'B9']);
-  rangeListBold.setFontWeight('bold');
-  /*
-  ws.getRange('B3').setFontWeight('bold');
-  ws.getRange('B5').setFontWeight('bold');
-  ws.getRange('B7').setFontWeight('bold');
-  ws.getRange('B9').setFontWeight('bold');*/
+  sh.getRangeList(['B3', 'B5', 'B7', 'B9']).setFontWeight('bold');
   // Column/Row Size
-  ws.setColumnWidth(1, 330);
-  ws.setColumnWidth(2, 380);
-  ws.setColumnWidth(3, 285);
-  ws.setColumnWidth(4, 400);
+  sh.setColumnWidth(1, 330);
+  sh.setColumnWidth(2, 380);
+  sh.setColumnWidth(3, 285);
+  sh.setColumnWidth(4, 400);
 
-  let maxRows = ws.getMaxRows();
-  for (let i = 1; i < maxRows + 1; i++) {
-    ws.setRowHeight(i, 27);
+  let maxRosh = sh.getMaxRows();
+  for (let i = 1; i < maxRosh + 1; i++) {
+    sh.setRowHeight(i, 27);
   }
-  ws.setRowHeight(2, 50);
+  sh.setRowHeight(2, 50);
 }
 
 function importRangeToken(ss_id, tokenID) { // TokenID is the ID of destination Google Sheet
@@ -222,4 +234,39 @@ function importRangeToken(ss_id, tokenID) { // TokenID is the ID of destination 
   };
 
   UrlFetchApp.fetch(url, params);
+}
+
+function manualUpdaterTemplate() {
+  const ss = SpreadsheetApp.getActive();
+  let sh = ss.getSheetByName('ACTUALIZAR') || ss.insertSheet('ACTUALIZAR', 1);
+
+  sh.clear().clearFormats();
+  tplText(sh);
+
+  sh.getRange('C2').setValue('Archivos exportados');
+  sh.getRange('D2').setValue('IDs');
+  sh.getRange('C3').setValue('TXT Sheets Falsos techos.txt');
+  sh.getRange('C4').setValue('TXT Sheets Superficies.txt');
+  sh.getRange('C5').setValue('TXT Sheets Ventanas.txt');
+
+  sheetFormatter(sh); // Formato de celdas
+
+  // Control Panel
+  sh.getRange('B1').setBackground('#FFF2CC').setBorder(true, true, true, true, true, true, '#BF9000', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+    .setFontColor('#BF9000')
+    .setFontWeight('bold');
+  sh.getRange('B8').setBackground('#FFF2CC').setBorder(true, true, true, true, true, true, '#BF9000', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+    .setFontColor('#BF9000');
+  // Filelist Style
+  sh.getRange(3, 3, 3, 2).setFontSize(13).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP).setFontColor('#B7B7B7');
+  sh.getRange(3, 3, 3, 1).setBorder(true, true, true, true, true, true, '#CCCCCC', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontColor('#B7B7B7').setFontWeight('bold');
+  sh.getRange(3, 4, 3, 1).setBackground('#FFF2CC').setBorder(true, true, true, true, true, true, '#BF9000', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+    .setFontColor('#BF9000');
+  // ImportRange Cells
+  sh.getRange('C1').setValue('=IMPORTRANGE(B1;"Instrucciones!A1")');
+  sh.getRange('D1').setValue('=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1CuMcYrtT6NXwxa9fMEIOTgRfkPySnNwKvA_1dyarCro";"DB-SI!B2")');
+
+  deleteEmptyRows();
+  removeEmptyColumns();
+  sh.activate();
 }

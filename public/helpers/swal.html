@@ -56,6 +56,9 @@ function swalConfirm(fa, sc, tl, tx, rw) {
     cancelButtonText: `Cancelar`,
     confirmButtonText: `Continuar`,
     confirmButtonColor: '#0D6EFD',
+    customClass: {
+      popup: 'swal-container',
+    }
   }).then((result) => {
     if (result.isConfirmed) {
       swaload()

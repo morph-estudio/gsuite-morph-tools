@@ -1,7 +1,7 @@
 <form novalidate>
 
   <div id="userform3">
-    <div class="mb-2 pt-3">
+    <div class="mb-2">
 
       <label for="list-files" class="form-label"><i class="fa-regular fa-folder fa-h-margin"></i>LINK/ID de la carpeta</label>
       <input type="text" class="form-control" id="list-files" placeholder="ej: https://drive.google.com/drive/folders/1DHirb56iLf-T_n6Idq2MP8f8Ok765JuZ?usp=sharing" aria-describedby="template-id-2-help" required>
@@ -12,17 +12,14 @@
 
       <div class="form-check form-switch mt-3">
         <input class="form-check-input" type="checkbox" onchange="document.getElementById('list-files').disabled = this.checked" role="switch" id="use-a1" >
-        <label class="form-check-label" for="use-a1" style="position:relative;top:1px;">Usar celda A1</label>
+        <label class="form-check-label" for="use-a1">Usar celda A1</label>
       </div>
 
-      <div class="">
         <button class="btn btn-primary btn-lg mt-3" id="listButton">Listar archivos</button>
-      </div>
 
     </div>
   </div>
 </form>
-
 
 <script>
 

@@ -1,0 +1,125 @@
+<div>
+
+<!--<form autocomplete="off">-->
+  <form novalidate>
+
+    <div id="userform3">
+
+      <div class="hideWhenBothSwitchOff">
+        <label class="switch mt-2">
+        <input class="form-check-input" type="checkbox" role="switch" id="email-activate" data-bs-toggle='collapse' data-bs-target='#emailForm, #all-emails-div' aria-expanded="false">
+        <div class="slider round">
+          <span class="on">ACTIVADO</span>
+          <span class="off">DESACTIVADO</span>
+        </div>
+        </label>
+      </div>
+
+        <div id="emailForm" aria-expanded="false" class="collapse">
+
+          <!-- Basic fields -->
+
+          <select id="email-field" class="form-select shadow-none mt-4" aria-describedby="email-field-help">
+            <option selected>Selecciona campo email</option>
+          </select>
+            <div id="email-field-help" class="form-text mt-2">Selecciona la columna donde se encuentran las direcciones email.</div>
+
+          <label for="email-specific" class="form-label mt-3">CC (enviar copias del email)</label>
+          <input type="text" class="form-control shadow-none" id="email-specific" placeholder="ej: gestoria@morphestudio.es" aria-describedby="email-specific-help">
+            <div id="email-specific-help" class="form-text mt-2">Para enviar copias a varias personas separa los emails con comas.</div>
+            <div class="invalid-feedback">Introduce un email correcto.</div>
+
+          <label for="email-sender" class="form-label mt-3">Nombre del remitente</label>
+          <input type="text" class="form-control shadow-none" id="email-sender" placeholder="ej: Érika Sánchez">
+            <div class="invalid-feedback">El nombre no tiene un formato válido.</div>
+
+          <label for="email-subject" class="form-label mt-3">Asunto</label>
+          <input type="text" class="form-control shadow-none" id="email-subject">
+            <div class="invalid-feedback">El asunto no tiene un formato válido.</div>
+
+          <!-- More fields -->
+
+          <div class="form-check form-switch mt-3 mb-1">
+            <label class="form-check-label" for="email-more" data-bs-toggle='collapse' data-bs-target='#emailMore' aria-expanded="false" aria-controls="emailMore">Rellenar otros campos</label>
+            <input class="form-check-input" type="checkbox" role="switch" id="email-more" >
+          </div>
+
+          <div id="emailMore" aria-expanded="false" class="collapse in">
+
+            <label for="email-bcc" class="form-label mt-3">BCC (copias ocultas)</label>
+            <input type="text" class="form-control shadow-none" id="email-bcc" aria-describedby="email-bcc-help">
+              <div id="email-bcc-help" class="form-text mt-2">Blind Carbon Copy (BCC) es una copia que se envía a destinatarios ocultos.</div>
+              <div class="invalid-feedback">Introduce una ID correcta.</div>
+
+            <label for="email-replyto" class="form-label mt-3">Reply-to Address</label>
+            <input type="text" class="form-control shadow-none" id="email-replyto" aria-describedby="email-replyto-help">
+              <div id="email-replyto-help" class="form-text mt-2">Correo personalizado al que responderán los destinatarios.</div>
+              <div class="invalid-feedback">Introduce una ID correcta.</div>
+
+          </div>
+
+          <!-- Tinymce -->
+
+          <div class="mb-4">
+            <!--Bootstrap classes arrange web page components into columns and rows in a grid -->
+            <div class="row justify-content-md-center">
+              <label for="editor" class="form-label mt-3">Mensaje</label>
+              <div class="col-md-12 col-lg-8">
+                  <div class="form-group">
+                      <textarea id="editor" type="textarea#editor" ></textarea>
+                  </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add Attachment -->
+
+          <div class="form-check form-switch mt-3">
+            <input class="form-check-input" type="checkbox" role="switch" id="email-addblob" data-bs-toggle='collapse' data-bs-target='#emailBlob' aria-controls="emailBlob" checked>
+            <label class="form-check-label" for="email-addblob">Añadir documento adjunto</label>
+          </div>
+
+          <div id="emailBlob" class="collapse show" >
+
+            <select id="email-blob-field" class="form-select shadow-none mt-3" aria-describedby="email-blob-field-help">
+              <option value="default" selected>Selecciona campo adjuntos</option>
+            </select>
+            <div id="email-blob-field-help" class="form-text mt-2">Selecciona la columna donde se encuentran las URL de archivos.</div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </form>
+
+</div>
+
+<!-- Form Scripts -->
+
+<script>
+
+  function afterSidebarLoads(){
+    google.script.run.withSuccessHandler(afterDropDrownArrayReturned).emailDropdown();
+  }
+
+  function addDropdownElements(arrayOfArrays, field) {
+    arrayOfArrays.forEach(function(r){
+      var option = document.createElement("option");
+      option.textContent = r[0];
+      field.appendChild(option);
+    });
+  }
+
+  function afterDropDrownArrayReturned(arrayOfArrays){
+    var emailField = document.getElementById("email-field");
+    addDropdownElements(arrayOfArrays, emailField)
+    var emailBlobField = document.getElementById("email-blob-field");
+    addDropdownElements(arrayOfArrays, emailBlobField);
+
+    //document.querySelector("#email-blob-field").selectedIndex = document.querySelector("#email-blob-field").length - 1;
+  }
+
+  document.addEventListener("DOMContentLoaded", afterSidebarLoads);
+
+</script>

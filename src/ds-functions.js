@@ -1,7 +1,3 @@
-function doGet() {
-  return HtmlService.createHtmlOutputFromFile('html/document-studio');
-}
-
 // GET-MARKERS FUNCTIONS
 
 function getDocItems(docID, identifier) {
@@ -78,11 +74,7 @@ function getSlidesItems(docID, identifier) {
   return [...new Set(docList)];
 }
 
-function columnRemover(sh, updatedValues, numberOfGreenCells) {
-  let lastColHeaders = sh.getLastColumn() - numberOfGreenCells;
-  let headerRange = sh.getRange(1, 1, 1, lastColHeaders);
-  let headerValues = headerRange.getValues()[0];
-
+function columnRemover(sh, updatedValues, headerValues) {
   let deleteColumn = [];
   headerValues.forEach((a, index) => {
     let i = updatedValues.indexOf(a);
@@ -92,7 +84,7 @@ function columnRemover(sh, updatedValues, numberOfGreenCells) {
   });
 
   let lastColmn;
-  for (let j = lastColHeaders; j > 0; j--) {
+  for (let j = headerValues.length; j > 0; j--) {
     if (deleteColumn.indexOf(j) === -1) {
     } else {
       lastColmn = sh.getLastColumn();
@@ -115,7 +107,99 @@ function isGreenCell(lastCell) {
   return false;
 }
 
+function getInternallyMarkers(docID) {
+  let identifier = {
+    start: '{{',
+    start_include: true,
+    end: '}}',
+    end_include: true,
+  };
+
+  let gDocTemplate = DriveApp.getFileById(docID);
+  let fileType = gDocTemplate.getMimeType();
+  let docMarkers;
+
+  switch (fileType) {
+    case MimeType.GOOGLE_DOCS:
+      docMarkers = getDocItems(docID, identifier);
+      break;
+    case MimeType.GOOGLE_SLIDES:
+      docMarkers = getSlidesItems(docID, identifier);
+      break;
+    default:
+  }
+
+  let dataReturn = {
+    docMarkers,
+    gDocTemplate,
+    fileType,
+  };
+  return dataReturn;
+}
+
 // DOCUMENT-STUDIO FUNCTIONS
+
+function getGreenColumns(sh, filenameField, fileurlField) {
+  if (sh.getLastColumn() === 0) {
+    addGreenColumn(sh, '[DS] Files', 'Celdas verdes: para usar la opción "usar celdas verdes" debes introducir en esta casilla una nota con la URL de la plantilla.');
+    var indexNameCell = fieldIndex(sh, filenameField);
+    sh.setColumnWidth(indexNameCell + 1, 300);
+  };
+
+  let dropdownValues = flatten(emailDropdown());
+
+  if (dropdownValues.indexOf(filenameField) > -1) {
+    var indexNameCell = fieldIndex(sh, filenameField);
+  } else {
+    addGreenColumn(sh, '[DS] Files', 'Celdas verdes: para usar la opción "usar celdas verdes" debes introducir en esta casilla una nota con la URL de la plantilla.');
+    var indexNameCell = fieldIndex(sh, filenameField);
+    sh.setColumnWidth(indexNameCell + 1, 300);
+  }
+  if (dropdownValues.indexOf(fileurlField) > -1) {
+    var indexUrlCell = fieldIndex(sh, fileurlField);
+  } else {
+    addGreenColumn(sh, '[DS] File-links', 'Celdas verdes: para usar la opción "usar celdas verdes" debes introducir en esta casilla una nota con la URL de la carpeta de destino.');
+    var indexUrlCell = fieldIndex(sh, fileurlField);
+    sh.setColumnWidth(indexUrlCell + 1, 300);
+  }
+
+  let dataReturn = {
+    indexNameCell,
+    indexUrlCell,
+  };
+  return dataReturn;
+}
+
+function addGreenColumn(sh, headerTitle, cellNote) {
+  let lastColmn = sh.getLastColumn();
+
+  if (lastColmn === 0) {
+  sh.insertColumns(1);
+  sh.getRange(1, lastColmn + 1).setBackground('#ECFDF5').setFontColor('#34a853').setValue(headerTitle)
+    .setNote(cellNote);
+  } else {
+  sh.insertColumnAfter(lastColmn);
+  sh.getRange(1, lastColmn + 1).setBackground('#ECFDF5').setFontColor('#34a853').setValue(headerTitle)
+    .setNote(cellNote);
+  }
+
+}
+
+function emailDropdown() { // If dropdown options are in a Google Sheet
+  let sh = SpreadsheetApp.getActive().getActiveSheet();
+  let dropdownValues = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues(); 
+  dropdownValues = transpose(dropdownValues);
+  return dropdownValues;
+}
+
+function fieldIndex(sh, fieldName) {
+  SpreadsheetApp.flush();
+  let dropdownValues = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues();
+  dropdownValues = transpose(dropdownValues);
+  dropdownValues = [].concat.apply([], dropdownValues);
+  idx = dropdownValues.findIndex(item => item.includes(fieldName));
+  return idx;
+}
 
 function imageFromTextDocs(body, searchText, image) {
   let next = body.findText(searchText);
