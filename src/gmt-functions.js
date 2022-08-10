@@ -1,6 +1,8 @@
-// List files in folder
-
-function linksArchivos(rowData) {
+/**
+ * listFilesInFolder
+ * Crea una lista de archivos dentro de una carpeta de Google Drive
+ */
+function listFilesInFolder(rowData) {
   let ss = SpreadsheetApp.getActive();
   let sh = ss.getActiveSheet();
   let maxR = sh.getMaxRows();
@@ -33,20 +35,14 @@ function linksArchivos(rowData) {
   sh.getRange(2, 1, names.length + 1, 3).setValues(result);
 }
 
-// New Google Sheet
-
-function createSpreadsheet() {
-  SpreadsheetApp.create("Google Sheet creada con Morph Tools");
-}
-
-// Wait
-
 function waiting(ms) {
   Utilities.sleep(ms);
 }
 
-// Morph Color Background
-
+/**
+ * colorMe
+ * Colorea celdas con el color Morph
+ */
 function colorMe() {
   let ss = SpreadsheetApp.getActive();
   let selection = ss.getSelection();
@@ -54,8 +50,10 @@ function colorMe() {
   currentCell.setBackgroundColor('#f1cb50');
 }
 
-// Morph Palette
-
+/**
+ * drawPalette
+ * Genera la paleta de colores del Cuadro de Superficies
+ */
 function drawPalette() {
   SpreadsheetApp.getActiveSpreadsheet().insertSheet('chart');
   SpreadsheetApp.getActiveSpreadsheet().getSheetByName('chart').getRange(1, 1, 1, 104).setBackgrounds([
@@ -76,8 +74,10 @@ function drawPalette() {
   ss.deleteSheet(sheet);
 }
 
-// MORPH USERLIST
-
+/**
+ * getDomainUsersList
+ * Genera una lista con los usuarios del servidor Morph
+ */
 function getDomainUsersList() {
   let users = [];
   let options = {
@@ -103,23 +103,22 @@ function getDomainUsersList() {
 
   // Insert data in a spreadsheet
   let ss = SpreadsheetApp.getActiveSpreadsheet();
-  let ws = ss.getSheetByName('MORPH MEMBERS') || ss.insertSheet('MORPH MEMBERS', 1);
-  //SpreadsheetApp.getActiveSpreadsheet().moveActiveSheet(ss.getNumSheets());
-  ws.getRange(1, 1, users.length, users[0].length).setValues(users);
-  ws.setColumnWidth(1, 250);
-  ws.setColumnWidth(2, 280);
-
-  let rangememb = ws.getRange('A1:B500').setFontSize(12).setFontFamily('Montserrat');
-  let rangememb2 = ws.getRange('A1:A500').setFontWeight('bold');
-
-  ws.activate();
+  let sh = ss.getActiveSheet();
+  sh.getRange(1, 1, users.length, users[0].length).setValues(users);
+  sh.setColumnWidth(1, 250);
+  sh.setColumnWidth(2, 280);
+  sh.getRange('A1:B500').setFontSize(12).setFontFamily('Montserrat');
+  sh.getRange('A1:A500').setFontWeight('bold');
+  sh.activate();
   deleteEmptyRows();
   removeEmptyColumns();
 }
 
-// Remove Rows and Columns
-
-function deleteFullEmptyRows() {
+/**
+ * deleteAllEmptyRows
+ * Borra cualquier fila donde no haya datos
+ */
+function deleteAllEmptyRows() {
   let spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   let sheet = spreadsheet.getActiveSheet();
   let data = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
@@ -139,6 +138,10 @@ function deleteFullEmptyRows() {
   }
 }
 
+/**
+ * deleteEmptyRows, removeEmptyColumns
+ * Borra las filas y columnas hasta la última que contenga datos
+ */
 function deleteEmptyRows() {
   let sh = SpreadsheetApp.getActiveSheet();
   let maxRows = sh.getMaxRows();
@@ -159,9 +162,11 @@ function removeEmptyColumns() {
   }
 }
 
-// MERGE COLUMNS BY HEADER
-
-function merge_Columns() {
+/**
+ * mergeColumns
+ * Combina los datos de las columnas con mismo encabezado
+ */
+function mergeColumns() {
   let transpose = (ar) => ar[0].map((_, c) => ar.map((r) => r[c]));
   let ss = SpreadsheetApp.getActiveSpreadsheet();
   let sh = ss.getActiveSheet();
@@ -179,12 +184,81 @@ function merge_Columns() {
   sh.getRange(1, 1, res.length, res[0].length).setValues(res);
 }
 
+/**
+ * saveSheetAsTSV
+ * Guarda la hoja en formato TSV manteniendo las fórmulas
+ */
+function saveSheetAsTSV() {
+  let ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getActiveSheet();
 
+  const ui = SpreadsheetApp.getUi();
+  let result = ui.prompt(
+    'Carpeta de destino',
+    'Introduce el LINK de la carpeta donde guardar el archivo.\nSi se deja en blanco se creará una nueva carpeta en Mi Unidad.',
+    ui.ButtonSet.OK_CANCEL,
+  );
 
+  let button = result.getSelectedButton();
+  let userResponse = result.getResponseText();
+  let folder; let externalFolderId;
+  if (button == ui.Button.OK) {
+    if (userResponse === '') {
+      folder = rootFolder.createFolder('TSV Exports');
+      externalFolderId = folder.getid();
+    } else {
+      externalFolderId = getIdFromUrl(userResponse);
+      folder = DriveApp.getFolderById(externalFolderId);
+    }
+  }
 
+  fileName = sh.getName() + ".txt";
+  var tsvFile = convertRangeTotsvFile(fileName, sh);
+  folder.createFile(fileName, tsvFile);
+  // Browser.msgBox('Files are waiting in a folder named ' + folder.getName());
+}
 
+function convertRangeTotsvFile(tsvFileName, sheet) {
+  // get available data range in the spreadsheet
+  var activeRange = sheet.getDataRange();
+  try {
+    var data = activeRange.getValues();
+    var formula = activeRange.getFormulas();
+    var tsvFile = undefined;
+    // loop through the data in the range and build a string with the tsv  data
+    if (data.length > 1) {
+      var tsv = "";
+      for (var row = 0; row < data.length; row++) {
+        for (var col = 0; col < data[row].length; col++) {
+          if (formula[row][col] !== '') {
+            data[row][col] = formula[row][col]
+          }
+          if (data[row][col].toString().indexOf("\t") != -1) {
+            data[row][col] = "\"" + data[row][col] + "\"";
+          }
+        }
+        // join each row's columns
+        // add a carriage return to end of each row, except for the last one
+        if (row < data.length-1) {
+          tsv += data[row].join("\t") + "\r\n";
+        }
+        else {
+          tsv += data[row].join("\t");
+        }
+      }
+      tsvFile = tsv;
+    }
+    return tsvFile;
+  }
+  catch(err) {
+    Browser.msgBox(err);
+  }
+}
+
+/**
+ * Funciones en fase de desarrollo
+ */
 function fExportXML() {
-
   let ss = SpreadsheetApp.getActive();
   let sh = ss.getActiveSheet();
   let values = sh.getDataRange().getValues();

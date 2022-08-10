@@ -62,7 +62,7 @@ function getMarkers(rowData) {
     if (headerValues.length != 0) {
       notAllMarkersChanged = updatedValues.some(element => {
         return headerValues.includes(element);
-      }); Logger.log('allmakers: ' + notAllMarkersChanged)
+      })
 
       if (notAllMarkersChanged) {
         columnRemover(sh, updatedValues, headerValues);

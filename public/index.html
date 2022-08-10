@@ -5,16 +5,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <?!= HtmlService.createHtmlOutputFromFile('html/helpers/header').getContent(); ?>
-  <?!= HtmlService.createHtmlOutputFromFile('html/stylesheet').getContent(); ?>
+  <?!= HtmlService.createHtmlOutputFromFile('public/helpers/header').getContent(); ?>
+  <?!= HtmlService.createHtmlOutputFromFile('public/stylesheet').getContent(); ?>
 
 </head>
 
 <body>
 
-<?!= HtmlService.createHtmlOutputFromFile('html/helpers/navbar').getContent(); ?>
+<?!= HtmlService.createHtmlOutputFromFile('public/helpers/navbar').getContent(); ?>
 
-<div class="body-padding mt-3">
+<div class="accordion-body mt-3 pb-0">
   <p>En esta app tienes las funciones implementadas por el equipo I+D para Google Suite.</p>
 </div>
 
@@ -28,24 +28,22 @@
     <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
       <div class="accordion-body pb-0 mt-2">
 
-        <button id='superFreezerButton' class="btn btn-primary btn-lg w-100 mt-1 mb-3"  onclick="swalConfirm('congeladorMorph', 'El archivo se ha congelado correctamente.', 'Congelar', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">SUPERCONGELADOR</button>
+        <button id='superFreezerButton' class="btn btn-primary btn-lg w-100 mt-1 mb-3"  onclick="swalConfirm('morphFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">SUPERCONGELADOR</button>
 
-        <!--
-        <button class="btn btn-primary btn-lg mt-1 mb-3"  onclick="swalConfirm('exportXML', 'El archivo se ha convertido correctamente.', 'Congelar', 'Una vez ejecutado no se puede detener. Confirma para continuar.')">EXPORTAR XML</button>
-        -->
-
+        <!-- <button class="btn btn-primary btn-lg mt-1 mb-3"  onclick="swalConfirm('exportXML', 'El archivo se ha convertido correctamente.', 'Congelar', 'Una vez ejecutado no se puede detener. Confirma para continuar.')">EXPORTAR XML</button> -->
       
       </div>
       <div class="accordion-body px-0 pb-0">
+        <button class="btn btn-primary index w-100 shadow-none" onclick="execFunction('getDomainUsersList')"><i class="fa-solid fa-users fa-fw"></i>Lista de miembros Morph</button>
         <div class="btn-group d-flex" role="group">
-          <button class="btn btn-primary index half"  onclick="execFunction('drawPalette')"><i class="fa-solid fa-palette"></i>Paleta Morph</button>
-          <button class="btn btn-primary index"  onclick="execDirect('colorMe')"><i class="fa-solid fa-fill-drip"></i>Color Morph</button>
+          <button class="btn btn-primary index shadow-none half" onclick="execFunction('drawPalette')"><i class="fa-solid fa-palette fa-fw"></i>Paleta Morph</button>
+          <button class="btn btn-primary index shadow-none" onclick="execDirect('colorMe')"><i class="fa-solid fa-fill-drip fa-fw"></i>Color Morph</button>
         </div>
-
-        <button class="btn btn-primary index w-100"  onclick="execFunction('getDomainUsersList')"><i class="fa-solid fa-users"></i>Lista de miembros Morph</button>
-        <button class="btn btn-primary index w-100"  onclick="execFunction('deleteEmptyRows')"><i class="fa-solid fa-table-list"></i>Eliminar filas vacías</button>
-        <button class="btn btn-primary index w-100"  onclick="execFunction('removeEmptyColumns')"><i class="fa-solid fa-table-columns"></i>Eliminar columnas vacías</button>
-        <button class="btn btn-primary index w-100 ult" onclick="execFunction('merge_Columns')"><i class="fa-solid fa-circle-h"></i>Unificar columnas con el mismo encabezado</button>
+        <button class="btn btn-primary index shadow-none w-100" onclick="execFunction('deleteEmptyRows')"><i class="fa-solid fa-table-list fa-fw"></i>Eliminar filas vacías</button>
+        <button class="btn btn-primary index shadow-none w-100" onclick="execFunction('removeEmptyColumns')"><i class="fa-solid fa-table-columns fa-fw"></i>Eliminar columnas vacías</button>
+        <button class="btn btn-primary index shadow-none w-100" onclick="execFunction('mergeColumns')"><i class="fa-solid fa-circle-h fa-fw"></i>Unificar columnas con el mismo encabezado</button>
+        <button class="btn btn-primary index shadow-none w-100 ult" onclick="execFunction('saveSheetAsTSV')"><i class="fa-solid fa-file-excel fa-fw"></i>Exportar TSV con fórmulas</button>
+        <!-- <button class="btn btn-primary index shadow-none w-100 ult" onclick="execFunction('morphFastFreezer')"><i class="fa-solid fa-snowflake fa-fw"></i>Supercongelador rápido (Beta)</button> -->
 
       </div>
     </div>
@@ -63,21 +61,16 @@
         <div class="mb-3">
           <p>Solo funciona en el documento <b>NAVE NODRIZA</b> del cuadro de superficies.</p>
 
-          <button id='csUpdater' class="btn btn-primary index sup yellow w-100 shadow-none" onclick="swalConfirm('actualizarCuadro', 'El cuadro se ha actualizado correctamente.', 'Actualizar', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">Actualizar cuadro de superficies</button>
-          <button id='csFreezer' class="btn btn-primary index sup inf blue w-100 shadow-none" onclick="swalConfirm('congeladorMorph', 'El archivo se ha congelado correctamente.', 'Congelar', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">Congelar cuadro de superficies</button>
+          <button id='csUpdater' class="btn btn-primary index sup yellow w-100 shadow-none" onclick="swalConfirm('morphCSUpdater', 'El cuadro se ha actualizado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">Actualizar cuadro de superficies</button>
+          <button id='csFreezer' class="btn btn-primary index sup inf blue w-100 shadow-none" onclick="swalConfirm('morphFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">Congelar cuadro de superficies</button>
         </div>
 
         <p>Si tienes problemas con el actualizador automático puedes usar el <a href="https://sites.google.com/morphestudio.es/morph-pills/gsuite/flujo-de-trabajo-gsuite/gsuite-morph-tools#h.m7p008656a6i" target="_blank"><b>método manual</b></a>:</p>
 
-        <div class="btn-group w-100" role="group" aria-label="Basic checkbox toggle button group">
-          <input type="checkbox" class="btn-check" id="csManual1" autocomplete="off" onclick="execFunction('manualUpdaterTemplate', 'Se ha generado una plantilla para el cuadro.')">
-          <label class="btn btn-outline-primary shadow-none" for="csManual1">PLANTILLA</label>
-
-          <input type="checkbox" class="btn-check" id="csManual2" autocomplete="off" onclick="swalConfirm('actualizarCuadro', 'El cuadro se ha actualizado correctamente.', 'Actualizar', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">
-          <label class="btn btn-outline-primary shadow-none" for="csManual2">ACT</label>
-
-          <input type="checkbox" class="btn-check" id="csManual3" autocomplete="off" onclick="swalConfirm('congeladorMorph', 'El archivo se ha congelado correctamente.', 'Congelar', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">
-          <label class="btn btn-outline-primary shadow-none" for="csManual3">CON</label>
+        <div class="btn-group w-100" role="group" aria-label="Actualizador manual">
+          <button type="button" id="csManual1" class="btn btn-outline-primary shadow-none" onclick="execFunction('manualUpdaterTemplate', 'Se ha generado una plantilla para el cuadro.')">PLANTILLA</button>
+          <button type="button" id="csManual2" class="btn btn-outline-primary shadow-none" onclick="swalConfirm('morphCSUpdater', 'El cuadro se ha actualizado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">ACT</button>
+          <button type="button" id="csManual3" class="btn btn-outline-primary shadow-none" onclick="swalConfirm('morphFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">CONG</button>
         </div>
 
       </div>
@@ -95,17 +88,16 @@
 
         <div class="mb-4">
           <h3 class="menu-h3">Generar estructura de carpetas</h3>
-          <p>Para que funcione hay que seguir la <b>plantilla</b> que proporcionamos.</p>
+          <p>Para que funcione hay que seguir la estructura de niveles de la <b>plantilla</b>.</p>
         
           <button class="btn btn-primary index sup tpl w-100 shadow-none" onclick="execFunction('autoFolderTreeTpl', 'Se ha generado una plantilla para la estructura de carpetas.')">Crear plantilla</button>
-          <button class="btn btn-primary index sup inf gen w-100 shadow-none" onclick="swalConfirm('autoFolderTree', 'Se ha generado la estructura de carpetas.', 'Carpetas', 'Una vez ejecutado no se puede detener. Confirma para continuar.')">Generar estructura de carpetas</button>
+          <button class="btn btn-primary index sup inf gen w-100 shadow-none" onclick="swalConfirm('autoFolderTree', 'Se ha generado la estructura de carpetas.', 'Una vez ejecutado no se puede detener. Confirma para continuar.')">Generar estructura de carpetas</button>
         </div>
         
         <h3 class="menu-h3">Listar archivos</h3>
         <p>Genera una lista con nombres y links de archivos en una carpeta.</p>
-        
 
-        <?!= HtmlService.createHtmlOutputFromFile('html/helpers/form-folderlist').getContent(); ?>
+        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/form-folderlist').getContent(); ?>
 
       </div>
     </div>
@@ -124,8 +116,8 @@
           <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width:<?= cellCounter() ?>%"><span class="justify-content-center d-flex position-absolute w-100"><?= cellCounter() ?>%</span></div>
           </div>
 
-        <?!= HtmlService.createHtmlOutputFromFile('html/helpers/counter').getContent(); ?>
-        <?!= HtmlService.createHtmlOutputFromFile('html/helpers/help').getContent(); ?>
+        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/counter').getContent(); ?>
+        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/help').getContent(); ?>
 
       </div>
     </div>
@@ -133,20 +125,14 @@
 
 </div>
 
-
-
-
-
 <script>
   function afterSidebarLoads(){
     setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 500);
   }
 </script>
 
-<?!= HtmlService.createHtmlOutputFromFile('html/helpers/swal').getContent(); ?>
-<?!= HtmlService.createHtmlOutputFromFile('html/helpers/footer').getContent(); ?>
-
-
+<?!= HtmlService.createHtmlOutputFromFile('public/helpers/swal').getContent(); ?>
+<?!= HtmlService.createHtmlOutputFromFile('public/helpers/footer').getContent(); ?>
 
 </body>
 </html>

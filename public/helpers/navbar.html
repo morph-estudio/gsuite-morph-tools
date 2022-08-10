@@ -1,14 +1,3 @@
-<div id="loading-spin" class="spinner-loading pt-10">
-  <div class="d-flex justify-content-center">
-    <div>
-      <div class="spinner-border text-dark spinner-loading-circle" style="width:8rem; height:8rem" role="status">
-        <span class="visually-hidden">Cargando...</span>
-      </div>
-      <div class="spinner-loading-text d-flex justify-content-center">Cargando...</div>
-    </div>
-  </div>
-</div>
-
 <nav class="navbar navbar-light navbar-custom">
   <div class="container-fluid ">
 
@@ -48,16 +37,31 @@
 
 <div class="collapse" id="navbarToggleExternalContent">
   <div class="bg-light">
-    <button class="btn btn-primary index navMenu w-100 shadow-none" onclick="execDirect('loadSidebar1')">Gsuite Morph Tools</button>
-    <button class="btn btn-primary index navMenu w-100 shadow-none" onclick="execDirect('loadSidebar2')">Morph Document Studio</button>
+    <button class="btn btn-primary index navMenu w-100 shadow-none" onclick="execDirect('sidebarIndex')">Gsuite Morph Tools</button>
+    <button class="btn btn-primary index navMenu w-100 shadow-none" onclick="execDirect('sidebarDS')">Morph Document Studio</button>
   </div>
 </div>
 
-<!--
+<!-- Toggle Navbar When Click Outside -->
 <script type="text/javascript">
-  function onSuccess(navBarTitle) {
-    document.getElementById('testi').innerHTML = navBarTitle;
-  }
-  google.script.run.withSuccessHandler(onSuccess).navBarTitle();
-  document.getElementById('testi').innerHTML = navBarTitle;
-</script> -->
+$(window).on('click', function(event){
+    // element over which click was made
+    var clickOver = $(event.target)
+    if ($('.navbar .nav-tog-cus').attr('aria-expanded') == 'true' && clickOver.closest('.navbar').length === 0) {
+        // Click on navbar toggler button
+        $('button[aria-expanded="true"]').click();
+    }
+});
+</script>
+
+<!-- Loading Page -->
+<div id="loading-spin" class="spinner-loading pt-10">
+  <div class="d-flex justify-content-center">
+    <div>
+      <div class="spinner-border text-dark spinner-loading-circle" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <div class="spinner-loading-text d-flex justify-content-center">Cargando...</div>
+    </div>
+  </div>
+</div>

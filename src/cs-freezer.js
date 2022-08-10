@@ -1,12 +1,11 @@
 /**
- * Gsuite Morph Tools - CS Freezer 1.2
+ * Gsuite Morph Tools - CS Freezer 1.5
  * Developed by alsanchezromero
- * Created on Mon Jul 25 2022
  *
  * Copyright (c) 2022 Morph Estudio
  */
 
-function congeladorMorph(btnID) {
+function morphFreezer(btnID) {
   let ss = SpreadsheetApp.getActive();
   let sh = ss.getSheetByName('ACTUALIZAR');
   let ss_id = ss.getId();
@@ -15,7 +14,7 @@ function congeladorMorph(btnID) {
   let parentFolderID = parentFolder.next().getId();
   let backupFolderSearch = DriveApp.getFolderById(parentFolderID);
   const dateNow = Utilities.formatDate(new Date(), 'GMT+1', 'yyyyMMdd');
-  
+
   let backupFolderId;
   if (btnID === 'csFreezer' || 'csManual3') {
     backupFolderId = freezerCS(sh, backupFolderSearch, btnID); // Destination Folder (Específico cuadro de superficies)
@@ -79,8 +78,8 @@ function congeladorMorph(btnID) {
     const ui = SpreadsheetApp.getUi();
     let confirm = Browser.msgBox('Documento Excel', '¿Quieres crear una copia en formato Excel en la misma carpeta?', Browser.Buttons.OK_CANCEL);
     if (confirm == 'ok') { DriveApp.getFolderById(parentFolderID).createFile(blob); }
-  } else if (btnID === 'csFreezer') {
-      sh.getRange('B9').setValue(url).setFontColor('#4A86E8'); // Add XLSX download url to sheet
+  } else if (btnID === 'csFreezer' || 'csManual3') {
+    sh.getRange('B9').setValue(url).setFontColor('#4A86E8'); // Add XLSX download url to sheet
   }
 
   sh.activate();
@@ -104,13 +103,11 @@ function freezerCS(sh, backupFolderSearch, btnID) {
       backupFolderId = backupFolderDef.getId();
       backupFolderName = backupFolderDef.getName();
       backupFolderUrl = backupFolderDef.getUrl();
-      Logger.log('brutas: ' + backupFolderId)
     }
   } else if (btnID === 'csManual3') {
-      backupFolderId = sh.getRange(8, 2).getValue();
-      backupFolderDef = DriveApp.getFolderById(backupFolderId);
-      backupFolderName = backupFolderDef.getName();
-      Logger.log('frutas: ' + backupFolderId)
+    backupFolderId = sh.getRange(8, 2).getValue();
+    backupFolderDef = DriveApp.getFolderById(backupFolderId);
+    backupFolderName = backupFolderDef.getName();
   }
 
   sh.getRange('B7').setFontWeight('bold').setFontColor('#B7B7B7');
@@ -182,6 +179,63 @@ function exportToXLSS(ss, destinationId) {
 
     return url;
   } catch (f) {
-    Logger.log(f.toString());
+    // Logger.log(f.toString());
   }
+}
+
+function morphFastFreezer() {
+  let ss = SpreadsheetApp.getActive();
+  let sh = ss.getSheetByName('ACTUALIZAR');
+  let ss_id = ss.getId();
+  let file = DriveApp.getFileById(ss_id);
+  let fileURL = file.getUrl();
+  let parentFolder = file.getParents();
+  let parentFolderID = parentFolder.next().getId();
+  let parentFolderDef = DriveApp.getFolderById(parentFolderID);
+  const dateNow = Utilities.formatDate(new Date(), 'GMT+1', 'yyyyMMdd');
+
+  var destination = ss.copy(ss.getName());
+  file.setName(`${ss.getName()} - ${dateNow} - CONGELADO`);
+
+  let destinationId = destination.getId();
+  let destinationFile = DriveApp.getFileById(destinationId);
+  destinationFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+  SpreadsheetApp.flush();
+
+  let tempSheets = ss.getSheets().filter((sht) => !sht.isSheetHidden()).map((sheet) => {
+    let dstSheet = sheet.getDataRange();
+    dstSheet.copyTo(dstSheet, { contentsOnly: true });
+    return dstSheet;
+  });
+
+  tempSheets = ss.getSheets().filter((sht) => sht.isSheetHidden()).map((sheet) => {
+    ss.deleteSheet(sheet);
+  });
+
+  let fileOriginal = DriveApp.getFileById(destinationId);
+
+  SpreadsheetApp.flush();
+
+  let url = `https://docs.google.com/feeds/download/spreadsheets/Export?key=${destinationId}&exportFormat=xlsx`;
+
+  let params = {
+    method: "get",
+    headers: {"Authorization": "Bearer " + ScriptApp.getOAuthToken()},
+    muteHttpExceptions: true,
+  };
+  let blob = UrlFetchApp.fetch(url, params).getBlob();
+  blob.setName(`${ss.getName()}.xlsx`);
+  const ui = SpreadsheetApp.getUi();
+  let confirm = Browser.msgBox('Documento Excel', '¿Quieres crear una copia en formato Excel en la misma carpeta?', Browser.Buttons.OK_CANCEL);
+  if (confirm == 'ok') { DriveApp.getFolderById(parentFolderID).createFile(blob); }
+
+  SpreadsheetApp.flush();
+
+  file.moveTo(parentFolderDef);
+  fileOriginal.moveTo(parentFolderDef);
+  let fileOriginalUrl = fileOriginal.getUrl();
+
+  openExternalUrlFromMenu(fileOriginalUrl);
+
 }

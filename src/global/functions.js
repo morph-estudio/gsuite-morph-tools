@@ -1,6 +1,9 @@
 /* eslint-disable no-only-tests/no-only-tests */
 
-// Check if the given URL is valid
+/**
+ * isValidHttpUrl
+ * Chequea si la URL dada es válida
+ */
 function isValidHttpUrl(str) {
   let pattern = new RegExp('^(https?:\\/\\/)?' // protocol
     + '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' // domain name
@@ -11,11 +14,18 @@ function isValidHttpUrl(str) {
   return !!pattern.test(str);
 }
 
-// Check if the given URL is image file
+/**
+ * isImage
+ * Checkea si un documento es imagen
+ */
 function isImage(url) {
   return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
 }
 
+/**
+ * openExternalUrlFromMenu
+ * Abre una página externa desde Google Apps Script
+ */
 function openExternalUrlFromMenu(link) {
   let oeufmURL = `${link}`;
   let oeufmHTML = HtmlService.createHtmlOutput('<html><script>'
@@ -34,30 +44,24 @@ function openExternalUrlFromMenu(link) {
   + '<script>google.script.host.setHeight(40);google.script.host.setWidth(410) </script>'
   + '</html>')
     .setWidth(110).setHeight(1);
-  SpreadsheetApp.getUi().showModalDialog(oeufmHTML, 'Opening Changelog... make sure the pop up is not blocked.');
+  SpreadsheetApp.getUi().showModalDialog(oeufmHTML, 'Abriendo enlace externo... asegúrate de no tener las ventanas emergentes bloqueadas.');
 }
 
-// Get ID from URL
-
+/**
+ * getIdFromUrl
+ * Obtiene la ID de un documento de Google a partir de su dirección URL
+ */
 function getIdFromUrl(url) { return url.match(/[-\w]{25,}(?!.*[-\w]{25,})/); }
 
-function getIdFromUrls(url) {
+function getIdFromUrlDeprecated(url) {
   let match = url.match(/([a-z0-9_-]{25,})[$/&?]/i);
   return match ? match[1] : null;
 }
 
-// Utils
-
-function transpose(a) {
-  return Object.keys(a[0]).map(function (c) { return a.map(function (r) { return r[c]; }); });
-}
-
-function flatten(arrayOfArrays){
-  return [].concat.apply([], arrayOfArrays);
-}
-
-// Object Identificator
-
+/**
+ * whatAmI
+ * Retorna el tipo de objeto
+ */
 function whatAmI(ob) {
   try {
     // test for an object
@@ -85,4 +89,38 @@ function whatAmI(ob) {
       type: 'unable to figure out what I am',
     };
   }
+}
+
+/**
+ * searchFile
+ * Busca un archivo concreto dentro de una carpeta
+ */
+function searchFile(fileName, folderId) {
+  let files = [];
+  // Look for file in current folder
+  const folderFiles = DriveApp.getFolderById(folderId).getFiles();
+  while (folderFiles.hasNext()) {
+    const folderFile = folderFiles.next(); 
+    if (folderFile.getName() === fileName) {
+      files.push(folderFile);
+    }
+  }
+  // Recursively look for file in subfolders
+  const subfolders = DriveApp.getFolderById(folderId).getFolders(); 
+  while (subfolders.hasNext()) {
+    files = files.concat(searchFile(fileName, subfolders.next().getId()));
+  }
+  return files;
+}
+
+/**
+ * Útiles de programación
+ * Función para transponer o simplificar arrays
+ */
+function transpose(a) {
+  return Object.keys(a[0]).map(function (c) { return a.map(function (r) { return r[c]; }); });
+}
+
+function flatten(arrayOfArrays) {
+  return [].concat.apply([], arrayOfArrays);
 }

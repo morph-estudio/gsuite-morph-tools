@@ -1,12 +1,12 @@
 <script>
 
-function execFunction(fa, sc) {
-          swaload()
-          google.script.run
-          .withSuccessHandler(e => {swalsuccess(sc)})
-          .withFailureHandler(swalerror)
-          [fa]();
-        }
+function execFunction(fa, sc, rw) {
+  swaload()
+  google.script.run
+  .withSuccessHandler(e => {swalsuccess(sc)})
+  .withFailureHandler(swalerror)
+  [fa](rw);
+}
 
 function execDirect(fa) {
   google.script.run
@@ -44,9 +44,8 @@ function swalinfo(e) {
   });
 }
 
-function swalConfirm(fa, sc, tl, tx, rw) {
+function swalConfirm(fa, sc, tx, rw) {
   Swal.fire({
-    title: tl,
     text: tx,
     icon: 'info',
     allowOutsideClick: false,

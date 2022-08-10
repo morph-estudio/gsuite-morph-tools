@@ -7,7 +7,7 @@
 
       <div class="hideWhenBothSwitchOff">
         <label class="switch mt-2">
-        <input class="form-check-input" type="checkbox" role="switch" id="email-activate" data-bs-toggle='collapse' data-bs-target='#emailForm, #all-emails-div' aria-expanded="false">
+        <input class="form-check-input" type="checkbox" role="switch" id="email-activate" data-bs-toggle='collapse' data-bs-target='#emailForm, #all-emails-div' aria-expanded="true" aria-controls="emailForm">
         <div class="slider round">
           <span class="on">ACTIVADO</span>
           <span class="off">DESACTIVADO</span>
@@ -40,11 +40,11 @@
           <!-- More fields -->
 
           <div class="form-check form-switch mt-3 mb-1">
-            <label class="form-check-label" for="email-more" data-bs-toggle='collapse' data-bs-target='#emailMore' aria-expanded="false" aria-controls="emailMore">Rellenar otros campos</label>
-            <input class="form-check-input" type="checkbox" role="switch" id="email-more" >
+            <label class="form-check-label" for="email-more">Rellenar otros campos</label>
+            <input class="form-check-input" type="checkbox" role="switch" id="email-more" data-bs-toggle='collapse' data-bs-target='#emailMore' aria-expanded="false" aria-controls="emailMore">
           </div>
 
-          <div id="emailMore" aria-expanded="false" class="collapse in">
+          <div id="emailMore" aria-expanded="false" class="collapse">
 
             <label for="email-bcc" class="form-label mt-3">BCC (copias ocultas)</label>
             <input type="text" class="form-control shadow-none" id="email-bcc" aria-describedby="email-bcc-help">
@@ -75,11 +75,11 @@
           <!-- Add Attachment -->
 
           <div class="form-check form-switch mt-3">
-            <input class="form-check-input" type="checkbox" role="switch" id="email-addblob" data-bs-toggle='collapse' data-bs-target='#emailBlob' aria-controls="emailBlob" checked>
+            <input class="form-check-input" type="checkbox" role="switch" id="email-addblob" data-bs-toggle='collapse' data-bs-target='#emailBlob' aria-controls="emailBlob">
             <label class="form-check-label" for="email-addblob">Añadir documento adjunto</label>
           </div>
 
-          <div id="emailBlob" class="collapse show" >
+          <div id="emailBlob" class="collapse" >
 
             <select id="email-blob-field" class="form-select shadow-none mt-3" aria-describedby="email-blob-field-help">
               <option value="default" selected>Selecciona campo adjuntos</option>
@@ -94,32 +94,3 @@
   </form>
 
 </div>
-
-<!-- Form Scripts -->
-
-<script>
-
-  function afterSidebarLoads(){
-    google.script.run.withSuccessHandler(afterDropDrownArrayReturned).emailDropdown();
-  }
-
-  function addDropdownElements(arrayOfArrays, field) {
-    arrayOfArrays.forEach(function(r){
-      var option = document.createElement("option");
-      option.textContent = r[0];
-      field.appendChild(option);
-    });
-  }
-
-  function afterDropDrownArrayReturned(arrayOfArrays){
-    var emailField = document.getElementById("email-field");
-    addDropdownElements(arrayOfArrays, emailField)
-    var emailBlobField = document.getElementById("email-blob-field");
-    addDropdownElements(arrayOfArrays, emailBlobField);
-
-    //document.querySelector("#email-blob-field").selectedIndex = document.querySelector("#email-blob-field").length - 1;
-  }
-
-  document.addEventListener("DOMContentLoaded", afterSidebarLoads);
-
-</script>

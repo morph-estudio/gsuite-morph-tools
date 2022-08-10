@@ -1,17 +1,16 @@
 /**
- * Gsuite Morph Tools - CS Updater 1.4
+ * Gsuite Morph Tools - CS Updater 1.5
  * Developed by alsanchezromero
- * Created on Mon Jul 25 2022
  *
  * Copyright (c) 2022 Morph Estudio
  */
 
-function actualizarCuadro(btnID) {
+function morphCSUpdater(btnID) {
   const ss = SpreadsheetApp.getActive();
   let sh = ss.getSheetByName('ACTUALIZAR') || ss.insertSheet('ACTUALIZAR', 1);
   let ss_id = ss.getId();
   let userMail = Session.getActiveUser().getEmail();
-  const dateNow = Utilities.formatDate(new Date(), 'GMT+1', 'yyyyMMdd');
+  let dateNow = Utilities.formatDate(new Date(), 'GMT+2', 'dd/MM/yyyy - HH:mm:ss');
 
   let file = DriveApp.getFileById(ss_id);
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
@@ -30,8 +29,7 @@ function actualizarCuadro(btnID) {
   // Panel de control
 
   let filA = getControlPanel(sh, file, btnID);
-  let [filePanelName, filePanelId, filePanelUrl, folderPanelcId] = filA; Logger.log(filA); Logger.log(filePanelId,);
-  Logger.log('manualfolderid: ' + folderPanelcId + 'id: ' + filePanelId);
+  let [filePanelName, filePanelId, filePanelUrl, folderPanelcId] = filA;
 
   let panelControl = DriveApp.getFileById(filePanelId);
   let folderPanelcName = DriveApp.getFolderById(folderPanelcId);
@@ -64,7 +62,6 @@ function actualizarCuadro(btnID) {
   let list = [];
 
   if (btnID === 'csUpdater') {
-    Logger.log('fileslistauto: ');
     let rangeClear = sh.getRange(3, 3, 6, 2);
     rangeClear.clearContent().clearFormat();
 
@@ -100,9 +97,7 @@ function actualizarCuadro(btnID) {
       .setFontColor('#B7B7B7').setBackground('#F3F3F3');
     sh.getRange(3, 3, list.length, 2).setFontSize(13).setFontFamily('Montserrat').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
       .setVerticalAlignment('middle');
-
   } else if (btnID === 'csManual2') {
-    Logger.log('fileslistmanual: ');
     let txtFileId_FT = sh.getRange(3, 4).getValue();
     let txtFile_FT = DriveApp.getFileById(txtFileId_FT);
     let txtFileId_SP = sh.getRange(4, 4).getValue();
@@ -118,7 +113,6 @@ function actualizarCuadro(btnID) {
     files.forEach((file) => {
       list.push([file.getName(), file.getId(), file.getName().slice(0, -4).replace('Sheets ', '').toUpperCase()]);
     });
-
   }
 
   // Copy data in Sheets
@@ -136,7 +130,8 @@ function actualizarCuadro(btnID) {
     sheetPaste.getRange(1, 1, tsvData.length, tsvData[0].length).setValues(tsvData);
   };
 
-  sh.getRange(2, 3).setNote(null).setNote(`Última actualización: ${dateNow} por ${userMail}.`); // Last Update Note
+  sh.getRange(2, 3).setNote(null).setNote(`Última actualización: ${dateNow} por ${userMail}`); // Last Update Note
+  deleteEmptyRows(); removeEmptyColumns();
 }
 
 function getControlPanel(sh, file, btnID) {
@@ -162,13 +157,11 @@ function getControlPanel(sh, file, btnID) {
         }
       }
     }
-    Logger.log('brutas: ' + filePanelId)
   } else if (btnID === 'csManual2') {
-    filePanelUrl = sh.getRange(1, 2).getValue();
-    filePanelId = getIdFromUrl(filePanelUrl);
-    filePC = DriveApp.getFileById(filePanelId);
+    let filePanelUrl = sh.getRange(1, 2).getValue();
+    let filePanelId = getIdFromUrl(filePanelUrl);
+    let filePC = DriveApp.getFileById(filePanelId);
     filA.push(filePC.getName(), filePanelId, filePanelUrl, filePC.getParents().next().getId());
-    Logger.log('frutas: ' + filePanelId);
   }
   return filA;
 }
@@ -200,12 +193,12 @@ function sheetFormatter(sh) {
   // Col B
   sh.getRange(3, 2, 7, 1).setBackground('#F3F3F3').setBorder(true, true, true, true, true, true, '#CCCCCC', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
   // ImportRanges
-  sh.getRange(1, 3, 1, 2).setBackground('#EAD1DC').setBorder(true, true, true, true, true, true, '#A64D79', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontColor('#A64D79')
+  sh.getRange(1, 3, 1, 2).setBackground('#ffe0ef').setBorder(true, true, true, true, true, true, '#A64D79', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontColor('#A64D79')
     .setFontWeight('bold')
     .setHorizontalAlignment('center');
   // Control Panel
-  sh.getRange('B1').setBackground('#D9EAD3').setBorder(true, true, true, true, true, true, '#6AA886', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-    .setFontColor('#6AA886')
+  sh.getRange('B1').setBackground('#ECFDF5').setBorder(true, true, true, true, true, true, '#34a853', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+    .setFontColor('#34a853')
     .setFontWeight('bold');
   // Folders Bold
   sh.getRangeList(['B3', 'B5', 'B7', 'B9']).setFontWeight('bold');
@@ -266,7 +259,6 @@ function manualUpdaterTemplate() {
   sh.getRange('C1').setValue('=IMPORTRANGE(B1;"Instrucciones!A1")');
   sh.getRange('D1').setValue('=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1CuMcYrtT6NXwxa9fMEIOTgRfkPySnNwKvA_1dyarCro";"DB-SI!B2")');
 
-  deleteEmptyRows();
-  removeEmptyColumns();
+  deleteEmptyRows(); removeEmptyColumns();
   sh.activate();
 }

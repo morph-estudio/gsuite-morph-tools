@@ -5,16 +5,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <?!= HtmlService.createHtmlOutputFromFile('html/helpers/header').getContent(); ?>
-  <?!= HtmlService.createHtmlOutputFromFile('html/stylesheet').getContent(); ?>
+  <?!= HtmlService.createHtmlOutputFromFile('public/helpers/header').getContent(); ?>
+  <?!= HtmlService.createHtmlOutputFromFile('public/stylesheet').getContent(); ?>
 <script src="https://www.tutorialspoint.com/jquery/jquery-3.6.0.js"></script>
 </head>
 
 <body>
 
-<?!= HtmlService.createHtmlOutputFromFile('html/helpers/navbar').getContent(); ?>
+<?!= HtmlService.createHtmlOutputFromFile('public/helpers/navbar').getContent(); ?>
 
-<div class="body-padding mt-3">
+<div class="accordion-body mt-3 pb-0">
 
   <p>Morph Document Studio te permite crear archivos en masa a partir de plantillas con DOCS y SLIDES.</p>
   <div class="d-flex mb-3">
@@ -38,7 +38,7 @@
     <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
       <div class="accordion-body">
 
-        <?!= HtmlService.createHtmlOutputFromFile('html/helpers/form-ds1').getContent(); ?>
+        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/form-ds-1').getContent(); ?>
 
       </div>
     </div>
@@ -53,7 +53,7 @@
     <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
       <div class="accordion-body">
 
-      <?!= HtmlService.createHtmlOutputFromFile('html/helpers/form-ds2').getContent(); ?>
+      <?!= HtmlService.createHtmlOutputFromFile('public/helpers/form-ds-2').getContent(); ?>
 
       </div>
     </div>
@@ -62,13 +62,13 @@
   <div class="accordion-item">
     <h2 class="accordion-header" id="headingThree">
       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-        Enviar e-mails
+        Enviar emails
       </button>
     </h2>
     <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
       <div class="accordion-body">
 
-      <?!= HtmlService.createHtmlOutputFromFile('html/helpers/form-ds3').getContent(); ?>
+      <?!= HtmlService.createHtmlOutputFromFile('public/helpers/form-ds-3').getContent(); ?>
 
       </div>
     </div>
@@ -83,7 +83,7 @@
     <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
       <div class="accordion-body">
 
-        <?!= HtmlService.createHtmlOutputFromFile('html/helpers/form-ds4').getContent(); ?>
+        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/form-ds-4').getContent(); ?>
 
       </div>
     </div>
@@ -98,13 +98,198 @@
     <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionExample">
       <div class="accordion-body">
 
-        <?!= HtmlService.createHtmlOutputFromFile('html/helpers/help').getContent(); ?>
+        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/help').getContent(); ?>
 
       </div>
     </div>
   </div>
 
 </div>
+
+
+
+
+
+
+<script type="text/javascript">
+
+function afterSidebarLoads(){
+
+  google.script.run.withSuccessHandler(afterDropDrownArrayReturned).emailDropdown();
+  setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 50);
+
+  function addDropdownElements(arrayOfArrays, field) {
+    arrayOfArrays.forEach(function(r){
+      var option = document.createElement("option");
+      option.textContent = r[0];
+      field.appendChild(option);
+    });
+    getCosas();
+    //removeFadeOut(document.getElementById('loading-spin'), 300);
+  }
+
+  function afterDropDrownArrayReturned(arrayOfArrays){
+    var emailField = document.getElementById("email-field");
+    addDropdownElements(arrayOfArrays, emailField)
+    var emailBlobField = document.getElementById("email-blob-field");
+    addDropdownElements(arrayOfArrays, emailBlobField);
+  }
+
+}
+
+function getCosas() {
+
+  var dataExtracted;
+  google.script.run
+  .withSuccessHandler(function(data){
+
+    dataExtracted = data; // DataExtracted is global and available to other functions
+
+    $(document).ready(function() {
+      $('#dsForm').collapse($('#ds-activate').prop('checked') ? "show" : "hide");
+      $('#all-documents-div').collapse($('#ds-activate').prop('checked') ? "show" : "hide");
+      $('#emailForm').collapse($('#email-activate').prop('checked') ? "show" : "hide");
+      $('#all-emails-div').collapse($('#email-activate').prop('checked') ? "show" : "hide");
+      $('#emailBlob').collapse($('#email-addblob').prop('checked') ? "show" : "hide");
+
+      document.getElementById('template-id').disabled = document.getElementById('green-cells').checked;
+      document.getElementById('destination-folder').disabled = document.getElementById('green-cells').checked;
+
+      $('#ds-activate').change(function() { 
+          $('#dsForm').collapse('toggle');
+          $('#all-documents-div').collapse('toggle');
+      });
+      $('#email-activate').change(function() { 
+          $('#emailForm').collapse('toggle');
+          $('#all-emails-div').collapse('toggle');
+      });
+      $('#email-addblob').change(function() { 
+          $('#emailBlob').collapse('toggle');
+      });
+
+      $(document).ready(function() {
+              var checks = $("#ds-activate, #email-activate");
+              if (checks.filter(':checked').length == 0) {
+                  $('#hideWhenBothSwitchOff').hide();
+              } else {
+                  $('#hideWhenBothSwitchOff').show();
+              }
+          $('.hideWhenBothSwitchOff').click(function () {
+              var checks = $("#ds-activate, #email-activate");
+              if (checks.filter(':checked').length == 0) {
+                  $('#hideWhenBothSwitchOff').hide();
+              } else {
+                  $('#hideWhenBothSwitchOff').show();
+              }
+          });
+      });
+
+    });
+
+    document.getElementById("ds-activate").checked = checkReturn(dataExtracted['DS Activate']);
+    document.getElementById("email-activate").checked = checkReturn(dataExtracted['Email Activate']);
+
+
+
+    if (typeof dataExtracted['Template Link'] !== 'undefined') document.getElementById("template-id").value = dataExtracted['Template Link'];
+    if (typeof dataExtracted['Green Cells'] !== 'undefined') document.getElementById("green-cells").checked = checkReturn(dataExtracted['Green Cells']);
+
+    if (typeof dataExtracted['Destination Folder'] !== 'undefined') var destinationFolder = document.getElementById("destination-folder").value = dataExtracted['Destination Folder'];
+    if (typeof dataExtracted['Filename'] !== 'undefined') var fileName = document.getElementById("file-name").value = dataExtracted['Filename'];
+    if (typeof dataExtracted['Export Format'] !== 'undefined') var exportFormat = document.getElementById("export-format").value = dataExtracted['Export Format'];
+    if (typeof dataExtracted['Permission 1'] !== 'undefined') var permission1 = document.getElementById("permission-1").checked = checkReturn(dataExtracted['Permission 1']);
+    if (typeof dataExtracted['Permission 2'] !== 'undefined') var permission2 = document.getElementById("permission-2").checked = checkReturn(dataExtracted['Permission 2']);
+    if (typeof dataExtracted['Permission 3'] !== 'undefined') var permission3 = document.getElementById("permission-3").checked = checkReturn(dataExtracted['Permission 3']);
+    if (typeof dataExtracted['Numeration Switch'] !== 'undefined') var numerationSwitch = document.getElementById("numeration-switch").checked = checkReturn(dataExtracted['Numeration Switch']);
+
+    if (typeof dataExtracted['Email Field'] !== 'undefined') var emailField = document.getElementById("email-field").value = dataExtracted['Email Field'];
+    if (typeof dataExtracted['Email Specific'] !== 'undefined') var emailSpecific = document.getElementById("email-specific").value = dataExtracted['Email Specific'];
+    if (typeof dataExtracted['Email Sender'] !== 'undefined') var emailSender = document.getElementById("email-sender").value = dataExtracted['Email Sender'];
+    if (typeof dataExtracted['Email Subject'] !== 'undefined') var emailSubject = document.getElementById("email-subject").value = dataExtracted['Email Subject'];
+    if (typeof dataExtracted['Email More Fields'] !== 'undefined') var emailMoreFields = document.getElementById("email-more").checked = checkReturn(dataExtracted['Email More Fields']);
+    if (typeof dataExtracted['Email BCC'] !== 'undefined') var emailBCC = document.getElementById("email-bcc").value = dataExtracted['Email BCC'];
+    if (typeof dataExtracted['Email Reply To'] !== 'undefined') var emailReplyTo = document.getElementById("email-replyto").value = dataExtracted['Email Reply To'];
+    if (typeof dataExtracted['Email Attach Switch'] !== 'undefined') var emailAttachSwitch = document.getElementById("email-addblob").checked = checkReturn(dataExtracted['Email Attach Switch']);
+    if (typeof dataExtracted['Email Attach Field'] !== 'undefined') var emailAttachField = document.getElementById("email-blob-field").value = dataExtracted['Email Attach Field'];
+
+    if (typeof dataExtracted['All Documents'] !== 'undefined') var allDocuments = document.getElementById("all-documents").checked = checkReturn(dataExtracted['All Documents']);
+    if (typeof dataExtracted['All Emails'] !== 'undefined') var allEmails = document.getElementById("all-emails").checked = checkReturn(dataExtracted['All Emails']);
+
+    if (typeof dataExtracted['Email Message'] !== 'undefined') var emailMessage = tinyMCE.activeEditor.setContent(dataExtracted['Email Message']);
+
+  })
+  .getDocProperties();
+
+}
+
+function checkReturn(arg) {
+  if(arg === 'true') { return true; } else { return false; }
+}
+
+function afterButtonClickedSave() {
+
+  var dsActivate = document.getElementById("ds-activate").checked;
+  var emailActivate = document.getElementById("email-activate").checked;
+
+  var templateID = document.getElementById("template-id").value;
+  var greenCells = document.getElementById("green-cells").checked;
+
+  var destinationFolder = document.getElementById("destination-folder").value;
+  var fileName = document.getElementById("file-name").value;
+  var exportFormat = document.getElementById("export-format").value;
+  var permission1 = document.getElementById("permission-1").checked;
+  var permission2 = document.getElementById("permission-2").checked;
+  var permission3 = document.getElementById("permission-3").checked;
+  var numerationSwitch = document.getElementById("numeration-switch").checked;
+
+  var emailField = document.getElementById("email-field").value;
+  var emailSpecific = document.getElementById("email-specific").value;
+  var emailSender = document.getElementById("email-sender").value;
+  var emailSubject = document.getElementById("email-subject").value;
+  var emailMoreFields = document.getElementById("email-more").checked;
+  var emailBCC = document.getElementById("email-bcc").value;
+  var emailReplyTo = document.getElementById("email-replyto").value;
+  var emailMessage = tinymce.activeEditor.getContent();
+  var emailAttachSwitch = document.getElementById("email-addblob").checked;
+  var emailAttachField = document.getElementById("email-blob-field").value;
+
+  var allDocuments = document.getElementById("all-documents").checked;
+  var allEmails = document.getElementById("all-emails").checked;
+
+  var rowData = {
+        dsActivate: dsActivate,
+        emailActivate: emailActivate,
+
+        templateID: templateID,
+        greenCells: greenCells,
+
+        destinationFolder: destinationFolder,
+        fileName: fileName,
+        exportFormat: exportFormat,
+        permission1: permission1,
+        permission2: permission2,
+        permission3: permission3,
+        numerationSwitch: numerationSwitch,
+
+        emailField: emailField,
+        emailSpecific: emailSpecific,
+        emailSender: emailSender,
+        emailSubject: emailSubject,
+        emailMoreFields: emailMoreFields,
+        emailBCC: emailBCC,
+        emailReplyTo: emailReplyTo,
+        emailMessage: emailMessage,
+        emailAttachSwitch: emailAttachSwitch,
+        emailAttachField: emailAttachField,
+
+        allDocuments: allDocuments,
+        allEmails: allEmails,
+      };
+
+  execFunction('setDocProperties', 'Se ha guardado la configuración.', rowData);
+}
+
+</script>
 
 <script>
 
@@ -125,63 +310,64 @@ function afterButtonClicked() {
 
     if(validate(fieldsToValidate)) {
       
-      var tplID = document.getElementById("template-id");
-      var destFolder = document.getElementById("destination-folder");
-      var fileName = document.getElementById("file-name");
-      var exportFMT = document.getElementById("export-format");
-      var permCheck1 = document.getElementById("permission-1");
-      var permCheck2 = document.getElementById("permission-2");
-      var permCheck3 = document.getElementById("permission-3");
-      var numSwitch = document.getElementById("numeration-switch");
-      var greenCells = document.getElementById("green-cells");
+      var templateID = document.getElementById("template-id").value;
+      var greenCells = document.getElementById("green-cells").checked;
 
-      var emailField = document.getElementById("email-field");
-      var emailSpecific = document.getElementById("email-specific");
-      var emailSender = document.getElementById("email-sender");
-      var emailSubject = document.getElementById("email-subject");
-      var emailBCC = document.getElementById("email-bcc");
-      var emailReplyTo = document.getElementById("email-replyto");
+      var destinationFolder = document.getElementById("destination-folder").value;
+      var fileName = document.getElementById("file-name").value;
+      var exportFormat = document.getElementById("export-format").value;
+      var permission1 = document.getElementById("permission-1").checked;
+      var permission2 = document.getElementById("permission-2").checked;
+      var permission3 = document.getElementById("permission-3").checked;
+      var numerationSwitch = document.getElementById("numeration-switch").checked;
+
+      var emailField = document.getElementById("email-field").value;
+      var emailSpecific = document.getElementById("email-specific").value;
+      var emailSender = document.getElementById("email-sender").value;
+      var emailSubject = document.getElementById("email-subject").value;
+      var emailBCC = document.getElementById("email-bcc").value;
+      var emailReplyTo = document.getElementById("email-replyto").value;
       var emailMessage = tinymce.activeEditor.getContent();
-      var emailAttach = document.getElementById("email-addblob");
-      var emailAttachField = document.getElementById("email-blob-field");
+      var emailAttachSwitch = document.getElementById("email-addblob").checked;
+      var emailAttachField = document.getElementById("email-blob-field").value;
 
-      var allDocuments = document.getElementById("all-documents");
-      var allEmails = document.getElementById("all-emails");
+      var allDocuments = document.getElementById("all-documents").checked;
+      var allEmails = document.getElementById("all-emails").checked;
 
       var rowData = {
             dsActivate: dsActivate,
             emailActivate: emailActivate,
-            greenCells: greenCells.checked,
-            templateID: tplID.value,
 
-            destFolder: destFolder.value,
-            fileName: fileName.value,
-            exportFormat: exportFMT.value,
-            permission1: permCheck1.checked,
-            permission2: permCheck2.checked,
-            permission3: permCheck3.checked,
-            numSwitch: numSwitch.checked,
+            templateID: templateID,
+            greenCells: greenCells,
 
-            emailField: emailField.value,
-            emailSpecific: emailSpecific.value,
-            emailSender: emailSender.value,
-            emailSubject: emailSubject.value,
-            emailBCC: emailBCC.value,
-            emailReplyTo: emailReplyTo.value,
+            destinationFolder: destinationFolder,
+            fileName: fileName,
+            exportFormat: exportFormat,
+            permission1: permission1,
+            permission2: permission2,
+            permission3: permission3,
+            numerationSwitch: numerationSwitch,
+
+            emailField: emailField,
+            emailSpecific: emailSpecific,
+            emailSender: emailSender,
+            emailSubject: emailSubject,
+            emailBCC: emailBCC,
+            emailReplyTo: emailReplyTo,
             emailMessage: emailMessage,
-            emailAttach: emailAttach.checked,
-            emailAttachField: emailAttachField.value,
+            emailAttachSwitch: emailAttachSwitch,
+            emailAttachField: emailAttachField,
 
-            allDocuments: allDocuments.checked,
-            allEmails: allEmails.checked,
+            allDocuments: allDocuments,
+            allEmails: allEmails,
           };
 
-      swaload();
-      google.script.run.withSuccessHandler(e => {swalsuccess('El programa se ha ejecutado correctamente.'), afterSubmit2(e)}).withFailureHandler(swalerror).documentStudio(rowData);
+      swalConfirm('documentStudio', 'Los documentos se han generado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', rowData);
 
-    } else{ $('#errorNotFields').toast({delay: 2000}).toast("show");  }
+    } else{ $('#errorNotFields').toast({delay: 4000}).toast("show");  }
 
-  } else{ $('#errorNotFunctions').toast({delay: 2000}).toast("show"); }
+  } else{ $('#errorNotFunctions').toast({delay: 4000}).toast("show"); }
 
 }
 
@@ -202,7 +388,7 @@ function afterButtonClickedMarkers() {
     };
 
     if (purgeMarkers) {
-      swalConfirm('getMarkers', 'Los marcadores se han actualizado en la hoja.', 'Purgar', 'Si seleccionas purgar, se eliminarán los datos de las columnas que no correspondan con algún marcador de la plantilla. Confirma para continuar.', rowData);
+      swalConfirm('getMarkers', 'Los marcadores se han actualizado en la hoja.', 'Si seleccionas purgar, se eliminarán los datos de las columnas que no correspondan con algún marcador de la plantilla. Confirma para continuar.', rowData);
     } else{
       swaload();
       google.script.run.withSuccessHandler(e => {swalsuccess('Los marcadores se han actualizado en la hoja.'), afterSubmit(e)}).withFailureHandler(swalerror).getMarkers(rowData);
@@ -214,8 +400,8 @@ function afterButtonClickedMarkers() {
 
 function afterSubmit(e) {
   clearFields(["template-id", "destination-folder", "file-name"]);
-  var exportFMT = document.getElementById("export-format");
-  exportFMT.value = "PDF";
+  var exportFormat = document.getElementById("export-format");
+  exportFormat.value = "PDF";
   //$("#successNotification").toast("show");
 }
 
@@ -241,34 +427,20 @@ function validate(fieldsToValidate) {
   });
 }
 
-document.getElementById("mainButton").addEventListener("click", afterButtonClicked);
-document.getElementById("markerButton").addEventListener("click", afterButtonClickedMarkers);
-
 </script>
 
-<script type="text/javascript">
-    $(document).ready(function() {
-        $('#hideWhenBothSwitchOff').show();
-        $('.hideWhenBothSwitchOff').click(function () {
-            var checks = $("#ds-activate, #email-activate");
-            if (checks.filter(':checked').length == 0) {
-                $('#hideWhenBothSwitchOff').hide();
-            } else {
-                $('#hideWhenBothSwitchOff').show();
-            }
-        });
-    });
-</script>
 
 <script>
 
-  function afterSidebarLoads(){
-    setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 50);
-  }
+  document.getElementById("mainButton").addEventListener("click", afterButtonClicked);
+  document.getElementById("markerButton").addEventListener("click", afterButtonClickedMarkers);
+  document.getElementById("saveButton").addEventListener("click", afterButtonClickedSave);
+  document.addEventListener("DOMContentLoaded", afterSidebarLoads);
+
 </script>
 
-<?!= HtmlService.createHtmlOutputFromFile('html/helpers/swal').getContent(); ?>
-<?!= HtmlService.createHtmlOutputFromFile('html/helpers/footer').getContent(); ?>
+<?!= HtmlService.createHtmlOutputFromFile('public/helpers/swal').getContent(); ?>
+<?!= HtmlService.createHtmlOutputFromFile('public/helpers/footer').getContent(); ?>
 
 
 </body>

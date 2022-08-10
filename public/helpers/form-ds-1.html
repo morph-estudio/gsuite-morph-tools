@@ -12,10 +12,10 @@
           <div class="invalid-feedback">
           Introduce una URL/ID correcta.
           </div>
-          <div id="template-id-help" class="form-text mt-2">El archivo debe tener formato <b>.doc</b> y contener marcadores <b>{{marker}}</b>.</div>
+          <div id="template-id-help" class="form-text mt-2">Debe ser un archivo <b>docs</b> o <b>slides</b> y contener marcadores <b>{{marker}}</b>.</div>
       
           <div class="form-check form-switch mt-3">
-            <input class="form-check-input" type="checkbox" onchange="document.getElementById('template-id').disabled = this.checked;document.getElementById('destination-folder').disabled = this.checked" role="switch" id="green-cells" >
+            <input class="form-check-input" type="checkbox" onclick="document.getElementById('template-id').disabled = this.checked;document.getElementById('destination-folder').disabled = this.checked" role="switch" id="green-cells" >
             <label class="form-check-label" for="green-cells">Usar celdas verdes</label>
           </div>
 

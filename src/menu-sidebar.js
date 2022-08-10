@@ -1,52 +1,45 @@
-function onOpen() {
-  var ui = SpreadsheetApp.getUi();
-  ui.createAddonMenu()
-    .addItem('Panel G-Suite Morph Tools', 'loadSidebar1')
-    .addItem('Document Studio', 'loadSidebar2')
-    .addItem('Gestor de hojas', 'loadSidebar3')
+function onOpen(e) {
+  SpreadsheetApp.getUi().createAddonMenu()
+    .addItem('G-Suite Morph Tools Panel', 'sidebarIndex')
+    .addItem('Morph Document Studio', 'sidebarDS')
+    //.addItem('Gestor de hojas', 'sidebarSD')
     .addSeparator()
-    .addItem('Changelog', 'loadSidebarCL')
+    .addItem('Changelog', 'sidebarChangelog')
     .addToUi();
 }
 
-/**/
-const ui = SpreadsheetApp.getUi();
-var barTitle1 = '💛 G-Suite Morph Tools (I+D)';
-var barTitle2 = '📑 Document Studio by Morph (I+D)';
-var barTitle3 = '📑 Gestor de hojas by Morph (I+D)';
-
-function loadSidebar1() {
-  var hs1 = HtmlService.createTemplateFromFile('html/index').evaluate().setTitle(barTitle1);
-  ui.showSidebar(hs1);
-  
-}
-function loadSidebar2() {
-  var hs2 = HtmlService.createTemplateFromFile('html/document-studio').evaluate().setTitle(barTitle2);
-  ui.showSidebar(hs2);
-}
-function loadSidebar3() {
-  var hs3 = HtmlService.createTemplateFromFile('sheetDeleterIndex').evaluate().setTitle(barTitle3);
-  ui.showSidebar(hs3);
-}
-function loadSidebar4() {
-  var hs4 = HtmlService.createTemplateFromFile('html/email').evaluate().setTitle(barTitle2);
-  ui.showSidebar(hs4);
+function onInstall(e) {
+  onOpen(e);
 }
 
-function loadSidebarCL() {
-  var link = 'https://github.com/alsanmorph/gsuite-morph-tools/blob/d2f4a46ebcbea3daada6952819f66dd469fb55ac/CHANGELOG.md';
+var sh = function(){
+    return SpreadsheetApp.getActiveSpreadsheet().getActiveSheet() }
+var ui = function(){
+    return SpreadsheetApp.getUi() }
+
+function sidebarIndex() {
+  let barTitleIndex = '⚙️ G-Suite Morph Tools (I+D)';
+  let hs1 = HtmlService.createTemplateFromFile('public/index').evaluate().setTitle(barTitleIndex);
+  ui().showSidebar(hs1);
+}
+function sidebarDS() {
+  Browser.msgBox('Herramienta en desarrollo', 'Morph Document Studio estará disponible en la próxima versión de Gsuite Morph Tools.', Browser.Buttons.OK);
+  /*
+  let barTitleDS = '📑 Morph Document Studio (I+D)';
+  let hs2 = HtmlService.createTemplateFromFile('public/document-studio').evaluate().setTitle(barTitleDS);
+  ui().showSidebar(hs2); */
+}
+function sidebarSD() {
+  let barTitleSD = '📑 Gestor de hojas by Morph (I+D)';
+  let hs3 = HtmlService.createTemplateFromFile('public/sheet-deleter').evaluate().setTitle(barTitleSD);
+  ui().showSidebar(hs3);
+}
+function sidebarChangelog() {
+  let link = 'https://github.com/alsanmorph/gsuite-morph-tools/blob/d2f4a46ebcbea3daada6952819f66dd469fb55ac/CHANGELOG.md';
   openExternalUrlFromMenu(link);
 }
-
-function navBarTitle() {
-  var navBarTitle = 'Morphies';
-  return navBarTitle;
-}
-
-/**/
-
-function doGet(htmlimport) {
-  return HtmlService.createHtmlOutputFromFile(htmlimport);
+function comingSoon() {
+  Browser.msgBox('Herramienta en desarrollo', 'Morph Document Studio estará disponible en la próxima versión de Gsuite Morph Tools.', Browser.Buttons.OK);
 }
 
 let size;

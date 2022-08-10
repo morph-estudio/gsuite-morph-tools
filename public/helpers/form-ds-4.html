@@ -5,16 +5,16 @@
     <div id="userform3">
 
       <div class="hideWhenBothSwitchOff">
-        <div id="hideWhenBothSwitchOff" aria-expanded="false" class="collapse show">
+        <div id="hideWhenBothSwitchOff" aria-expanded="false" class="collapse">
           <label class="form-label mt-2">Más opciones</label>
-          <p>Ejecutar en todas las filas o solo cuando las celdas en <i>[DS] File-links</i> y <i>[DS] Email-links</i> están vacías.</p>
+          <p>Ejecutar en todas las filas o solo cuando las celdas en <i>[DS] File-links</i> o <i>[DS] Email-links</i> están vacías.</p>
         </div>
         
 
-        <div id="all-documents-div" aria-expanded="false" class="collapse show">
+        <div id="all-documents-div" aria-expanded="false" class="collapse">
           <div class="form-check mt-2 mb-2">
-            <input class="form-check-input shadow-none" type="checkbox" value="" id="all-documents">
-            <label class="form-check-label" for="allDocuments">
+            <input class="form-check-input shadow-none" id="all-documents" type="checkbox" >
+            <label class="form-check-label" for="all-documents">
               Generar todos los documentos.
             </label>
           </div>
@@ -22,16 +22,20 @@
 
         <div id="all-emails-div" aria-expanded="false" class="collapse">
           <div class="form-check">
-            <input class="form-check-input shadow-none" type="checkbox" value="" id="all-emails">
-            <label class="form-check-label" for="allEmails">
+            <input class="form-check-input shadow-none" id="all-emails" type="checkbox">
+            <label class="form-check-label" for="all-emails">
               Enviar todos los emails.
             </label>
           </div>
         </div>
       </div>
 
-      <div class="pt-3 mb-1">
-        <button class="btn btn-primary btn-lg w-100 " id="mainButton">Ejecutar configuración</button>
+      <div class="mt-3 d-flex">
+        <button class="btn btn-secondary btn-lg w-50 btn-izq shadow-none " style="border-radius: 5px 0px 0px 0px;" id="saveButton">Guardar</button>
+        <button class="btn btn-danger btn-lg w-50 btn-der shadow-none ms-1" style="border-radius: 0px 5px 0px 0px" id="deleteButton" onclick="execFunction('deleteProperties', 'Se ha eliminado la configuración.')">Borrar</button>
+      </div>
+      <div class="mt-1">
+        <button class="btn btn-primary btn-lg btn-xxl w-100 shadow-none" style="border-radius: 0px 0px 5px 5px" id="mainButton">Ejecutar</button>
       </div>
 
 
@@ -73,11 +77,6 @@
         </symbol>
       </svg>
 
-
-
     </div>
   </form>
 </div>
-
-
-

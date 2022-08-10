@@ -1,9 +1,9 @@
-<form novalidate>
+<form novalidate autocomplete="off">
 
   <div id="userform3">
     <div class="mb-2">
 
-      <label for="list-files" class="form-label"><i class="fa-regular fa-folder fa-h-margin"></i>LINK/ID de la carpeta</label>
+      <label for="list-files" class="form-label"><i class="fa-regular fa-folder fa-h-margin fa-fw"></i>URL/ID de la carpeta</label>
       <input type="text" class="form-control shadow-none" id="list-files" placeholder="ej: https://drive.google.com/drive/folders/1DHirb56iLf-T_n6Idq2MP8f8Ok765JuZ?usp=sharing" aria-describedby="template-id-2-help" required>
       <div class="invalid-feedback">
       Introduce una URL/ID correcta.
@@ -21,58 +21,55 @@
   </div>
 </form>
 
-
 <script>
 
-  function afterButtonClicked(){
-  
-    if(validate()){
-  
-      var listFolderID = document.getElementById("list-files");
-      var useA1 = document.getElementById("use-a1").checked;
-      var rowData = {
-        listFolderID: listFolderID.value,
-        useA1: useA1,
-      };
-        swaload();
-        google.script.run.withSuccessHandler(e => {swalsuccess('Los archivos se han listado correctamente.'), afterSubmit(e)}).withFailureHandler(swalerror).linksArchivos(rowData);
-  
+function afterButtonClicked(){
+
+  if(validate()){
+
+    var listFolderID = document.getElementById("list-files");
+    var useA1 = document.getElementById("use-a1").checked;
+    var rowData = {
+      listFolderID: listFolderID.value,
+      useA1: useA1,
+    };
+      swaload();
+      google.script.run.withSuccessHandler(e => {swalsuccess('Los archivos se han listado correctamente.'), afterSubmit(e)}).withFailureHandler(swalerror).listFilesInFolder(rowData);
+
+  } else{
+    //$("#errorNotification").toast("show");
+  }
+}
+
+function afterSubmit(e){
+  clearFields(["list-files"]);
+  //$("#successNotification").toast("show");
+}
+
+function clearFields(feilds){
+  feilds.forEach(function(feild){
+    var el = document.getElementById(feild);
+    el.value = "";
+  });
+}
+
+function validate(){
+  var fieldsToValidate = document.querySelectorAll("#userform3 input");
+
+  Array.prototype.forEach.call(fieldsToValidate, function(el){
+    if (el.checkValidity()){
+      el.classList.remove("is-invalid");
     } else{
-      //$("#errorNotification").toast("show");
+      el.classList.add("is-invalid");
     }
-  }
-  
-  function afterSubmit(e){
-    clearFields(["list-files"]);
-    //$("#successNotification").toast("show");
-  }
-  
-  function clearFields(feilds){
-    feilds.forEach(function(feild){
-      var el = document.getElementById(feild);
-      el.value = "";
-    });
-  }
-  
-  function validate(){
-    var fieldsToValidate = document.querySelectorAll("#userform3 input");
-  
-    //is-invalid
-  
-    Array.prototype.forEach.call(fieldsToValidate, function(el){
-      if (el.checkValidity()){
-        el.classList.remove("is-invalid");
-      } else{
-        el.classList.add("is-invalid");
-      }
-    });
-  
-    return Array.prototype.every.call(fieldsToValidate,function(el){
-    return el.checkValidity();
-    });
-  
-  }
-  
-  document.getElementById("listButton").addEventListener("click",afterButtonClicked);
+  });
+
+  return Array.prototype.every.call(fieldsToValidate,function(el){
+  return el.checkValidity();
+  });
+
+}
+
+document.getElementById("listButton").addEventListener("click",afterButtonClicked);
   
   </script>

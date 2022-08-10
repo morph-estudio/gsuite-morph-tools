@@ -1,5 +1,3 @@
-// GET-MARKERS FUNCTIONS
-
 function getDocItems(docID, identifier) {
   let body = DocumentApp.openById(docID).getBody();
   let docText = body.getText();
@@ -255,7 +253,6 @@ function replaceDocText(repText, newText, copyId) {
     replaceAllTextRequest.containsText = Docs.newSubstringMatchCriteria();
     replaceAllTextRequest.containsText.text = rule.toReplace;
     replaceAllTextRequest.containsText.matchCase = false;
-    // Logger.log(replaceAllTextRequest)
     let request = Docs.newRequest();
     request.replaceAllText = replaceAllTextRequest;
     return request;
@@ -292,4 +289,83 @@ function replaceSlideText(slides, replaceText, markerText, copyId) {
   });
 }
 
+function setDocProperties(rowData){
 
+  let formData = [
+    rowData.dsActivate,
+    rowData.emailActivate,
+
+    rowData.templateID,
+    rowData.greenCells,
+
+    rowData.destinationFolder,
+    rowData.fileName,
+    rowData.exportFormat,
+    rowData.permission1,
+    rowData.permission2,
+    rowData.permission3,
+    rowData.numerationSwitch,
+
+    rowData.emailField,
+    rowData.emailSpecific,
+    rowData.emailSender,
+    rowData.emailSubject,
+    rowData.emailMoreFields,
+    rowData.emailBCC,
+    rowData.emailReplyTo,
+    rowData.emailMessage,
+    rowData.emailAttachSwitch,
+    rowData.emailAttachField,
+
+    rowData.allDocuments,
+    rowData.allEmails,
+  ];
+
+  let [dsActivate, emailActivate, templateID, greenCells, destinationFolder, fileName, exportFormat, permission1, permission2, permission3, numerationSwitch, emailField, emailSpecific, emailSender, emailSubject, emailMoreFields, emailBCC, emailReplyTo, emailMessage, emailAttachSwitch, emailAttachField, allDocuments, allEmails] = formData;
+
+  PropertiesService.getDocumentProperties().setProperties({
+    'DS Activate': dsActivate,
+    'Email Activate': emailActivate,
+
+    'Template Link': templateID,
+    'Green Cells': Boolean(greenCells),
+
+    'Destination Folder': destinationFolder,
+    'Filename': fileName,
+    'Export Format': exportFormat,
+    'Permission 1': permission1,
+    'Permission 2': permission2,
+    'Permission 3': permission3,
+    'Numeration Switch': numerationSwitch,
+
+    'Email Field': emailField,
+    'Email Specific': emailSpecific,
+    'Email Sender': emailSender,
+    'Email Subject': emailSubject,
+    'Email More Fields': emailMoreFields,
+    'Email BCC': emailBCC,
+    'Email Reply To': emailReplyTo,
+    'Email Message': emailMessage,
+    'Email Attach Switch': emailAttachSwitch,
+    'Email Attach Field': emailAttachField,
+
+    'All Documents': allDocuments,
+    'All Emails': allEmails,
+  });
+}
+
+function deleteProperties() {
+  PropertiesService.getDocumentProperties().deleteAllProperties();
+}
+
+function getDocProperties(){
+
+  /*
+  let documentProperties = PropertiesService.getDocumentProperties().getProperties()
+  let a = documentProperties['Email Message'];
+  let b = documentProperties['All Emails'];
+  Logger.log('all property: ' + a + b)
+  */
+
+  return PropertiesService.getDocumentProperties().getProperties();
+}
