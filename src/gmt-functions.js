@@ -41,7 +41,7 @@ function waiting(ms) {
 
 /**
  * colorMe
- * Colorea celdas con el color Morph
+ * Fondo de celdas con el color Morph
  */
 function colorMe() {
   let ss = SpreadsheetApp.getActive();

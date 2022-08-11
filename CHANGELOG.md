@@ -1,6 +1,6 @@
 
 # Change Log
-Todos los cambios notables en el proyecto serán documentados en este archivo.
+Todos los cambios en el proyecto serán documentados en este archivo.
 
 ## [ 1.5 ] - 2022/08/10
 
@@ -9,17 +9,20 @@ Todos los cambios notables en el proyecto serán documentados en este archivo.
 - Primera versión implementada públicamente en el servidor de Morph.
 - Añadido un menú desplegable interno como encabezado del complemento. El logo aparece dentro de este encabezado.
 - Nueva herramienta: exportar TSV con fórmulas.
+- Nota informando de la última vez actualizado / congelado en el cuadro de superficies.
 
 ### Changed
 
 - Completada la plantilla para el generador de estructura de carpetas.
 - Actualizada la página Gsuite Morph Tools de Morph Pills.
 - Las funciones similares (p.ej: congelador / supercongelador) se han optimizado en una sola función que reconoce desde qué botón se ejecuta.
+- Cambiado el diseño de la plantilla del cuadro de superficies.
 
 ### Fixed
 
 - Arreglado: la pantalla de carga no rellena la barra lateral.
-- Arreglado: el problema de variables en onOpen(e) impide mostrar el menú en la aplicación publicada.
+- Arreglado problema de variables en onOpen(e) impide mostrar el menú en la aplicación publicada.
+- Arreglado error al acceder al documento al actualizar cuadro de superficies.
 
 ## [ 1.3 ] - 2022/07/27
 

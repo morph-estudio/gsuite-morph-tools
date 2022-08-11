@@ -1,5 +1,5 @@
 /**
- * Gsuite Morph Tools - Morph Document Studio (Get Markers)
+ * Gsuite Morph Tools - Morph Document Studio - Get Markers
  * Developed by alsanchezromero
  *
  * Copyright (c) 2022 Morph Estudio

@@ -143,7 +143,7 @@ function getCosas() {
   google.script.run
   .withSuccessHandler(function(data){
 
-    dataExtracted = data; // DataExtracted is global and available to other functions
+    dataExtracted = data; // DataExtracted is global and available to other functions!
 
     $(document).ready(function() {
       $('#dsForm').collapse($('#ds-activate').prop('checked') ? "show" : "hide");
@@ -188,8 +188,6 @@ function getCosas() {
 
     document.getElementById("ds-activate").checked = checkReturn(dataExtracted['DS Activate']);
     document.getElementById("email-activate").checked = checkReturn(dataExtracted['Email Activate']);
-
-
 
     if (typeof dataExtracted['Template Link'] !== 'undefined') document.getElementById("template-id").value = dataExtracted['Template Link'];
     if (typeof dataExtracted['Green Cells'] !== 'undefined') document.getElementById("green-cells").checked = checkReturn(dataExtracted['Green Cells']);

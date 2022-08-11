@@ -172,15 +172,14 @@ function addGreenColumn(sh, headerTitle, cellNote) {
   let lastColmn = sh.getLastColumn();
 
   if (lastColmn === 0) {
-  sh.insertColumns(1);
-  sh.getRange(1, lastColmn + 1).setBackground('#ECFDF5').setFontColor('#34a853').setValue(headerTitle)
-    .setNote(cellNote);
+    sh.insertColumns(1);
+    sh.getRange(1, lastColmn + 1).setBackground('#ECFDF5').setFontColor('#34a853').setValue(headerTitle)
+      .setNote(cellNote);
   } else {
-  sh.insertColumnAfter(lastColmn);
-  sh.getRange(1, lastColmn + 1).setBackground('#ECFDF5').setFontColor('#34a853').setValue(headerTitle)
-    .setNote(cellNote);
+    sh.insertColumnAfter(lastColmn);
+    sh.getRange(1, lastColmn + 1).setBackground('#ECFDF5').setFontColor('#34a853').setValue(headerTitle)
+      .setNote(cellNote);
   }
-
 }
 
 function emailDropdown() { // If dropdown options are in a Google Sheet
@@ -289,8 +288,7 @@ function replaceSlideText(slides, replaceText, markerText, copyId) {
   });
 }
 
-function setDocProperties(rowData){
-
+function setDocProperties(rowData) {
   let formData = [
     rowData.dsActivate,
     rowData.emailActivate,
@@ -358,14 +356,12 @@ function deleteProperties() {
   PropertiesService.getDocumentProperties().deleteAllProperties();
 }
 
-function getDocProperties(){
-
+function getDocProperties() {
   /*
   let documentProperties = PropertiesService.getDocumentProperties().getProperties()
   let a = documentProperties['Email Message'];
   let b = documentProperties['All Emails'];
   Logger.log('all property: ' + a + b)
   */
-
   return PropertiesService.getDocumentProperties().getProperties();
 }

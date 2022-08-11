@@ -1,5 +1,5 @@
 /**
- * Gsuite Morph Tools - CS Updater 1.5
+ * Gsuite Morph Tools - CS Updater 1.4
  * Developed by alsanchezromero
  *
  * Copyright (c) 2022 Morph Estudio
@@ -40,9 +40,9 @@ function morphCSUpdater(btnID) {
   tplText(sh);
 
   sh.getRange('B1').setValue(filePanelUrl);
-  sh.getRange('B3').setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${carpetaBaseID}";"${carpetaBase}")`).setFontColor('#4A86E8');
+  sh.getRange('B3').setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${carpetaBaseID}";"${carpetaBase}")`).setFontColor('#0000FF');
   sh.getRange('B4').setValue(carpetaBaseID);
-  sh.getRange('B5').setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${folderPanelcId}";"${folderPanelcName}")`).setFontColor('#4A86E8');
+  sh.getRange('B5').setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${folderPanelcId}";"${folderPanelcName}")`).setFontColor('#0000FF');
   sh.getRange('B6').setValue(folderPanelcId);
 
   // ImportRange Permission
@@ -91,12 +91,10 @@ function morphCSUpdater(btnID) {
 
     // Filelist Styling
 
-    sh.getRange(3, 3, list.length, 1).setBorder(true, true, true, true, true, true, '#CCCCCC', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-      .setFontColor('#B7B7B7').setFontWeight('bold');
-    sh.getRange(3, 4, list.length, 1).setBorder(true, true, true, true, true, true, '#CCCCCC', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-      .setFontColor('#B7B7B7').setBackground('#F3F3F3');
-    sh.getRange(3, 3, list.length, 2).setFontSize(13).setFontFamily('Montserrat').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
-      .setVerticalAlignment('middle');
+    sh.getRange(3, 3, list.length, 2).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+    .setFontSize(14).setFontFamily('Montserrat').setFontColor('#78909c').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP).setVerticalAlignment('middle');
+    sh.getRange(3, 3, list.length, 1).setFontWeight('bold');
+    sh.getRange(3, 4, list.length, 1).setBackground('#fafafa');
   } else if (btnID === 'csManual2') {
     let txtFileId_FT = sh.getRange(3, 4).getValue();
     let txtFile_FT = DriveApp.getFileById(txtFileId_FT);
@@ -117,6 +115,8 @@ function morphCSUpdater(btnID) {
 
   // Copy data in Sheets
 
+  SpreadsheetApp.flush();
+
   for (const [txtFileName, txtFileId, txtFileSheet] of list) {
     let txt_file = DriveApp.getFileById(txtFileId);
     txt_file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
@@ -128,10 +128,12 @@ function morphCSUpdater(btnID) {
     sheetPaste.setTabColor('F1C232').hideSheet();
     sheetPaste.clear();
     sheetPaste.getRange(1, 1, tsvData.length, tsvData[0].length).setValues(tsvData);
+    SpreadsheetApp.flush();
   };
 
-  sh.getRange(2, 3).setNote(null).setNote(`Última actualización: ${dateNow} por ${userMail}`); // Last Update Note
+  sh.getRange('C2').setNote(null).setNote(`Última actualización: ${dateNow} por ${userMail}`); // Last Update Note
   deleteEmptyRows(); removeEmptyColumns();
+  sh.activate();
 }
 
 function getControlPanel(sh, file, btnID) {
@@ -180,39 +182,38 @@ function tplText(sh) {
 
 function sheetFormatter(sh) {
   // Estilo global
-  sh.getRange(1, 1, sh.getMaxRows(), sh.getMaxColumns()).setFontSize(13).setFontFamily('Montserrat').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
+  sh.getRange(1, 1, sh.getMaxRows(), sh.getMaxColumns()).setFontSize(14).setFontFamily('Montserrat').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
     .setVerticalAlignment('middle')
-    .setFontColor('#B7B7B7');
+    .setFontColor('#78909c');
   // Col A
-  sh.getRange(1, 1, 9, 1).setBorder(true, true, true, true, true, true, '#CCCCCC', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontWeight('bold');
+  sh.getRange(1, 1, 9, 1).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontWeight('bold');
   // Row 2
-  sh.getRange(2, 1, 1, 4).setFontFamily('Inconsolata').setFontSize(16).setBorder(true, true, true, true, true, true, '#CCCCCC', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-    .setFontColor('#999999')
+  sh.getRange(2, 1, 1, 4).setFontFamily('Inconsolata').setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
     .setFontWeight('bold')
     .setHorizontalAlignment('center');
   // Col B
-  sh.getRange(3, 2, 7, 1).setBackground('#F3F3F3').setBorder(true, true, true, true, true, true, '#CCCCCC', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+  sh.getRange(3, 2, 7, 1).setBackground('#fafafa').setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
   // ImportRanges
-  sh.getRange(1, 3, 1, 2).setBackground('#ffe0ef').setBorder(true, true, true, true, true, true, '#A64D79', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontColor('#A64D79')
+  sh.getRange(1, 3, 1, 2).setBackground('#e0f7fa').setBorder(true, true, true, true, true, true, '#26c6da', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontColor('#26c6da')
     .setFontWeight('bold')
     .setHorizontalAlignment('center');
   // Control Panel
-  sh.getRange('B1').setBackground('#ECFDF5').setBorder(true, true, true, true, true, true, '#34a853', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-    .setFontColor('#34a853')
+  sh.getRange('B1').setBackground('#ECFDF5').setBorder(true, true, true, true, true, true, '#00C853', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+    .setFontColor('#00C853')
     .setFontWeight('bold');
   // Folders Bold
   sh.getRangeList(['B3', 'B5', 'B7', 'B9']).setFontWeight('bold');
   // Column/Row Size
-  sh.setColumnWidth(1, 330);
+  sh.setColumnWidth(1, 335);
   sh.setColumnWidth(2, 380);
   sh.setColumnWidth(3, 285);
   sh.setColumnWidth(4, 400);
 
-  let maxRosh = sh.getMaxRows();
-  for (let i = 1; i < maxRosh + 1; i++) {
-    sh.setRowHeight(i, 27);
+  //let maxRosh = sh.getMaxRows();
+  for (let i = 1; i < sh.getMaxRows() + 1; i++) {
+    sh.setRowHeight(i, 28);
   }
-  sh.setRowHeight(2, 50);
+  sh.setRowHeight(1, 35); sh.setRowHeight(2, 50);
 }
 
 function importRangeToken(ss_id, tokenID) { // TokenID is the ID of destination Google Sheet
@@ -244,17 +245,15 @@ function manualUpdaterTemplate() {
 
   sheetFormatter(sh); // Formato de celdas
 
-  // Control Panel
-  sh.getRange('B1').setBackground('#FFF2CC').setBorder(true, true, true, true, true, true, '#BF9000', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-    .setFontColor('#BF9000')
-    .setFontWeight('bold');
-  sh.getRange('B8').setBackground('#FFF2CC').setBorder(true, true, true, true, true, true, '#BF9000', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-    .setFontColor('#BF9000');
+  // Control Panel 
+  sh.getRangeList(['B1', 'B8']).setBackground('#FFFDE7').setBorder(true, true, true, true, true, true, '#FBC02D', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+    .setFontColor('#FBC02D');
+  sh.getRange('B1').setFontWeight('bold');
   // Filelist Style
-  sh.getRange(3, 3, 3, 2).setFontSize(13).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP).setFontColor('#B7B7B7');
-  sh.getRange(3, 3, 3, 1).setBorder(true, true, true, true, true, true, '#CCCCCC', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontColor('#B7B7B7').setFontWeight('bold');
-  sh.getRange(3, 4, 3, 1).setBackground('#FFF2CC').setBorder(true, true, true, true, true, true, '#BF9000', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-    .setFontColor('#BF9000');
+  sh.getRange(3, 3, 3, 2).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
+  sh.getRange(3, 3, 3, 1).setFontWeight('bold');
+  sh.getRange(3, 4, 3, 1).setBackground('#FFFDE7').setBorder(true, true, true, true, true, true, '#FBC02D', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+    .setFontColor('#FBC02D');
   // ImportRange Cells
   sh.getRange('C1').setValue('=IMPORTRANGE(B1;"Instrucciones!A1")');
   sh.getRange('D1').setValue('=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1CuMcYrtT6NXwxa9fMEIOTgRfkPySnNwKvA_1dyarCro";"DB-SI!B2")');

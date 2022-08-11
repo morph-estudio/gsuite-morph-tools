@@ -36,14 +36,11 @@ function afterButtonClicked(){
       swaload();
       google.script.run.withSuccessHandler(e => {swalsuccess('Los archivos se han listado correctamente.'), afterSubmit(e)}).withFailureHandler(swalerror).listFilesInFolder(rowData);
 
-  } else{
-    //$("#errorNotification").toast("show");
   }
 }
 
 function afterSubmit(e){
   clearFields(["list-files"]);
-  //$("#successNotification").toast("show");
 }
 
 function clearFields(feilds){
@@ -67,7 +64,6 @@ function validate(){
   return Array.prototype.every.call(fieldsToValidate,function(el){
   return el.checkValidity();
   });
-
 }
 
 document.getElementById("listButton").addEventListener("click",afterButtonClicked);

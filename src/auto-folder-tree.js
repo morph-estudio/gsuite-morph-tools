@@ -1,5 +1,5 @@
 /**
- * Gsuite Morph Tools - Morph autoFolderTree 1.2
+ * Gsuite Morph Tools - Morph autoFolderTree 1.3
  * Developed by alsanchezromero
  *
  * Copyright (c) 2022 Morph Estudio
@@ -9,12 +9,11 @@
 /* eslint-disable no-restricted-syntax */
 
 function autoFolderTree() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sh = ss.getActiveSheet();
+  const ss = SpreadsheetApp.getActive();
+  let sh = ss.getActiveSheet();
   let niveles = [1, 2, 3, 4, 5, 6, 7];
 
-  sh.activate();
-
+/*
   let cell = sh.getRange('B3');
   if (cell.isBlank()) {
     const ui = SpreadsheetApp.getUi();
@@ -30,6 +29,22 @@ function autoFolderTree() {
       // call function and pass the value
       cell.setValue(userGetID);
     }
+  }
+**/
+
+  let result = ui().alert(
+    '¿Quieres crear una copia de la hoja?',
+    'Las fórmulas de la plantilla actual se sustituirán por las nuevas carpetas creadas.',
+    ui().ButtonSet.YES_NO,
+  );
+
+  if (result == ui().Button.YES) {
+    let sheetName = sh.getSheetName();
+    let copiedSheetIndex = sh.getIndex() + 1;
+    sh.setName(`${sheetName} - Final`);
+    sh.copyTo(ss).setName(sheetName).activate();
+    ss.moveActiveSheet(copiedSheetIndex);
+    sh.activate();
   }
 
   for (n in niveles) {
@@ -57,7 +72,7 @@ function autoFolderTree() {
         newFolderID.setValue(folderIdValue);
         let addLink = sh.getRange(Number(i) + 3, Number(Level));
         let value = addLink.getDisplayValue();
-        addLink.setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${folderIdValue}","${value}")`);
+        addLink.setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${folderIdValue}";"${value}")`);
       }
     }
   }
@@ -86,24 +101,22 @@ function autoFolderTreeTpl() {
   // Global Style
   sh.getRange(1, 1, sh.getMaxRows(), sh.getMaxColumns()).setFontSize(12).setFontFamily('Montserrat').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
     .setVerticalAlignment('middle');
-
   // Levels of Structure
   sh.getRange(1, 3, 1, 13).setBackground('#434343').setFontColor('#fff');
-  sh.getRange('B1').setBackground('#BF9000').setBorder(true, true, true, true, true, true, '#BF9000', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+  sh.getRange('B1').setBackground('#FBC02D').setBorder(true, true, true, true, true, true, '#FBC02D', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
     .setFontColor('#fff');
-  sh.getRange('B3').setBackground('#FFF2CC').setBorder(true, true, true, true, true, true, '#BF9000', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-    .setFontColor('#BF9000');
-
+  sh.getRange('B3').setBackground('#FFFDE7').setBorder(true, true, true, true, true, true, '#FBC02D', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+    .setFontColor('#FBC02D');
   // Style of Morph Project Template
-  sh.getRange(1, 18, 1, 6).setBackground('#BF9000').setBorder(true, true, true, true, true, true, '#BF9000', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+  sh.getRange(1, 18, 1, 6).setBackground('#FBC02D').setBorder(true, true, true, true, true, true, '#FBC02D', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
     .setFontColor('#fff');
-  sh.getRange(2, 18, 1, 6).setBackground('#FFF2CC').setBorder(true, true, true, true, true, true, '#BF9000', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-    .setFontColor('#BF9000').setHorizontalAlignment('center');
+  sh.getRange(2, 18, 1, 6).setBackground('#FFFDE7').setBorder(true, true, true, true, true, true, '#FBC02D', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+    .setFontColor('#FBC02D').setHorizontalAlignment('center');
 
   let cell = sh.getRange('T2');
   let rule = SpreadsheetApp.newDataValidation().requireValueInList(['AEI', 'E', 'I', 'IINT', 'I+D']).build();
-
   cell.setDataValidation(rule);
+  
   sh.getRange(1, 1, 1, sh.getMaxColumns()).setFontWeight('bold').setFontSize(14).setHorizontalAlignment('center');
 
   // Column Style

@@ -1,6 +1,6 @@
 # Gsuite Morph Tools
 
-<img src="https://i.ibb.co/PYXLTBs/Morph-Logo-final.jpg" align="center" width="30%" >
+<img src="https://i.ibb.co/PYXLTBs/Morph-Logo-final.jpg" align="center" width="32%" >
 
 ## ¿Qué es?
 Gsuite Morph Tools es una extensión para Google Suite que centraliza todas las funciones y herramientas implementadas por el equipo I+D para el estudio Morph, con el fin de automatizar y facilitar tareas con una interfaz accesible para todos.

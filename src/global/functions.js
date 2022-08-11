@@ -2,7 +2,7 @@
 
 /**
  * isValidHttpUrl
- * Chequea si la URL dada es válida
+ * Chequea si una URL es válida
  */
 function isValidHttpUrl(str) {
   let pattern = new RegExp('^(https?:\\/\\/)?' // protocol

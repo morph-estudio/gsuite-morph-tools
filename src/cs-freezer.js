@@ -10,13 +10,16 @@ function morphFreezer(btnID) {
   let sh = ss.getSheetByName('ACTUALIZAR');
   let ss_id = ss.getId();
   let file = DriveApp.getFileById(ss_id);
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
   let parentFolder = file.getParents();
   let parentFolderID = parentFolder.next().getId();
   let backupFolderSearch = DriveApp.getFolderById(parentFolderID);
-  const dateNow = Utilities.formatDate(new Date(), 'GMT+1', 'yyyyMMdd');
+  let userMail = Session.getActiveUser().getEmail();
+  let dateNow = Utilities.formatDate(new Date(), 'GMT+2', 'dd/MM/yyyy - HH:mm:ss');
+  let freezerDate = Utilities.formatDate(new Date(), 'GMT+2', 'yyyyMMdd');
 
   let backupFolderId;
-  if (btnID === 'csFreezer' || 'csManual3') {
+  if (btnID === 'csFreezer' || btnID === 'csManual3') {
     backupFolderId = freezerCS(sh, backupFolderSearch, btnID); // Destination Folder (Específico cuadro de superficies)
   }
 
@@ -24,7 +27,7 @@ function morphFreezer(btnID) {
 
   // Copy the source Spreadsheet
 
-  let destination = ss.copy(`${ss.getName()} - ${dateNow} - CONGELADO`);
+  let destination = ss.copy(`${ss.getName()} - ${freezerDate} - CONGELADO`);
   let destinationId = destination.getId();
   let destinationFile = DriveApp.getFileById(destinationId);
   destinationFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
@@ -53,15 +56,13 @@ function morphFreezer(btnID) {
   // Move file to the destination folder
 
   if (btnID === 'superFreezerButton') {
-    file = DriveApp.getFileById(destinationId);
-    DriveApp.getFolderById(parentFolderID).addFile(file);
-    file.getParents().next().removeFile(file);
-  } 
-  if (btnID == 'csFreezer' || 'csManual3') {
-    file = DriveApp.getFileById(destinationId);
-    DriveApp.getFolderById(backupFolderId).addFile(file);
-    file.getParents().next().removeFile(file);
-  }
+    DriveApp.getFolderById(parentFolderID).addFile(destinationFile);
+    destinationFile.getParents().next().removeFile(destinationFile);
+  };
+  if (btnID === 'csFreezer' || btnID === 'csManual3') {
+    DriveApp.getFolderById(backupFolderId).addFile(destinationFile);
+    destinationFile.getParents().next().removeFile(destinationFile);
+  };
 
   // Export to XLSX let xlsDownloadUrl = exportToXLSS(ss, destinationId);
 
@@ -74,15 +75,17 @@ function morphFreezer(btnID) {
       muteHttpExceptions: true,
     };
     let blob = UrlFetchApp.fetch(url, params).getBlob();
-    blob.setName(`${ss.getName()} - ${dateNow} - ` + `CONGELADO` + `.xlsx`);
+    blob.setName(`${ss.getName()} - ${freezerDate} - CONGELADO.xlsx`);
     const ui = SpreadsheetApp.getUi();
     let confirm = Browser.msgBox('Documento Excel', '¿Quieres crear una copia en formato Excel en la misma carpeta?', Browser.Buttons.OK_CANCEL);
     if (confirm == 'ok') { DriveApp.getFolderById(parentFolderID).createFile(blob); }
   } else if (btnID === 'csFreezer' || 'csManual3') {
-    sh.getRange('B9').setValue(url).setFontColor('#4A86E8'); // Add XLSX download url to sheet
+    sh.getRange('B9').setValue(url).setFontColor('#0000FF'); // Add XLSX download url to sheet
+    sh.getRange('B7').setNote(null).setNote(`Último congelado: ${dateNow} por ${userMail}`); // Last Update Note
   }
 
   sh.activate();
+
 }
 
 /**
@@ -114,7 +117,7 @@ function freezerCS(sh, backupFolderSearch, btnID) {
   sh.getRange('A7').setValue('CARPETA BACKUP');
   sh.getRange('A8').setValue('ID CARPETA BACKUP');
   sh.getRange('A9').setValue('DESCARGAR ARCHIVO XLSX');
-  sh.getRange('B7').setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${backupFolderId}";"${backupFolderName}")`).setFontColor('#4A86E8');
+  sh.getRange('B7').setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${backupFolderId}";"${backupFolderName}")`).setFontColor('#0000FF');
   sh.getRange('B8').setValue(backupFolderId);
 
   return backupFolderId;
@@ -192,10 +195,10 @@ function morphFastFreezer() {
   let parentFolder = file.getParents();
   let parentFolderID = parentFolder.next().getId();
   let parentFolderDef = DriveApp.getFolderById(parentFolderID);
-  const dateNow = Utilities.formatDate(new Date(), 'GMT+1', 'yyyyMMdd');
+  let freezerDate = Utilities.formatDate(new Date(), 'GMT+2', 'yyyyMMdd');
 
   var destination = ss.copy(ss.getName());
-  file.setName(`${ss.getName()} - ${dateNow} - CONGELADO`);
+  file.setName(`${ss.getName()} - ${freezerDate} - CONGELADO`);
 
   let destinationId = destination.getId();
   let destinationFile = DriveApp.getFileById(destinationId);

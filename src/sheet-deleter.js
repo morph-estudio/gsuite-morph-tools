@@ -14,13 +14,11 @@ function deleteWorksheets(sheetNamesToDeleteAsString, rowData) {
   let ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheets = ss.getSheets();
 
-    let formData = [
+  let formData = [
     rowData.gmtAction,
   ];
 
   let [gmtAction] = formData;
-
-
 
   let sheetsToDelete = sheets.filter((sheet) => sheetNamesToDelete.includes(sheet.getSheetName()));
 

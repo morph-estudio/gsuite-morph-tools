@@ -1,5 +1,5 @@
 /**
- * Gsuite Morph Tools - Morph Document Studio 1.5
+ * Gsuite Morph Tools - Morph Document Studio 1.6
  * Developed by alsanchezromero
  *
  * Copyright (c) 2022 Morph Estudio
