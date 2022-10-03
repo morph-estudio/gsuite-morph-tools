@@ -1,6 +1,6 @@
 {
   "timeZone": "Europe/Madrid",
-  "exceptionLogging": "STACKDRIVER", 
+  "exceptionLogging": "NONE",
   "runtimeVersion": "V8",
   "dependencies": {
     "enabledAdvancedServices": [
@@ -12,11 +12,6 @@
       {
         "userSymbol": "Drive",
         "serviceId": "drive",
-        "version": "v2"
-      },
-      {
-        "userSymbol": "BigQuery",
-        "serviceId": "bigquery",
         "version": "v2"
       },
       {
@@ -43,6 +38,13 @@
         "userSymbol": "Slides",
         "serviceId": "slides",
         "version": "v1"
+      }
+    ],
+    "libraries": [
+      {
+        "userSymbol": "OAuth2",
+        "version": "41",
+        "libraryId": "1B7FSrk5Zi6L1rSxxTDgDEUsPzlukDsi4KGuTMorsTQHhGBzBkMun4iDF"
       }
     ]
   }

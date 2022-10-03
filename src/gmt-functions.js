@@ -1,3 +1,163 @@
+function increaseFontSize() {
+  const range = sh().getDataRange();
+  let fontsizes = range.getFontSizes();
+  let numRows = range.getNumRows();
+  let numCols = range.getNumColumns();
+
+  for (let i = 0; i < numRows; i++) {
+    for (let j = 0; j < numCols; j++) {
+      range.getCell(i + 1,j + 1).setFontSize(fontsizes[i][j] + 2)
+    }
+  }
+}
+
+function decreaseFontSize() {
+  const range = sh().getDataRange();
+  let fontsizes = range.getFontSizes();
+  let numRows = range.getNumRows();
+  let numCols = range.getNumColumns();
+
+  for (let i = 0; i < numRows; i++) {
+    for (let j = 0; j < numCols; j++) {
+      range.getCell(i + 1,j + 1).setFontSize(fontsizes[i][j] - 2)
+    }
+  }
+}
+
+function autoResizeAllRows() {
+  const sh = ss().getActiveSheet();
+  const maxRows = sh.getLastRow();
+  sh.autoResizeRows(1, maxRows)
+}
+
+function autoResizeAllCols() {
+  const sh = ss().getActiveSheet();
+  const numCols = sh.getLastColumn();
+
+  for (let j = 1; j < numCols + 1; j++) {
+    sh.autoResizeColumn(j);
+    let colWidth = sh.getColumnWidth(j)
+    sh.setColumnWidth(j, colWidth + 20)
+  }
+}
+
+
+/**
+ * listFilesInFolder
+ * Crea una lista de archivos dentro de una carpeta de Google Drive
+ */
+function setSubindex() {
+
+
+Logger.log(externalDatabase)
+/*
+
+  let sh = ss().getActiveSheet();
+  let cell = sh.getActiveCell();
+  let value = cell.getValue();
+  Logger.log(value)
+
+let value2 = 'asdf';
+value3 = value2.toString()
+let jsonobj = {
+  "squadName": "Super hero squad",
+  "homeTown": "Metro City",
+  "formed": 2016,
+  "secretBase": "Super tower",
+  "active": true,
+  "subindex": [
+    {
+      "0": "₀",
+      "1": "₁",
+      "2": "₂",
+      "3": "₃",
+      "4": "₄",
+      "5": "₅",
+      "6": "₆",
+      "7": "₇",
+      "8": "₈",
+      "9": "₉",
+
+      "a": "₉",
+      "b": "₉",
+    }
+  ]
+}
+
+  for (let i in value) {
+    //value = value.replace(value[i], jsonobj['subindex'][0][value[i].toString()])
+  }
+
+ cell.setValue(value2.sub());
+
+
+
+*/
+
+
+/*
+  //let database = SpreadsheetApp.openById('1lcymggGAbACfKuG0ceMDWIIB9zWuxgVtSR9qpgNq4Ng').getSheetByName('UnicodeCharas');
+
+  let database = UrlFetchApp.fetch('https://docs.google.com/spreadsheets/d/1lcymggGAbACfKuG0ceMDWIIB9zWuxgVtSR9qpgNq4Ng/gviz/tq?tqx=out:json&gid=951104656').getContentText();
+  database1 = JSON.parse(database.match(/(?<=.*\().*(?=\);)/s)[0])
+  let database2 = database.match(/(?<=.*\().*(?=\);)/s)[0]
+  Logger.log(database2)
+
+  //let object = database2['rows'][0][2]
+  //Logger.log(`Final value: ${object}`)
+
+
+
+  
+
+  Logger.log(value);
+
+
+
+
+
+
+
+
+
+
+
+let response = jsonobj['subindex'][0][char]
+Logger.log(jsonobj);
+Logger.log(response);
+
+
+
+let database = UrlFetchApp.fetch('https://docs.google.com/spreadsheets/d/1lcymggGAbACfKuG0ceMDWIIB9zWuxgVtSR9qpgNq4Ng/gviz/tq?tqx=out:json&gid=951104656').getContentText();
+database1 = JSON.parse(database.match(/(?<=.*\().*(?=\);)/s)[0])
+let database2 = database.match(/(?<=.*\().*(?=\);)/s)[0]
+Logger.log(database1)
+
+let object = database1['table.rows'][0][2]
+Logger.log(object)
+*/
+
+
+
+
+
+
+
+}
+
+function rowToDict(sheet, rownumber) {
+  var columns = sheet.getRange(1,1,1, sheet.getMaxColumns()).getValues()[0];
+  var data = sheet.getDataRange().getValues()[rownumber-1];
+  var dict_data = {};
+  for (var keys in columns) {
+    var key = columns[keys];
+    dict_data[key] = data[keys];
+  }
+  return dict_data;
+}
+
+
+
 /**
  * listFilesInFolder
  * Crea una lista de archivos dentro de una carpeta de Google Drive
@@ -33,6 +193,8 @@ function listFilesInFolder(rowData) {
   }
   let result = [['Filename', 'File URL', 'Type'], ...names.sort()];
   sh.getRange(2, 1, names.length + 1, 3).setValues(result);
+
+  autoResizeAllRows(); autoResizeAllCols(); sh.setColumnWidth(1, 300); sh.setColumnWidth(2, 300);
 }
 
 function waiting(ms) {
@@ -185,97 +347,46 @@ function mergeColumns() {
 }
 
 /**
- * saveSheetAsTSV
- * Guarda la hoja en formato TSV manteniendo las fórmulas
+ * uniqueIdentifier
+ * Genera identificadores únicos en las celdas seleccionadas.
  */
-function saveSheetAsTSV() {
-  let ss = SpreadsheetApp.getActiveSpreadsheet();
-  let sh = ss.getActiveSheet();
-
-  const ui = SpreadsheetApp.getUi();
-  let result = ui.prompt(
-    'Carpeta de destino',
-    'Introduce el LINK de la carpeta donde guardar el archivo.\nSi se deja en blanco se creará una nueva carpeta en Mi Unidad.',
-    ui.ButtonSet.OK_CANCEL,
-  );
-
-  let button = result.getSelectedButton();
-  let userResponse = result.getResponseText();
-  let folder; let externalFolderId;
-  if (button == ui.Button.OK) {
-    if (userResponse === '') {
-      folder = rootFolder.createFolder('TSV Exports');
-      externalFolderId = folder.getid();
-    } else {
-      externalFolderId = getIdFromUrl(userResponse);
-      folder = DriveApp.getFolderById(externalFolderId);
+function uniqueIdentifier() {
+  const selection = sh().getActiveRange();
+  const columns = selection.getNumColumns();
+  const rows = selection.getNumRows();
+  for (let column = 1; column <= columns; column++) {
+    for (let row = 1; row <= rows; row++) {
+      const cell = selection.getCell(row, column);
+      cell.setValue(Utilities.getUuid());
     }
-  }
-
-  fileName = sh.getName() + ".txt";
-  var tsvFile = convertRangeTotsvFile(fileName, sh);
-  folder.createFile(fileName, tsvFile);
-  // Browser.msgBox('Files are waiting in a folder named ' + folder.getName());
-}
-
-function convertRangeTotsvFile(tsvFileName, sheet) {
-  // get available data range in the spreadsheet
-  var activeRange = sheet.getDataRange();
-  try {
-    var data = activeRange.getValues();
-    var formula = activeRange.getFormulas();
-    var tsvFile = undefined;
-    // loop through the data in the range and build a string with the tsv  data
-    if (data.length > 1) {
-      var tsv = "";
-      for (var row = 0; row < data.length; row++) {
-        for (var col = 0; col < data[row].length; col++) {
-          if (formula[row][col] !== '') {
-            data[row][col] = formula[row][col]
-          }
-          if (data[row][col].toString().indexOf("\t") != -1) {
-            data[row][col] = "\"" + data[row][col] + "\"";
-          }
-        }
-        // join each row's columns
-        // add a carriage return to end of each row, except for the last one
-        if (row < data.length-1) {
-          tsv += data[row].join("\t") + "\r\n";
-        }
-        else {
-          tsv += data[row].join("\t");
-        }
-      }
-      tsvFile = tsv;
-    }
-    return tsvFile;
-  }
-  catch(err) {
-    Browser.msgBox(err);
   }
 }
 
 /**
- * Funciones en fase de desarrollo
+ * cellCounter
+ * Determina cuán lleno está el documento respecto al total de celdas.
  */
-function fExportXML() {
-  let ss = SpreadsheetApp.getActive();
-  let sh = ss.getActiveSheet();
-  let values = sh.getDataRange().getValues();
-  return '<sheet>' + values.map(function(row, i) {
-    return '<row>' + row.map(function(v) {
-      return '<cell>' + v + '</cell>';
-    }).join('') + '</row>';
-  }).join('') + '</sheet>';
+let size;
+function cellCounter() {
+  let ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheets = ss.getSheets();
+  let cells = 0;
+  sheets.forEach((sheet) => {
+    cells = cells + sheet.getMaxRows() * sheet.getMaxColumns();
+  });
+  let division = cells / 10000000 * 100;
+  let percentage = +division.toFixed(0);
+  return percentage;
 }
 
-function exportXML() {
-  var content;
-  try {
-    content = fExportXML();
-  } catch(err) {
-    content = '<error>' + (err.message || err) + '</error>';
-  }
-  return ContentService.createTextOutput(content)
-    .setMimeType(ContentService.MimeType.XML).downloadAsFile('Hola');
+function cellCounter2() {
+  let ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheets = ss.getSheets();
+  let cells = 0;
+  sheets.forEach((sheet) => {
+    cells = cells + sheet.getMaxRows() * sheet.getMaxColumns();
+  });
+  let division = cells / 10000000 * 100;
+  let percentage = +division.toFixed(0);
+  return (`📈 Cada Google Sheets tiene capacidad para diez millones de celdas. Has usado el <strong>${percentage}%</strong> del total con <strong>${cells} celdas</strong>.`);
 }

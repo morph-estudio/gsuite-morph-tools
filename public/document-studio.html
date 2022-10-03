@@ -7,25 +7,43 @@
 
   <?!= HtmlService.createHtmlOutputFromFile('public/helpers/header').getContent(); ?>
   <?!= HtmlService.createHtmlOutputFromFile('public/stylesheet').getContent(); ?>
-<script src="https://www.tutorialspoint.com/jquery/jquery-3.6.0.js"></script>
+  <script src="https://www.tutorialspoint.com/jquery/jquery-3.6.0.js"></script>
+
+  <script src="https://cdn.tiny.cloud/1/c6gsjn35dtkdhm0zan0ftyao7fe0lr3ye6ocltbbu4bj46em/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+  <script>
+    tinymce.init({
+      selector: 'textarea#editor',
+      plugins: 'lists',
+      toolbar_mode: 'wrap',
+      placeholder: 'En el asunto y mensaje puedes utilizar {{marcadores}} para personalizar los emails.',
+      skin: 'bootstrap',
+      height : "300",
+      plugins: 'lists, link, image, media',
+      toolbar: 'bold italic underline forecolor bullist numlist | link emoticons removeformat undo',
+      menubar: false,
+      entity_encoding: "raw",
+      placeholder_attrs: "color: #888",
+      });
+  </script>
+
 </head>
 
 <body>
 
 <?!= HtmlService.createHtmlOutputFromFile('public/helpers/navbar').getContent(); ?>
 
-<div class="accordion-body mt-3 pb-0">
+<!--  <div class="background-grey">
 
-  <p>Morph Document Studio te permite crear archivos en masa a partir de plantillas con DOCS y SLIDES.</p>
-  <div class="d-flex mb-3">
+  <p>Morph Document Studio te permite crear archivos en masa a partir de plantillas con DOCS y SLIDES.</p> 
+  <div class="d-flex pt-3 pb-3 mx-auto accordion-body">
     <object data="https://mocarabes.com/wp-content/uploads/morph/google-sheets-icon.svg" class="docsicons"> </object>
     <i class="fa-solid fa-arrow-right fa-compatible"></i>
     <object data="https://mocarabes.com/wp-content/uploads/morph/google-docs-icon.svg" class="docsicons"> </object>
     <object data="https://mocarabes.com/wp-content/uploads/morph/google-slides-icon.svg" class="docsicons"> </object>
     <i class="fa-solid fa-wand-magic-sparkles fa-compatible"></i>
-  </div>
+  </div> 
 
-</div>
+</div> -->
 
 <div class="accordion" id="accordionExample">
 
@@ -37,6 +55,14 @@
     </h2>
     <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
       <div class="accordion-body">
+
+        <div class="d-flex pt-1 pb-3 mx-auto">
+          <object data="https://mocarabes.com/wp-content/uploads/morph/google-sheets-icon.svg" class="docsicons"> </object>
+          <i class="fa-solid fa-arrow-right fa-compatible"></i>
+          <object data="https://mocarabes.com/wp-content/uploads/morph/google-docs-icon.svg" class="docsicons"> </object>
+          <object data="https://mocarabes.com/wp-content/uploads/morph/google-slides-icon.svg" class="docsicons"> </object>
+          <i class="fa-solid fa-wand-magic-sparkles fa-compatible"></i>
+        </div>
 
         <?!= HtmlService.createHtmlOutputFromFile('public/helpers/form-ds-1').getContent(); ?>
 
@@ -103,121 +129,131 @@
       </div>
     </div>
   </div>
-
 </div>
 
 
-
-
-
+<script>
+  let data = JSON.parse("<?=JSON.stringify(dsProperties)?>");
+  let emailDropdown = JSON.parse("<?=JSON.stringify(emailDropdown)?>");
+  let dataExtracted = data;
+</script>
 
 <script type="text/javascript">
 
 function afterSidebarLoads(){
+  afterDropDrownArrayReturned(emailDropdown);
+}
 
+function refreshButtonPush(){
   google.script.run.withSuccessHandler(afterDropDrownArrayReturned).emailDropdown();
-  setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 50);
+}
 
-  function addDropdownElements(arrayOfArrays, field) {
-    arrayOfArrays.forEach(function(r){
-      var option = document.createElement("option");
-      option.textContent = r[0];
-      field.appendChild(option);
-    });
-    getCosas();
-    //removeFadeOut(document.getElementById('loading-spin'), 300);
-  }
+function addDropdownElements(arrayOfArrays, field) {
+  arrayOfArrays.forEach(function(r){
+    let option = document.createElement("option");
+    option.textContent = r[0];
+    field.appendChild(option);
+  });
 
-  function afterDropDrownArrayReturned(arrayOfArrays){
-    var emailField = document.getElementById("email-field");
-    addDropdownElements(arrayOfArrays, emailField)
-    var emailBlobField = document.getElementById("email-blob-field");
-    addDropdownElements(arrayOfArrays, emailBlobField);
-  }
+  if (typeof dataExtracted['Email Field'] !== 'undefined') var emailField = document.getElementById("email-field").value = dataExtracted['Email Field'];
+  if (typeof dataExtracted['Email Attach Field'] !== 'undefined') var emailAttachField = document.getElementById("email-blob-field").value = dataExtracted['Email Attach Field'];
+}
+
+function afterDropDrownArrayReturned(arrayOfArrays){
+  let emailField = document.getElementById("email-field");
+  emailField.innerHTML = "";
+  addDefaultChild(emailField, 'Selecciona campo email');
+  addDropdownElements(arrayOfArrays, emailField)
+  let emailBlobField = document.getElementById("email-blob-field");
+  emailBlobField.innerHTML = "";
+  addDefaultChild(emailBlobField, 'Selecciona campo adjuntos');
+  addDropdownElements(arrayOfArrays, emailBlobField);
+  $('#fa-sync-1, #fa-sync-2').removeClass("fast-spin");
+}
+
+function addDefaultChild(field, text) {
+  let option = document.createElement("option");
+  option.text = text;
+  option.value = '0';
+  field.appendChild(option);
+}
+
+function getDropdownSavedFields() {
 
 }
 
-function getCosas() {
+function getSavedProperties() {
 
-  var dataExtracted;
-  google.script.run
-  .withSuccessHandler(function(data){
+  setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 600);
 
-    dataExtracted = data; // DataExtracted is global and available to other functions!
+  $(document).ready(function() {
+    $('#dsForm').collapse($('#ds-activate').prop('checked') ? "show" : "hide");
+    $('#all-documents-div').collapse($('#ds-activate').prop('checked') ? "show" : "hide");
+    $('#emailForm').collapse($('#email-activate').prop('checked') ? "show" : "hide");
+    $('#all-emails-div').collapse($('#email-activate').prop('checked') ? "show" : "hide");
+    $('#emailBlob').collapse($('#email-addblob').prop('checked') ? "show" : "hide");
 
-    $(document).ready(function() {
-      $('#dsForm').collapse($('#ds-activate').prop('checked') ? "show" : "hide");
-      $('#all-documents-div').collapse($('#ds-activate').prop('checked') ? "show" : "hide");
-      $('#emailForm').collapse($('#email-activate').prop('checked') ? "show" : "hide");
-      $('#all-emails-div').collapse($('#email-activate').prop('checked') ? "show" : "hide");
-      $('#emailBlob').collapse($('#email-addblob').prop('checked') ? "show" : "hide");
+    document.getElementById('template-id').disabled = document.getElementById('green-cells').checked;
+    document.getElementById('destination-folder').disabled = document.getElementById('green-cells').checked;
 
-      document.getElementById('template-id').disabled = document.getElementById('green-cells').checked;
-      document.getElementById('destination-folder').disabled = document.getElementById('green-cells').checked;
-
-      $('#ds-activate').change(function() { 
-          $('#dsForm').collapse('toggle');
-          $('#all-documents-div').collapse('toggle');
-      });
-      $('#email-activate').change(function() { 
-          $('#emailForm').collapse('toggle');
-          $('#all-emails-div').collapse('toggle');
-      });
-      $('#email-addblob').change(function() { 
-          $('#emailBlob').collapse('toggle');
-      });
-
-      $(document).ready(function() {
-              var checks = $("#ds-activate, #email-activate");
-              if (checks.filter(':checked').length == 0) {
-                  $('#hideWhenBothSwitchOff').hide();
-              } else {
-                  $('#hideWhenBothSwitchOff').show();
-              }
-          $('.hideWhenBothSwitchOff').click(function () {
-              var checks = $("#ds-activate, #email-activate");
-              if (checks.filter(':checked').length == 0) {
-                  $('#hideWhenBothSwitchOff').hide();
-              } else {
-                  $('#hideWhenBothSwitchOff').show();
-              }
-          });
-      });
-
+    $('#ds-activate').change(function() { 
+        $('#dsForm').collapse('toggle');
+        $('#all-documents-div').collapse('toggle');
+    });
+    $('#email-activate').change(function() { 
+        $('#emailForm').collapse('toggle');
+        $('#all-emails-div').collapse('toggle');
+    });
+    $('#email-addblob').change(function() { 
+        $('#emailBlob').collapse('toggle');
     });
 
-    document.getElementById("ds-activate").checked = checkReturn(dataExtracted['DS Activate']);
-    document.getElementById("email-activate").checked = checkReturn(dataExtracted['Email Activate']);
+    $(document).ready(function() {
+            var checks = $("#ds-activate, #email-activate");
+            if (checks.filter(':checked').length == 0) {
+                $('#hideWhenBothSwitchOff').hide();
+            } else {
+                $('#hideWhenBothSwitchOff').show();
+            }
+        $('.hideWhenBothSwitchOff').click(function () {
+            var checks = $("#ds-activate, #email-activate");
+            if (checks.filter(':checked').length == 0) {
+                $('#hideWhenBothSwitchOff').hide();
+            } else {
+                $('#hideWhenBothSwitchOff').show();
+            }
+        });
+    });
+  });
 
-    if (typeof dataExtracted['Template Link'] !== 'undefined') document.getElementById("template-id").value = dataExtracted['Template Link'];
-    if (typeof dataExtracted['Green Cells'] !== 'undefined') document.getElementById("green-cells").checked = checkReturn(dataExtracted['Green Cells']);
+  document.getElementById("ds-activate").checked = checkReturn(dataExtracted['DS Activate']);
+  document.getElementById("email-activate").checked = checkReturn(dataExtracted['Email Activate']);
 
-    if (typeof dataExtracted['Destination Folder'] !== 'undefined') var destinationFolder = document.getElementById("destination-folder").value = dataExtracted['Destination Folder'];
-    if (typeof dataExtracted['Filename'] !== 'undefined') var fileName = document.getElementById("file-name").value = dataExtracted['Filename'];
-    if (typeof dataExtracted['Export Format'] !== 'undefined') var exportFormat = document.getElementById("export-format").value = dataExtracted['Export Format'];
-    if (typeof dataExtracted['Permission 1'] !== 'undefined') var permission1 = document.getElementById("permission-1").checked = checkReturn(dataExtracted['Permission 1']);
-    if (typeof dataExtracted['Permission 2'] !== 'undefined') var permission2 = document.getElementById("permission-2").checked = checkReturn(dataExtracted['Permission 2']);
-    if (typeof dataExtracted['Permission 3'] !== 'undefined') var permission3 = document.getElementById("permission-3").checked = checkReturn(dataExtracted['Permission 3']);
-    if (typeof dataExtracted['Numeration Switch'] !== 'undefined') var numerationSwitch = document.getElementById("numeration-switch").checked = checkReturn(dataExtracted['Numeration Switch']);
+  if (typeof dataExtracted['Template Link'] !== 'undefined') document.getElementById("template-id").value = dataExtracted['Template Link'];
+  if (typeof dataExtracted['Green Cells'] !== 'undefined') document.getElementById("green-cells").checked = checkReturn(dataExtracted['Green Cells']);
 
-    if (typeof dataExtracted['Email Field'] !== 'undefined') var emailField = document.getElementById("email-field").value = dataExtracted['Email Field'];
-    if (typeof dataExtracted['Email Specific'] !== 'undefined') var emailSpecific = document.getElementById("email-specific").value = dataExtracted['Email Specific'];
-    if (typeof dataExtracted['Email Sender'] !== 'undefined') var emailSender = document.getElementById("email-sender").value = dataExtracted['Email Sender'];
-    if (typeof dataExtracted['Email Subject'] !== 'undefined') var emailSubject = document.getElementById("email-subject").value = dataExtracted['Email Subject'];
-    if (typeof dataExtracted['Email More Fields'] !== 'undefined') var emailMoreFields = document.getElementById("email-more").checked = checkReturn(dataExtracted['Email More Fields']);
-    if (typeof dataExtracted['Email BCC'] !== 'undefined') var emailBCC = document.getElementById("email-bcc").value = dataExtracted['Email BCC'];
-    if (typeof dataExtracted['Email Reply To'] !== 'undefined') var emailReplyTo = document.getElementById("email-replyto").value = dataExtracted['Email Reply To'];
-    if (typeof dataExtracted['Email Attach Switch'] !== 'undefined') var emailAttachSwitch = document.getElementById("email-addblob").checked = checkReturn(dataExtracted['Email Attach Switch']);
-    if (typeof dataExtracted['Email Attach Field'] !== 'undefined') var emailAttachField = document.getElementById("email-blob-field").value = dataExtracted['Email Attach Field'];
+  if (typeof dataExtracted['Destination Folder'] !== 'undefined') var destinationFolder = document.getElementById("destination-folder").value = dataExtracted['Destination Folder'];
+  if (typeof dataExtracted['Filename'] !== 'undefined') var fileName = document.getElementById("file-name").value = dataExtracted['Filename'];
+  if (typeof dataExtracted['Export Format'] !== 'undefined') var exportFormat = document.getElementById("export-format").value = dataExtracted['Export Format'];
+  if (typeof dataExtracted['Permission 1'] !== 'undefined') var permission1 = document.getElementById("permission-1").checked = checkReturn(dataExtracted['Permission 1']);
+  if (typeof dataExtracted['Permission 2'] !== 'undefined') var permission2 = document.getElementById("permission-2").checked = checkReturn(dataExtracted['Permission 2']);
+  if (typeof dataExtracted['Permission 3'] !== 'undefined') var permission3 = document.getElementById("permission-3").checked = checkReturn(dataExtracted['Permission 3']);
+  if (typeof dataExtracted['Numeration Switch'] !== 'undefined') var numerationSwitch = document.getElementById("numeration-switch").checked = checkReturn(dataExtracted['Numeration Switch']);
 
-    if (typeof dataExtracted['All Documents'] !== 'undefined') var allDocuments = document.getElementById("all-documents").checked = checkReturn(dataExtracted['All Documents']);
-    if (typeof dataExtracted['All Emails'] !== 'undefined') var allEmails = document.getElementById("all-emails").checked = checkReturn(dataExtracted['All Emails']);
+  if (typeof dataExtracted['Email Field'] !== 'undefined') var emailField = document.getElementById("email-field").value = dataExtracted['Email Field'];
+  if (typeof dataExtracted['Email Specific'] !== 'undefined') var emailSpecific = document.getElementById("email-specific").value = dataExtracted['Email Specific'];
+  if (typeof dataExtracted['Email Sender'] !== 'undefined') var emailSender = document.getElementById("email-sender").value = dataExtracted['Email Sender'];
+  if (typeof dataExtracted['Email Subject'] !== 'undefined') var emailSubject = document.getElementById("email-subject").value = dataExtracted['Email Subject'];
+  if (typeof dataExtracted['Email More Fields'] !== 'undefined') var emailMoreFields = document.getElementById("email-more").checked = checkReturn(dataExtracted['Email More Fields']);
+  if (typeof dataExtracted['Email BCC'] !== 'undefined') var emailBCC = document.getElementById("email-bcc").value = dataExtracted['Email BCC'];
+  if (typeof dataExtracted['Email Reply To'] !== 'undefined') var emailReplyTo = document.getElementById("email-replyto").value = dataExtracted['Email Reply To'];
+  if (typeof dataExtracted['Email Attach Switch'] !== 'undefined') var emailAttachSwitch = document.getElementById("email-addblob").checked = checkReturn(dataExtracted['Email Attach Switch']);
+  if (typeof dataExtracted['Email Attach Field'] !== 'undefined') var emailAttachField = document.getElementById("email-blob-field").value = dataExtracted['Email Attach Field'];
 
-    if (typeof dataExtracted['Email Message'] !== 'undefined') var emailMessage = tinyMCE.activeEditor.setContent(dataExtracted['Email Message']);
+  if (typeof dataExtracted['All Documents'] !== 'undefined') var allDocuments = document.getElementById("all-documents").checked = checkReturn(dataExtracted['All Documents']);
+  if (typeof dataExtracted['All Emails'] !== 'undefined') var allEmails = document.getElementById("all-emails").checked = checkReturn(dataExtracted['All Emails']);
 
-  })
-  .getDocProperties();
-
+  if (typeof dataExtracted['Email Message'] !== 'undefined') var emailMessage = tinyMCE.activeEditor.setContent(dataExtracted['Email Message']);
 }
 
 function checkReturn(arg) {
@@ -364,9 +400,7 @@ function afterButtonClicked() {
       swalConfirm('documentStudio', 'Los documentos se han generado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', rowData);
 
     } else{ $('#errorNotFields').toast({delay: 4000}).toast("show");  }
-
   } else{ $('#errorNotFunctions').toast({delay: 4000}).toast("show"); }
-
 }
 
 function afterButtonClickedMarkers() {
@@ -393,7 +427,6 @@ function afterButtonClickedMarkers() {
     }
 
   } else{ $("#errorNotFields").toast("show"); }
-
 }
 
 function afterSubmit(e) {
@@ -427,18 +460,30 @@ function validate(fieldsToValidate) {
 
 </script>
 
+<script>
+
+  $(document).ready(function() {
+    $('#btn-refresh-1, #btn-refresh-2').click(function() {
+        $('#fa-sync-1, #fa-sync-2').addClass("fast-spin")
+    });
+  });
+</script>
 
 <script>
 
   document.getElementById("mainButton").addEventListener("click", afterButtonClicked);
   document.getElementById("markerButton").addEventListener("click", afterButtonClickedMarkers);
   document.getElementById("saveButton").addEventListener("click", afterButtonClickedSave);
-  document.addEventListener("DOMContentLoaded", afterSidebarLoads);
+  document.addEventListener('DOMContentLoaded', function() {
+    afterSidebarLoads();
+    getSavedProperties();
+});
 
 </script>
 
 <?!= HtmlService.createHtmlOutputFromFile('public/helpers/swal').getContent(); ?>
 <?!= HtmlService.createHtmlOutputFromFile('public/helpers/footer').getContent(); ?>
+
 
 
 </body>

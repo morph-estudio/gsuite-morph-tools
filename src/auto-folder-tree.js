@@ -11,30 +11,13 @@
 function autoFolderTree() {
   const ss = SpreadsheetApp.getActive();
   let sh = ss.getActiveSheet();
+  let userMail = Session.getActiveUser().getEmail();
+  let dateNow = Utilities.formatDate(new Date(), 'GMT+2', 'dd/MM/yyyy - HH:mm:ss');
   let niveles = [1, 2, 3, 4, 5, 6, 7];
-
-/*
-  let cell = sh.getRange('B3');
-  if (cell.isBlank()) {
-    const ui = SpreadsheetApp.getUi();
-    let result = ui.prompt(
-      'ID Carpeta',
-      'Introduce el ID de la carpeta donde crear la estructura:',
-      ui.ButtonSet.OK_CANCEL,
-    );
-
-    let button = result.getSelectedButton();
-    let userGetID = result.getResponseText();
-    if (button == ui.Button.OK) {
-      // call function and pass the value
-      cell.setValue(userGetID);
-    }
-  }
-**/
 
   let result = ui().alert(
     '¿Quieres crear una copia de la hoja?',
-    'Las fórmulas de la plantilla actual se sustituirán por las nuevas carpetas creadas.',
+    'Las fórmulas de la plantilla actual se sustituirán por las nuevas carpetas creadas. Si no haces una copia perderás la plantilla personalizada.',
     ui().ButtonSet.YES_NO,
   );
 
@@ -48,12 +31,14 @@ function autoFolderTree() {
   }
 
   for (n in niveles) {
+    if (n == 0) Logger.log('holaaaa');
     let levelInput = niveles[n];
     let Level = levelInput * 2 + 1;
     let numRows = sh.getLastRow(); // Number of rows to process
-    let dataRange = sh.getRange(3, Number(Level) - 1, numRows, Number(Level)); // startRow, startCol, endRow, endCol
+    let dataRange = sh.getRange(2, Number(Level) - 1, numRows, Number(Level)); // startRow, startCol, endRow, endCol
     let data = dataRange.getValues();
     let parentFolderID = new Array();
+    let theParentFolder;
 
     for (let i in data) {
       parentFolderID[i] = data [i][0];
@@ -63,18 +48,27 @@ function autoFolderTree() {
     }
 
     for (let i in data) {
+      
       if (data [i][1] !== '') {
-        let theParentFolder = DriveApp.getFolderById(parentFolderID[i]);
+        if (n == 0) {
+          theParentFolder = DriveApp.getFolderById(getIdFromUrl(parentFolderID[i]));
+          Logger.log('cosasidtheparent ' + theParentFolder)
+        } else {
+          theParentFolder = DriveApp.getFolderById(parentFolderID[i]);
+        }
         let folderName = data[i][1];
         let theChildFolder = theParentFolder.createFolder(folderName);
-        let newFolderID = sh.getRange(Number(i) + 3, Number(Level) + 1);
+        let newFolderID = sh.getRange(Number(i) + 2, Number(Level) + 1);
         let folderIdValue = theChildFolder.getId();
         newFolderID.setValue(folderIdValue);
-        let addLink = sh.getRange(Number(i) + 3, Number(Level));
+        let addLink = sh.getRange(Number(i) + 2, Number(Level));
         let value = addLink.getDisplayValue();
         addLink.setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${folderIdValue}";"${value}")`);
+        SpreadsheetApp.flush();
       }
     }
+    sh.getRange('B2').clearNote().setNote(`Estructura creada el ${dateNow} por ${userMail}`);
+    SpreadsheetApp.flush();
   }
 }
 
@@ -94,24 +88,24 @@ function autoFolderTreeTpl() {
     fileId = file.getId();
   }
   let tsvUrl = `https://drive.google.com/uc?id=${fileId}&x=.tsv`;
-  let tsvContent = UrlFetchApp.fetch(tsvUrl, {muteHttpExceptions: true }).getContentText();
+  let tsvContent = UrlFetchApp.fetch(tsvUrl, {}).getContentText();
   let tsvData = Utilities.parseCsv(tsvContent, '\t');
   sh.getRange(1, 1, tsvData.length, tsvData[0].length).setValues(tsvData);
 
   // Global Style
-  sh.getRange(1, 1, sh.getMaxRows(), sh.getMaxColumns()).setFontSize(12).setFontFamily('Montserrat').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
+  sh.getRange(1, 1, sh.getMaxRows(), sh.getMaxColumns()).setFontSize(12).setFontFamily('Inter').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
     .setVerticalAlignment('middle');
   // Levels of Structure
-  sh.getRange(1, 3, 1, 13).setBackground('#434343').setFontColor('#fff');
-  sh.getRange('B1').setBackground('#FBC02D').setBorder(true, true, true, true, true, true, '#FBC02D', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+  sh.getRange(1, 3, 1, 13).setBackground('#546E7A').setFontColor('#fff');
+  sh.getRange('B1').setBackground('#FFAB00').setBorder(true, true, true, true, true, true, '#FFAB00', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
     .setFontColor('#fff');
-  sh.getRange('B3').setBackground('#FFFDE7').setBorder(true, true, true, true, true, true, '#FBC02D', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-    .setFontColor('#FBC02D');
+  sh.getRange('B2').setBackground('#FFFDE7').setBorder(true, true, true, true, true, true, '#FFAB00', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+    .setFontColor('#FFAB00').setNote(null).setNote(`Introduce en esta celda la dirección URL de la carpeta inicial de la estructura.`);
   // Style of Morph Project Template
-  sh.getRange(1, 18, 1, 6).setBackground('#FBC02D').setBorder(true, true, true, true, true, true, '#FBC02D', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+  sh.getRange(1, 18, 1, 6).setBackground('#FFAB00').setBorder(true, true, true, true, true, true, '#FFAB00', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
     .setFontColor('#fff');
-  sh.getRange(2, 18, 1, 6).setBackground('#FFFDE7').setBorder(true, true, true, true, true, true, '#FBC02D', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-    .setFontColor('#FBC02D').setHorizontalAlignment('center');
+  sh.getRange(2, 18, 1, 6).setBackground('#FFFDE7').setBorder(true, true, true, true, true, true, '#FFAB00', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+    .setFontColor('#FFAB00').setHorizontalAlignment('center');
 
   let cell = sh.getRange('T2');
   let rule = SpreadsheetApp.newDataValidation().requireValueInList(['AEI', 'E', 'I', 'IINT', 'I+D']).build();
@@ -124,14 +118,14 @@ function autoFolderTreeTpl() {
   sh.hideColumns(4); sh.hideColumns(6); sh.hideColumns(8); sh.hideColumns(10);
   sh.hideColumns(12); sh.hideColumns(14); sh.hideColumns(16);
   sh.setColumnWidth(1, 25);
-  sh.setColumnWidth(2, 220);
-  sh.setColumnWidth(3, 200);
-  sh.setColumnWidth(5, 200);
-  sh.setColumnWidth(7, 200);
-  sh.setColumnWidth(9, 200);
-  sh.setColumnWidth(11, 200);
-  sh.setColumnWidth(13, 200);
-  sh.setColumnWidth(15, 200);
+  sh.setColumnWidth(2, 250);
+  sh.setColumnWidth(3, 230);
+  sh.setColumnWidth(5, 230);
+  sh.setColumnWidth(7, 230);
+  sh.setColumnWidth(9, 230);
+  sh.setColumnWidth(11, 230);
+  sh.setColumnWidth(13, 230);
+  sh.setColumnWidth(15, 230);
   sh.setColumnWidth(17, 40);
   sh.setColumnWidth(21, 150);
   sh.setColumnWidth(22, 200);

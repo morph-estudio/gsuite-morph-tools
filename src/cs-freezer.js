@@ -1,5 +1,5 @@
 /**
- * Gsuite Morph Tools - CS Freezer 1.5
+ * Gsuite Morph Tools - CS Freezer 1.5.0
  * Developed by alsanchezromero
  *
  * Copyright (c) 2022 Morph Estudio
@@ -42,6 +42,13 @@ function morphFreezer(btnID) {
 
   // Delete the original sheets from the copied Spreadsheet and rename the copied sheets
 
+  let formUrl = destination.getSheets()[0].getFormUrl(); // Remove form links
+  if (formUrl) {
+    FormApp.openByUrl(formUrl).removeDestination();
+    let formID = getIdFromUrl(formUrl);
+    DriveApp.getFileById(formID).setTrashed(true);
+  };
+
   deleteAndRenameSheets(destination);
 
   // Delete the main DATA SHEET
@@ -82,9 +89,8 @@ function morphFreezer(btnID) {
   } else if (btnID === 'csFreezer' || 'csManual3') {
     sh.getRange('B9').setValue(url).setFontColor('#0000FF'); // Add XLSX download url to sheet
     sh.getRange('B7').setNote(null).setNote(`Último congelado: ${dateNow} por ${userMail}`); // Last Update Note
+    sh.activate();
   }
-
-  sh.activate();
 
 }
 

@@ -19,9 +19,11 @@
 
           <!-- Basic fields -->
 
-          <select id="email-field" class="form-select shadow-none mt-4" aria-describedby="email-field-help">
-            <option selected>Selecciona campo email</option>
-          </select>
+          <label for="email-field" class="form-label mt-4">Columna de emails</label>
+          <div class="d-flex flex-row align-items-baseline">
+            <select id="email-field" class="form-select shadow-none" aria-describedby="email-field-help"></select>
+            <button id="btn-refresh-1" type="button" class="btn-refresh" onclick="refreshButtonPush()"><i id="fa-sync-1" class="fa-solid fa-rotate-right"></i></button>
+          </div>
             <div id="email-field-help" class="form-text mt-2">Selecciona la columna donde se encuentran las direcciones email.</div>
 
           <label for="email-specific" class="form-label mt-3">CC (enviar copias del email)</label>
@@ -81,10 +83,14 @@
 
           <div id="emailBlob" class="collapse" >
 
-            <select id="email-blob-field" class="form-select shadow-none mt-3" aria-describedby="email-blob-field-help">
-              <option value="default" selected>Selecciona campo adjuntos</option>
-            </select>
-            <div id="email-blob-field-help" class="form-text mt-2">Selecciona la columna donde se encuentran las URL de archivos.</div>
+            
+
+          <div class="d-flex flex-row align-items-baseline">
+            <select id="email-blob-field" class="form-select shadow-none mt-3" aria-describedby="email-blob-field-help"></select>
+            <button id="btn-refresh-2" type="button" class="btn-refresh" onclick="refreshButtonPush()"><i id="fa-sync-2" class="fa-solid fa-rotate-right"></i></button>
+          </div>
+
+            <div id="email-blob-field-help" class="form-text mt-2">Selecciona la columna donde se encuentran los LINKS de archivos.</div>
 
         </div>
 

@@ -1,11 +1,11 @@
 /**
- * Gsuite Morph Tools - CS Updater 1.4
+ * Gsuite Morph Tools - CS Updater 1.5.0
  * Developed by alsanchezromero
  *
  * Copyright (c) 2022 Morph Estudio
  */
 
-function morphCSUpdater(btnID) {
+function morphCSUpdater(btnID, updatePrefix) {
   const ss = SpreadsheetApp.getActive();
   let sh = ss.getSheetByName('ACTUALIZAR') || ss.insertSheet('ACTUALIZAR', 1);
   let ss_id = ss.getId();
@@ -62,8 +62,7 @@ function morphCSUpdater(btnID) {
   let list = [];
 
   if (btnID === 'csUpdater') {
-    let rangeClear = sh.getRange(3, 3, 6, 2);
-    rangeClear.clearContent().clearFormat();
+    sh.getRange(3, 3, 6, 2).clear();
 
     let searchFor = 'title contains "Exportaciones"';
     let names =[];
@@ -78,11 +77,14 @@ function morphCSUpdater(btnID) {
       names.push(expFolderName);
     }
 
-    let sufix = 'TXT'; // mask
+    let sufix = updatePrefix || 'TXT'; // mask
     let files = expFolderDef.getFiles();
     while (files.hasNext()) {
       file = files.next();
-      list.push([file.getName(), file.getId(), file.getName().slice(0, -4).replace('Sheets ', '').toUpperCase()]);
+      filename = file.getName();
+      if (filename.includes(sufix)) {
+        list.push([file.getName(), file.getId(), file.getName().slice(0, -4).replace('Sheets ', '').toUpperCase()]);
+      }
     }
 
     let result = [['Archivos exportados', 'IDs', 'Hoja'], ...list.filter((r) => r[0].includes(sufix)).sort()];

@@ -1,0 +1,45 @@
+<html>
+<head>
+  <base target="_top">
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <?!= HtmlService.createHtmlOutputFromFile('public/helpers/header').getContent(); ?>
+  <?!= HtmlService.createHtmlOutputFromFile('public/stylesheet').getContent(); ?>
+
+</head>
+
+<body>
+
+<?!= HtmlService.createHtmlOutputFromFile('public/helpers/navbar').getContent(); ?>
+
+
+<div class="btn-group d-flex" role="group"></div>
+  <button id="F3E5F5-8E24AA" class="btn btn-primary shadow-none colours" style="background-color:#F3E5F5; color:#8E24AA;" onclick="execNoSuccess('colorize', this.id)">Amaya Lavender</button>
+  <button id="E0F7FA-26C6DC" class="btn btn-primary shadow-none colours" style="background-color:#E0F7FA; color:#26C6DC;" onclick="execNoSuccess('colorize', this.id)">Mariana Blue</button>
+  <button id="FFFDE7-FFAB00" class="btn btn-primary shadow-none colours" style="background-color:#FFFDE7; color:#FFAB00;" onclick="execNoSuccess('colorize', this.id)">Amarillo Prior</button>
+  <button id="ECFDF5-00C853" class="btn btn-primary shadow-none colours" style="background-color:#ECFDF5; color:#00C853;" onclick="execNoSuccess('colorize', this.id)">Érika Green</button>
+  <button id="FFEBEE-F44336" class="btn btn-primary shadow-none colours" style="background-color:#FFEBEE; color:#F44336;" onclick="execNoSuccess('colorize', this.id)">Coral Moore</button>
+  <button id="ECEFF1-546E7A" class="btn btn-primary shadow-none colours" style="background-color:#ECEFF1; color:#546E7A;" onclick="execNoSuccess('colorize', this.id)">Gris Torralba</button>
+  <button id="FFF8E1-FB8C00" class="btn btn-primary shadow-none colours" style="background-color:#FFF8E1; color:#FB8C00;" onclick="execNoSuccess('colorize', this.id)">Abejaro Honey</button>
+  
+
+
+<script>
+  function afterSidebarLoads(){
+    setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 300);
+  }
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    afterSidebarLoads();
+  });
+</script>
+
+<?!= HtmlService.createHtmlOutputFromFile('public/helpers/swal').getContent(); ?>
+<?!= HtmlService.createHtmlOutputFromFile('public/helpers/footer').getContent(); ?>
+
+</body>
+</html>

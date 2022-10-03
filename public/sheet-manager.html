@@ -1,0 +1,159 @@
+<html>
+<head>
+  <base target="_top">
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.css">
+  <?!= HtmlService.createHtmlOutputFromFile('public/helpers/header').getContent(); ?>
+  <?!= HtmlService.createHtmlOutputFromFile('public/stylesheet').getContent(); ?>
+  <script src="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.js"></script>
+</head>
+
+<body>
+
+<?!= HtmlService.createHtmlOutputFromFile('public/helpers/navbar').getContent(); ?>
+
+<button id="delete-button" class="btn btn-primary btn-xl w-100 rounded-0 shadow-none pt-2 pb-2 ps-3" style="text-align:left; font-size: 26px;">Ejecutar</button>
+<button id="refresh-button" class="btn btn-secondary w-100 rounded-0 shadow-none ps-3" style="text-align:left">Refrescar las hojas</button>
+
+<select id="select-action" class="form-select form-select-lg border-0 border-bottom rounded-0 mt-0 shadow-none" data-role="select" data-filter="false">
+  <option value="act-delete" selected="selected">Eliminar</option>
+  <option value="act-hide">Ocultar</option>
+  <option value="act-clear">Limpiar</option>
+  <option value="act-duplicate">Duplicar</option>
+</select>
+
+<input type="text" class="form-control form-control-lg border-0 border-bottom rounded-0 mt-0 shadow-none" id="sheet-deleter-search" placeholder="Buscar hojas..." aria-describedby="destination-folder-help">
+
+<div class="body-padding">
+
+  
+
+  <div id="errorNotSheets" class="toast fade hide shadow-sm w-100 mt-2" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+      <strong class="me-auto">Advertencia</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      No has seleccionado ninguna hoja.
+    </div>
+  </div>
+
+  <table
+    id="table"
+    data-toolbar="#toolbar"
+    data-pagination="true"
+    data-pagination-h-align="left"
+    data-search="true"
+    data-search-selector="#sheet-deleter-search"
+    data-click-to-select="true"
+    data-page-list="[7, 15, 20, all]"
+    data-page-size="7"
+    >
+    <thead>
+      <tr>
+        <th data-field="state" data-checkbox="true"></th>
+        <th data-field="name">Hojas</th>
+      </tr>
+    </thead>
+  </table>
+
+</div>
+
+<script>
+
+var $table = $('#table')
+let wsNames = JSON.parse("<?=JSON.stringify(wsNames)?>");
+
+</script>
+
+<script>
+
+const WorksheetDeleteApp = {};
+
+WorksheetDeleteApp.loadWorksheetNames = function() {
+  
+  var data = [];
+
+  Object.keys(wsNames).forEach(function(key){ 
+    var value = wsNames[key]; 
+    data.push(value);
+  });
+  $table.bootstrapTable({data: data});
+
+  setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 250);
+}
+
+WorksheetDeleteApp.refreshWorksheets = function(){
+  google.script.run.withSuccessHandler(sheetNames => {
+      $table.bootstrapTable('removeAll');
+      $table.bootstrapTable('append', sheetNames);
+      btnReset("#refresh-button");
+  }).getWorksheetNames()
+}
+
+WorksheetDeleteApp.deleteSheets = function(){
+  var sheetNamesToDeleteAsString = JSON.stringify($table.bootstrapTable('getSelections'));
+  var sdAction = document.getElementById("select-action");
+  var rowData = {
+  sdAction: sdAction.value,
+  };
+  swaload()
+  google.script.run.withSuccessHandler(e => {WorksheetDeleteApp.refreshWorksheets(), success()}).withFailureHandler(swalerror).deleteWorksheets(sheetNamesToDeleteAsString, rowData)
+}
+
+WorksheetDeleteApp.openDialogActions = function(){
+  let numberOfSheets = $table.bootstrapTable('getSelections').length;
+  let optionSelected = $("#select-action option:selected" ).text().toLowerCase();
+
+  if (numberOfSheets === 0) { 
+    $('#errorNotSheets').toast({delay: 4000}).toast("show");
+    } else {
+      Swal.fire({
+        text: `Vas a ${optionSelected} ${numberOfSheets} hoja/s.`,
+        icon: 'info',
+        allowOutsideClick: false,
+        showLoaderOnConfirm: true,
+        showDenyButton: false,
+        showCancelButton: true,
+        cancelButtonText: `Cancelar`,
+        confirmButtonText: `Continuar`,
+        confirmButtonColor: '#0D6EFD',
+        customClass: {
+          popup: 'swal-container',
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          WorksheetDeleteApp.deleteSheets();
+        } else if (result.isDenied) {
+          return;
+        }
+      })
+    }
+}
+
+$("#refresh-button").click(function() {
+    btnLoading('#refresh-button', 'Actualizando...');
+});
+
+$(document).ready(function() {
+  WorksheetDeleteApp.loadWorksheetNames();
+});
+
+</script>
+
+<script>
+  document.getElementById("delete-button").addEventListener("click", WorksheetDeleteApp.openDialogActions)
+  document.getElementById("refresh-button").addEventListener("click", WorksheetDeleteApp.refreshWorksheets)
+</script>
+
+
+<?!= HtmlService.createHtmlOutputFromFile('public/helpers/swal').getContent(); ?>
+<?!= HtmlService.createHtmlOutputFromFile('public/helpers/footer').getContent(); ?>
+
+
+</body>
+</html>

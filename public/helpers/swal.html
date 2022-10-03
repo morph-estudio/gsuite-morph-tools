@@ -8,9 +8,20 @@ function execFunction(fa, sc, rw) {
   [fa](rw);
 }
 
-function execDirect(fa) {
+function execNoSuccess(fa, rw) {
+  swaload()
   google.script.run
-  [fa]();
+  .withSuccessHandler(success)
+  .withFailureHandler(swalerror)
+  [fa](rw);
+}
+function success() {
+  swal.close();
+}
+
+function execDirect(fa, rw, rw2) {
+  google.script.run
+  [fa](rw, rw2);
 }
 
 function swalsuccess(e) {
@@ -24,10 +35,10 @@ function swalsuccess(e) {
   });
 }
 
-function swalerror(e) {
+function swalerror(err) {
   Swal.fire({
     title: 'Error!',
-    text: 'La función no ha podido ejecutarse.',
+    text: err.message.replace('Exception: ', '') || 'La función no ha podido ejecutarse.',
     icon: 'error',
     confirmButtonColor: '#0D6EFD',
     confirmButtonText: 'Entendido'
@@ -44,7 +55,7 @@ function swalinfo(e) {
   });
 }
 
-function swalConfirm(fa, sc, tx, rw) {
+function swalConfirm(fa, sc, tx, rw, rw2) {
   Swal.fire({
     text: tx,
     icon: 'info',
@@ -64,7 +75,7 @@ function swalConfirm(fa, sc, tx, rw) {
       google.script.run
       .withSuccessHandler(e => {swalsuccess(sc)})
       .withFailureHandler(swalerror)
-      [fa](rw);
+      [fa](rw, rw2);
     } else if (result.isDenied) {
       return;
     }

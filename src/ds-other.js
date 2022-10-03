@@ -139,7 +139,7 @@ function getInternallyMarkers(docID) {
 
 function getGreenColumns(sh, filenameField, fileurlField) {
   if (sh.getLastColumn() === 0) {
-    addGreenColumn(sh, '[DS] Files', 'Celdas verdes: para usar la opción "usar celdas verdes" debes introducir en esta casilla una nota con la URL de la plantilla.');
+    addGreenColumn(sh, '[DS] Files', 'Celdas verdes: para usar la opción "usar celdas verdes" debes sustituir esta nota con la URL de la plantilla.');
     var indexNameCell = fieldIndex(sh, filenameField);
     sh.setColumnWidth(indexNameCell + 1, 300);
   };
@@ -149,14 +149,14 @@ function getGreenColumns(sh, filenameField, fileurlField) {
   if (dropdownValues.indexOf(filenameField) > -1) {
     var indexNameCell = fieldIndex(sh, filenameField);
   } else {
-    addGreenColumn(sh, '[DS] Files', 'Celdas verdes: para usar la opción "usar celdas verdes" debes introducir en esta casilla una nota con la URL de la plantilla.');
+    addGreenColumn(sh, '[DS] Files', 'Celdas verdes: para usar la opción "usar celdas verdes" debes sustituir esta nota con la URL de la plantilla.');
     var indexNameCell = fieldIndex(sh, filenameField);
     sh.setColumnWidth(indexNameCell + 1, 300);
   }
   if (dropdownValues.indexOf(fileurlField) > -1) {
     var indexUrlCell = fieldIndex(sh, fileurlField);
   } else {
-    addGreenColumn(sh, '[DS] File-links', 'Celdas verdes: para usar la opción "usar celdas verdes" debes introducir en esta casilla una nota con la URL de la carpeta de destino.');
+    addGreenColumn(sh, '[DS] File-links', 'Celdas verdes: para usar la opción "usar celdas verdes" debes sustituir esta nota con la URL de la carpeta de destino.');
     var indexUrlCell = fieldIndex(sh, fileurlField);
     sh.setColumnWidth(indexUrlCell + 1, 300);
   }
@@ -173,27 +173,26 @@ function addGreenColumn(sh, headerTitle, cellNote) {
 
   if (lastColmn === 0) {
     sh.insertColumns(1);
-    sh.getRange(1, lastColmn + 1).setBackground('#ECFDF5').setFontColor('#34a853').setValue(headerTitle)
+    sh.getRange(1, lastColmn + 1).setBackground('#ECFDF5').setFontColor('#00C853').setValue(headerTitle)
       .setNote(cellNote);
   } else {
     sh.insertColumnAfter(lastColmn);
-    sh.getRange(1, lastColmn + 1).setBackground('#ECFDF5').setFontColor('#34a853').setValue(headerTitle)
+    sh.getRange(1, lastColmn + 1).setBackground('#ECFDF5').setFontColor('#00C853').setValue(headerTitle)
       .setNote(cellNote);
   }
 }
 
 function emailDropdown() { // If dropdown options are in a Google Sheet
-  let sh = SpreadsheetApp.getActive().getActiveSheet();
-  let dropdownValues = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues(); 
+  let dropdownValues = sh().getRange(1, 1, 1, sh().getLastColumn()).getValues(); 
   dropdownValues = transpose(dropdownValues);
   return dropdownValues;
 }
 
 function fieldIndex(sh, fieldName) {
   SpreadsheetApp.flush();
-  let dropdownValues = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues();
-  dropdownValues = transpose(dropdownValues);
-  dropdownValues = [].concat.apply([], dropdownValues);
+  let dropdownValues = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues().flat().filter(r=>r!="");
+  //dropdownValues = transpose(dropdownValues);
+  //dropdownValues = [].concat.apply([], dropdownValues);
   idx = dropdownValues.findIndex(item => item.includes(fieldName));
   return idx;
 }
@@ -357,11 +356,13 @@ function deleteProperties() {
 }
 
 function getDocProperties() {
+  let props = PropertiesService.getDocumentProperties().getProperties();
+  //Logger.log(props);
   /*
   let documentProperties = PropertiesService.getDocumentProperties().getProperties()
   let a = documentProperties['Email Message'];
   let b = documentProperties['All Emails'];
   Logger.log('all property: ' + a + b)
   */
-  return PropertiesService.getDocumentProperties().getProperties();
+  return props;
 }
