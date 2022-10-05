@@ -7,7 +7,7 @@
 
 function morphFreezer(btnID) {
   let ss = SpreadsheetApp.getActive();
-  let sh = ss.getSheetByName('ACTUALIZAR');
+  let sh = ss.getSheetByName('LINK');
   let ss_id = ss.getId();
   let file = DriveApp.getFileById(ss_id);
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
@@ -55,7 +55,7 @@ function morphFreezer(btnID) {
 
   destination.getSheets().forEach((sheet) => {
     sheetName = sheet.getSheetName();
-    if (sheetName.indexOf('ACTUALIZAR') > -1) {
+    if (sheetName.indexOf('LINK') > -1) {
       destination.deleteSheet(sheet);
     }
   });
@@ -194,7 +194,7 @@ function exportToXLSS(ss, destinationId) {
 
 function morphFastFreezer() {
   let ss = SpreadsheetApp.getActive();
-  let sh = ss.getSheetByName('ACTUALIZAR');
+  let sh = ss.getSheetByName('LINK');
   let ss_id = ss.getId();
   let file = DriveApp.getFileById(ss_id);
   let fileURL = file.getUrl();

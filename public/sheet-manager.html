@@ -42,7 +42,7 @@
     </div>
   </div>
 
-  <table
+  <table class="table table-striped borderless"
     id="table"
     data-toolbar="#toolbar"
     data-pagination="true"
@@ -52,6 +52,7 @@
     data-click-to-select="true"
     data-page-list="[7, 15, 20, all]"
     data-page-size="7"
+    data-maintain-meta-data="true"
     >
     <thead>
       <tr>
@@ -60,8 +61,8 @@
       </tr>
     </thead>
   </table>
-
 </div>
+
 
 <script>
 
@@ -139,11 +140,14 @@ $("#refresh-button").click(function() {
     btnLoading('#refresh-button', 'Actualizando...');
 });
 
+$.extend($.fn.bootstrapTable.defaults, {classes:'table'});
+
 $(document).ready(function() {
   WorksheetDeleteApp.loadWorksheetNames();
 });
 
 </script>
+
 
 <script>
   document.getElementById("delete-button").addEventListener("click", WorksheetDeleteApp.openDialogActions)

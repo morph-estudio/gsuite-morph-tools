@@ -137,7 +137,7 @@ h3 {
 
 .btn-xl {
   font-size: var(--fontsize-three);
-  font-weight: var(--fontweight-thin);
+  font-weight: var(--fontweight-bold);
   padding: 10px 10px;
 }
 .btn-refresh {
@@ -337,6 +337,9 @@ border: none;
   line-height: var(--primary-lineheight);
   font-size: var(--fontsize-small); 
 }
+.form-control:disabled {
+ color: #90A4AE;
+}
 .navbar-custom {
   height: auto;
   background-color: var(--morph-color);
@@ -372,6 +375,42 @@ border: none;
 .fast-spin {
   -webkit-animation: fa-spin 0.5s infinite linear;
   animation: fa-spin 0.5s infinite linear;
+}
+
+.table-striped>tbody>tr:nth-child(odd)>td,
+.table-striped>tbody>tr:nth-child(odd)>th {
+  background-color: #FAFAFA;
+}
+.table-striped>tbody>tr:nth-child(even)>td,
+.table-striped>tbody>tr:nth-child(even)>th {
+  background-color: #F5F5F5;
+}
+.table-striped>tbody>tr.selected{
+  background-color: #E0E0E0;
+  opacity: 1.0 !important;
+}
+.table-striped>tbody>tr:last-child>td:last-child{
+  border-radius: 0 0 10px 0;
+}
+.table-striped>tbody>tr:last-child>td:nth-last-child(2){
+  border-radius: 0 0 0 10px;
+}
+table th:first-child{
+  border-radius: 10px 0 0 0;
+}
+table th:nth-child(2){
+  border-radius: 0 10px 0 0;
+}
+.table-striped>thead th {
+  background-color: #9E9E9E;
+  color: white;
+}
+.borderless td, .borderless th {
+    border: none;
+}
+.table-striped>tr:hover td { 
+   background-color: inherit;     
+   opacity: 1.0;
 }
 
 // Counter Animated Bar

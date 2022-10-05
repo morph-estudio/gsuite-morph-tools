@@ -1,8 +1,24 @@
 
 # Change Log
-Todos los cambios en el proyecto serán documentados en este archivo.
+Documentación de cambios del proyecto.
 
-## [ 1.5.0 ] - 2022/09/01
+## [ 1.5.1 ] - 2022/09/03
+
+### Added
+
+- Opción para añadir todos los archivos en el sector de prefijo del actualizador de cuadro de superficies.
+
+### Changed
+
+- Arreglos estéticos en la tabla de Sheet Manager.
+- Arreglos en el input de claves de la sección de desarrollo.
+
+### Fixed
+
+- Al actualizar el cuadro de superficies se eliminan los archivos .txt duplicados en la carpeta de exportaciones.
+- Mantener selección en la tabla de Sheet Manager al cambiar de página.
+
+## [ 1.5.0 ] - 2022/09/28
 
 ### Added
 

@@ -5,15 +5,22 @@
  * Copyright (c) 2022 Morph Estudio
  */
 
-function morphCSUpdater(btnID, updatePrefix) {
+function morphCSUpdater(btnID, rowData) {
   const ss = SpreadsheetApp.getActive();
-  let sh = ss.getSheetByName('ACTUALIZAR') || ss.insertSheet('ACTUALIZAR', 1);
+  let sh = ss.getSheetByName('LINK') || ss.insertSheet('LINK', 1);
   let ss_id = ss.getId();
   let userMail = Session.getActiveUser().getEmail();
   let dateNow = Utilities.formatDate(new Date(), 'GMT+2', 'dd/MM/yyyy - HH:mm:ss');
 
   let file = DriveApp.getFileById(ss_id);
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+  let formData = [
+    rowData.updatePrefix,
+    rowData.prefixAll,
+  ];
+
+  let [updatePrefix, prefixAll] = formData;  
 
   if (btnID === 'csUpdater') {
     sh.clear().clearFormats();
@@ -64,7 +71,7 @@ function morphCSUpdater(btnID, updatePrefix) {
   if (btnID === 'csUpdater') {
     sh.getRange(3, 3, 6, 2).clear();
 
-    let searchFor = 'title contains "Exportaciones"';
+    let searchFor = 'title contains "ExpTXT"';
     let names =[];
     let expFolderIds=[];
     let expFolder = carpetaBase.searchFolders(searchFor);
@@ -77,17 +84,27 @@ function morphCSUpdater(btnID, updatePrefix) {
       names.push(expFolderName);
     }
 
+    keepNewestFilesOfEachNameInAFolder(expFolderDef); // Delete duplicated files in Exports Folder
+
     let sufix = updatePrefix || 'TXT'; // mask
     let files = expFolderDef.getFiles();
     while (files.hasNext()) {
       file = files.next();
       filename = file.getName();
-      if (filename.includes(sufix)) {
-        list.push([file.getName(), file.getId(), file.getName().slice(0, -4).replace('Sheets ', '').toUpperCase()]);
+      if (prefixAll === true) {
+        if (filename.includes('.txt')) {
+          list.push([file.getName(), file.getId(), file.getName().slice(0, -4).replace('Sheets ', '').toUpperCase()]);
+        }
+      } else {
+        if (filename.includes(sufix)) {
+          list.push([file.getName(), file.getId(), file.getName().slice(0, -4).replace('Sheets ', '').toUpperCase()]);
+        }
       }
     }
 
-    let result = [['Archivos exportados', 'IDs', 'Hoja'], ...list.filter((r) => r[0].includes(sufix)).sort()];
+    let result = [['Archivos exportados', 'IDs', 'Hoja'], ...list.filter((r) => r[0].includes('.txt')).sort()];
+
+    
     let resultCrop = result.map((val) => val.slice(0, -1));
     sh.getRange(2, 3, result.length, 2).setValues(resultCrop);
 
@@ -234,7 +251,7 @@ function importRangeToken(ss_id, tokenID) { // TokenID is the ID of destination 
 
 function manualUpdaterTemplate() {
   const ss = SpreadsheetApp.getActive();
-  let sh = ss.getSheetByName('ACTUALIZAR') || ss.insertSheet('ACTUALIZAR', 1);
+  let sh = ss.getSheetByName('LINK') || ss.insertSheet('LINK', 1);
 
   sh.clear().clearFormats();
   tplText(sh);

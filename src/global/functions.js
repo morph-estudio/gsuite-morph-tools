@@ -124,3 +124,39 @@ function transpose(a) {
 function flatten(arrayOfArrays) {
   return [].concat.apply([], arrayOfArrays);
 }
+
+/**
+ * keepNewestFilesOfEachNameInAFolder
+ * Borrar archivos duplicados en una carpeta (elimina el más antiguo)
+ */
+function keepNewestFilesOfEachNameInAFolder(folder) {
+  const files = folder.getFiles();
+  let fO = { pA: [] };
+  let keep = [];
+  while (files.hasNext()) {
+    let file = files.next();
+    let n = file.getName();
+    //Organize file info in fO
+    if (!fO.hasOwnProperty(n)) {
+      fO[n] = [];
+      fO[n].push(file);
+      fO.pA.push(n);
+    } else {
+      fO[n].push(file);
+    }
+  }
+  //Sort each group with same name
+  fO.pA.forEach(n => {
+    fO[n].sort((a, b) => {
+      let va = new Date(a.getDateCreated()).valueOf();
+      let vb = new Date(b.getDateCreated()).valueOf();
+      return vb - va;
+    });
+    //Keep the newest one and delete the rest
+    fO[n].forEach((f, i) => {
+      if (i > 0) {
+        f.setTrashed(true)
+      }
+    });
+  });
+}

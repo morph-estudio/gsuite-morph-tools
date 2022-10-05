@@ -3,9 +3,9 @@
  */
 
 const morphDivision = '(I+D)'; const morphDev = '(Devs)'
-const titleIX = 'G-Suite Morph Tools'; const barTitleIX = `⚙️ ${titleIX} ${morphDivision}`;
+const titleIX = 'G-Suite Morph Tools'; const barTitleIX = `💡 ${titleIX} ${morphDivision}`;
 const titleDS = 'Morph Document Studio'; const barTitleDS = `✨ ${titleDS} ${morphDivision}`;
-const titleSM = 'Gestor de hojas'; const barTitleSM = `📑 ${titleSM} ${morphDivision}`;
+const titleSM = 'Gestor de hojas'; const barTitleSM = `📋 ${titleSM} ${morphDivision}`;
 const titleCL = 'Paleta de colores'; const barTitleCL = `${titleCL} ${morphDivision}`;
 
 const ss = function() {
@@ -41,12 +41,10 @@ function sidebarIndex() {
 }
 
 function sidebarDS() {
-  Browser.msgBox('Herramienta en desarrollo', 'Morph Document Studio estará disponible en la próxima versión de G-Suite Morph Tools.', Browser.Buttons.OK);
-  /*
+  // Browser.msgBox('Herramienta en desarrollo', 'Morph Document Studio estará disponible en la próxima versión de G-Suite Morph Tools.', Browser.Buttons.OK);
   let html = HtmlService.createTemplateFromFile('public/document-studio');
   html.dsProperties = getDocProperties(); html.emailDropdown = emailDropdown();
   html = html.evaluate().setTitle(barTitleDS); ui().showSidebar(html);
-  */
 }
 
 function sidebarSM() {
