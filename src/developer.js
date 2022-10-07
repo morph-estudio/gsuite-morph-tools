@@ -1,4 +1,74 @@
 /**
+ * adaptarCuadroAntiguo
+ * Script para adaptar cuadros de superficies antiguos a la nueva estructura automática.
+ */
+function adaptarCuadroAntiguo() {
+  let ss = SpreadsheetApp.getActive();
+  let sheetnames = getSheetnames(ss);
+  let ui = SpreadsheetApp.getUi();
+
+  // Change Sheet Names and create LINK sheet
+
+  if (sheetnames.indexOf('ACTUALIZAR') > -1) {
+    let sh_act = ss.getSheetByName('ACTUALIZAR');
+    let sh = ss.insertSheet('LINK', 0);
+    templateFormat(sh);
+    templateText(sh);
+    deleteEmptyRows(); removeEmptyColumns();
+    ss.deleteSheet(sh_act);
+    sh.setTabColor('FFFF00');
+  }
+
+  let oldSheets = ['TXT LIMPIO','TXT FT','TXT VN'];
+  let newSheets = ['TXT SUPERFICIES','TXT FALSOS TECHOS','TXT VENTANAS'];
+
+  for (let i = 0; i < oldSheets.length; i++) {
+    if (sheetnames.indexOf(oldSheets[i]) > -1) {
+      ss.getSheetByName(oldSheets[i]).setName(newSheets[i]);
+    }
+  }
+
+  // Change Export Folder Name
+
+  let ss_id = ss.getId();
+  let file = DriveApp.getFileById(ss_id);
+  let parents = file.getParents();
+  let carpetaBase = parents.next();
+  let searchFor = `title contains 'Exportaciones' or title contains 'Exportación' or title contains 'Exportar' or title contains 'Exportados'`;
+  let expFolder = carpetaBase.searchFolders(searchFor); Logger.log(expFolder)
+  let a;
+
+  try {
+    let expFolderDef = expFolder.next();
+    expFolderDef.setName(expFolderDef.getName().replace('Exportaciones', 'ExpTXT').replace('Exportación', 'ExpTXT').replace('Exportar', 'ExpTXT').replace('Exportados', 'ExpTXT'))
+  } catch (e) {
+    a = true;
+  }
+
+  if (a == true) {
+    ui.alert('Aviso', 'No se ha encontrado la carpeta de Exportaciones .txt dentro de la carpeta del Cuadro de Superficies. Debes modificarlo manualmente añadiendo "ExpTXT" en el nombre (siguiendo la estructura PXXXXX-A-CS-ExpTXT)', ui.ButtonSet.OK)
+  }
+
+  PropertiesService.getDocumentProperties().setProperties({
+    'adaptedSpreadsheet': true,
+  });
+
+  sidebarIndex()
+
+}
+
+/**
+ * getSheetnames
+ * Devuelve una lista con el nombre de las hojas del documento Sheets.
+ */
+function getSheetnames(ss) { 
+  var out = [];
+  var sheets = ss.getSheets();
+  for (var i = 0 ; i < sheets.length ; i++) out.push( sheets[i].getName() )
+  return out;
+}
+
+/**
  * getDatabaseColumn
  * Devuelve los valores de una columna en documento Sheets externo a través de su título.
  */

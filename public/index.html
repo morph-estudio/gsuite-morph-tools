@@ -71,7 +71,7 @@
     <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
       <div class="accordion-body mt-2">
 
-        <div class="mb-1">
+        <div class="">
           <p>Diseñado para funcionar en las copias de la <b>NAVE NODRIZA</b> del cuadro de superficies.</p>
 
           <div class="input-group flex-nowrap update rounded-pill mb-3">
@@ -86,6 +86,13 @@
 
           <button id="csUpdater" class="btn btn-primary gmt sup yellow w-100 shadow-none mb-1">Actualizar cuadro de superficies</button>
           <button id="csFreezer" class="btn btn-primary gmt inf blue w-100 shadow-none" onclick="swalConfirm('morphFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">Congelar cuadro de superficies</button>
+        </div>
+
+        <div class="mt-4">
+          <h3><i class="fa-solid fa-margin fa-fw fa-triangle-exclamation"></i>Transición de cuadros</h3>
+          <p>Si es un cuadro anterior a <u>Octubre 2022</u> debes adaptarlo antes de actualizar.</p>
+          <button class="btn btn-success mainbtn btn-xl w-100" id="adaptButton" onclick="execFunction('adaptarCuadroAntiguo', 'El cuadro se ha adaptado correctamente.')">Adaptar cuadro antiguo</button>
+          <!--<button class="btn btn-primary mainbtn btn-lg-gmt w-100 mt-4" id="adaptDeleteButton" onclick="execNoSuccess('deleteProperty', 'adaptedSpreadsheet')">Adaptar cuadro antiguo</button>-->
         </div>
 
         <!--<p>Si tienes problemas con el actualizador automático puedes usar el <a href="https://sites.google.com/morphestudio.es/morph-pills/i-d/scripting/gsuite-morph-tools?authuser=0#h.ll0ic3i4hbnx" target="_blank"><b>método manual</b></a>:</p>
@@ -170,6 +177,11 @@
         <button class="btn btn-primary index shadow-none w-100" onclick="execFunction('saveSheetAsTSV')"><i class="fa-solid fa-margin fa-file-excel fa-fw"></i>Exportar TSV con fórmulas</button>
         <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('postLessons')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Enviar mensajes de Chat</button>
         <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('createTimeTriggerSpecifcDate')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Programar base de mensajes</button>
+
+        <button class="btn btn-primary index shadow-none w-100" id="adaptDeleteButton" onclick="execNoSuccess('deleteProperty', 'adaptedSpreadsheet')"><i class="fa-solid fa-unlock fa-margin fa-fw"></i>Desbloquear Adaptar Cuadro</button>
+
+
+
         
         <button class="btn btn-primary index shadow-none w-100 ult" onclick="swalinfo()"><i class="fa-solid fa-gear fa-margin fa-fw fa-spin" style="--fa-animation-duration: 6s;"></i>Destructor de mundos</button>
 
@@ -337,7 +349,27 @@ function password_show_hide() {
 
 </script>
 
+<script>
 
+  function adaptButtonDisable() {
+    $('#adaptButton').prop('disabled', true);
+    $('#adaptButton').html('Ya se ha adaptado');
+  }
+
+  function getSavedProperties() {
+    let data = JSON.parse("<?=JSON.stringify(isAdapted)?>");
+    let dataExtracted = data;
+    //window.alert(dataExtracted)
+    if (data == 'true') {
+      adaptButtonDisable()
+    }
+    //document.getElementById("adaptButton").disabled = checkReturn(dataExtracted['adaptedSpreadsheet']);
+  }
+  function checkReturn(arg) {
+    if(arg === 'true') { return true; } else { return false; }
+  }
+
+</script>
 
 <script>
   document.getElementById('hideSectionButton').addEventListener("click", check_password);
@@ -345,6 +377,7 @@ function password_show_hide() {
   document.addEventListener('DOMContentLoaded', () => {
     check_userRole();
     afterSidebarLoads();
+    getSavedProperties();
   });
 </script>
 

@@ -24,7 +24,7 @@ function morphCSUpdater(btnID, rowData) {
 
   if (btnID === 'csUpdater') {
     sh.clear().clearFormats();
-    sheetFormatter(sh); // Formato de celdas
+    templateFormat(sh); // Formato de celdas
   }
 
   // Carpeta Cuadro de Superficies
@@ -44,7 +44,7 @@ function morphCSUpdater(btnID, rowData) {
 
   // Set Template Values
 
-  tplText(sh);
+  templateText(sh);
 
   sh.getRange('B1').setValue(filePanelUrl);
   sh.getRange('B3').setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${carpetaBaseID}";"${carpetaBase}")`).setFontColor('#0000FF');
@@ -187,7 +187,7 @@ function getControlPanel(sh, file, btnID) {
   return filA;
 }
 
-function tplText(sh) {
+function templateText(sh) {
   sh.getRange('A1').setValue('URL PANEL DE CONTROL');
   sh.getRange('B2').setValue('Carpetas referentes');
   sh.getRange('A3').setValue('CARPETA CUADRO SUP.');
@@ -197,9 +197,13 @@ function tplText(sh) {
   sh.getRange('A7').setValue('CARPETA BACKUP');
   sh.getRange('A8').setValue('ID CARPETA BACKUP');
   sh.getRange('A9').setValue('DESCARGAR ARCHIVO XLSX');
+  sh.getRange('C1').setValue('=IMPORTRANGE(B1;"Instrucciones!A1")');
+  sh.getRange('D1').setValue('=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1CuMcYrtT6NXwxa9fMEIOTgRfkPySnNwKvA_1dyarCro";"DB-SI!B2")');
+  sh.getRange('C2').setValue('Archivos importados');
+  sh.getRange('D2').setValue('IDs');
 }
 
-function sheetFormatter(sh) {
+function templateFormat(sh) {
   // Estilo global
   sh.getRange(1, 1, sh.getMaxRows(), sh.getMaxColumns()).setFontSize(14).setFontFamily('Montserrat').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
     .setVerticalAlignment('middle')
@@ -223,12 +227,11 @@ function sheetFormatter(sh) {
   // Folders Bold
   sh.getRangeList(['B3', 'B5', 'B7', 'B9']).setFontWeight('bold');
   // Column/Row Size
-  sh.setColumnWidth(1, 335);
+  sh.setColumnWidth(1, 340);
   sh.setColumnWidth(2, 380);
-  sh.setColumnWidth(3, 285);
-  sh.setColumnWidth(4, 400);
+  sh.setColumnWidth(3, 340);
+  sh.setColumnWidth(4, 380);
 
-  //let maxRosh = sh.getMaxRows();
   for (let i = 1; i < sh.getMaxRows() + 1; i++) {
     sh.setRowHeight(i, 28);
   }
@@ -254,7 +257,7 @@ function manualUpdaterTemplate() {
   let sh = ss.getSheetByName('LINK') || ss.insertSheet('LINK', 1);
 
   sh.clear().clearFormats();
-  tplText(sh);
+  templateText(sh);
 
   sh.getRange('C2').setValue('Archivos exportados');
   sh.getRange('D2').setValue('IDs');
@@ -262,7 +265,7 @@ function manualUpdaterTemplate() {
   sh.getRange('C4').setValue('TXT Sheets Superficies.txt');
   sh.getRange('C5').setValue('TXT Sheets Ventanas.txt');
 
-  sheetFormatter(sh); // Formato de celdas
+  templateFormat(sh); // Formato de celdas
 
   // Control Panel 
   sh.getRangeList(['B1', 'B8']).setBackground('#FFFDE7').setBorder(true, true, true, true, true, true, '#FBC02D', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)

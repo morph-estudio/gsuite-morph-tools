@@ -355,7 +355,11 @@ function deleteProperties() {
   PropertiesService.getDocumentProperties().deleteAllProperties();
 }
 
-function getDocProperties() {
+function deleteProperty(e) {
+  PropertiesService.getDocumentProperties().deleteProperty(e);
+}
+
+function getDocProperties(e) {
   let props = PropertiesService.getDocumentProperties().getProperties();
   //Logger.log(props);
   /*
@@ -365,4 +369,9 @@ function getDocProperties() {
   Logger.log('all property: ' + a + b)
   */
   return props;
+}
+
+function getDocProperty(e) {
+  let prop = PropertiesService.getDocumentProperties().getProperty(e)
+  return prop;
 }

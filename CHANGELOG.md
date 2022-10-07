@@ -2,6 +2,12 @@
 # Change Log
 Documentación de cambios del proyecto.
 
+## [ 1.5.2 ] - 2022/09/07
+
+### Fixed
+
+- Se ha añadido un botón temporal para adaptar los cuadros de superficies anteriores al nuevo sistema de actualización.
+
 ## [ 1.5.1 ] - 2022/09/03
 
 ### Added
