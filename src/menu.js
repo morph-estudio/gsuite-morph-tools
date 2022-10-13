@@ -6,7 +6,8 @@ const morphDivision = '(I+D)'; const morphDev = '(Devs)'
 const titleIX = 'G-Suite Morph Tools'; const barTitleIX = `💡 ${titleIX} ${morphDivision}`;
 const titleDS = 'Morph Document Studio'; const barTitleDS = `✨ ${titleDS} ${morphDivision}`;
 const titleSM = 'Gestor de hojas'; const barTitleSM = `📋 ${titleSM} ${morphDivision}`;
-const titleCL = 'Paleta de colores'; const barTitleCL = `${titleCL} ${morphDivision}`;
+const titleCL = 'Guía de estilo'; const barTitleCL = `🎨 ${titleCL} ${morphDivision}`;
+
 
 const ss = function() {
   return SpreadsheetApp.getActiveSpreadsheet() }
@@ -20,6 +21,7 @@ const ui = function() {
  */
 
 function onOpen(e) {
+  
   SpreadsheetApp.getUi().createAddonMenu()
     .addItem(titleIX, 'sidebarIndex')
     .addItem(titleDS, 'sidebarDS')
@@ -55,8 +57,9 @@ function sidebarSM() {
 }
 
 function sidebarCL() {
-  let html = HtmlService.createTemplateFromFile('public/colour');
-  // html.navBarHEX = '#000';
+  let html = HtmlService.createTemplateFromFile('public/styles-front');
+  
+  html.obj = cargarEstilos();
   html = html.evaluate().setTitle(barTitleCL); ui().showSidebar(html)
 }
 
@@ -73,7 +76,10 @@ function sidebarSMDevs() {
 }
 
 function sidebarCLDevs() {
-  let html = HtmlService.createTemplateFromFile('public/colours'); html = html.evaluate().setTitle(`${barTitleCL} Devs`); ui().showSidebar(html)
+  let html = HtmlService.createTemplateFromFile('public/styles-front');
+  html.obj = cargarEstilos();
+  var estilos_sheet = PropertiesService.getDocumentProperties();
+  html = html.evaluate().setTitle(`${barTitleCL} Devs`); ui().showSidebar(html)
 }
 
 function sidebarChangelog() {

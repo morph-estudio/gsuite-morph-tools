@@ -1,0 +1,217 @@
+<html>
+<head>
+  <base target="_top">
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <?!= HtmlService.createHtmlOutputFromFile('public/helpers/header').getContent(); ?>
+  <?!= HtmlService.createHtmlOutputFromFile('public/stylesheet').getContent(); ?>
+
+</head>
+
+<body>
+
+<?!= HtmlService.createHtmlOutputFromFile('public/helpers/navbar').getContent(); ?>
+
+<!--<div class="btn-group d-flex" role="group"></div>
+  <button id="ref-page" class="btn btn-primary btn-xl w-100 rounded-0 shadow-none pt-2 pb-2 ps-3" style="font-size: 22px;" onclick="execNoSuccess('sidebarCL')">Refrescar página</button>-->
+
+
+<div class="headerh3 d-flex flex-row align-items-baseline">
+  <h3 class="menu-h3" style="width:85%"><i class="fa-solid fa-margin fa-fw fa-swatchbook"></i>Estilos Morph</h3>
+  <button id="pageRefresh" type="button" class="btn-refresh text-light justify-content-end" onclick="execNoSuccess('sidebarCL')"><i id="fa-sync-1" class="fa-solid fa-rotate-right"></i></button>
+</div>
+
+
+<select id="select-var" class="form-select form-select-lg border-0 rounded-0 mt-0 shadow-none" data-role="select" data-filter="false">
+  <option value="v-reg" selected="selected">Estilo básico</option>
+  <option value="v-bold">Acentuado</option>
+</select>
+
+
+
+
+
+  
+  <button id="E0F7FA-26C6DC" class="btn btn-primary shadow-none colours" value="Mariana Blue" onclick="morphColor(this.innerText)">Mariana Blue</button>
+  <button id="FFFDE7-FFAB00" class="btn btn-primary shadow-none colours" value="Amayillo" onclick="morphColor(this.innerText)">Amayillo</button>
+  <button id="ECFDF5-00C853" class="btn btn-primary shadow-none colours" value="Érika Green" onclick="morphColor(this.innerText)">Érika Green</button>
+  <button id="FFEBEE-F44336" class="btn btn-primary shadow-none colours" value="Coral Moore" onclick="morphColor(this.innerText)">Coral Moore</button>
+  <!-- <button id="ECEFF1-546E7A" class="btn btn-primary shadow-none colours" onclick="execNoSuccess('colorize', this.id)">Gris Torralba</button>
+  <button id="F3E5F5-8E24AA" class="btn btn-primary shadow-none colours" onclick="execNoSuccess('colorize', this.id)">Amaya Lavender</button>
+  <button id="FFF8E1-FB8C00" class="btn btn-primary shadow-none colours" onclick="execNoSuccess('colorize', this.id)">Abejaro Honey</button> -->
+
+<div class="headerh3">
+  <h3 class="menu-h3"><i class="fa-solid fa-margin fa-fw fa-palette"></i>Estilos personalizados</h3>
+</div>
+
+
+  <div class="d-flex flex-column">
+
+
+    </div>
+      <button id="delete-styles" class="btn btn-primary btn-danger border-0 rounded-0 shadow-none w-100 pt-2 pb-2" onclick="swalConfirm('eliminarEstilos', 'Se han eliminado los estilos personalizados', 'Se perderán todos los estilos personalizados. Confirma para continuar.')">Eliminar estilos personalizados</button>
+    </div>
+    <div class="">
+      <input type="text" class="form-control form-control-lg shadow-none border-0 rounded-0" id="style-name" placeholder="Nombre de estilo...">
+    </div>
+
+    <div class="btn-group d-flex w-100 mb-1" role="group">
+      <button class="stbut1 stbutname1 btn btn-primary colours border-0 shadow-none me-1 d-flex justify-content-start" style="width:80%" onclick="google.script.run.aplicarEstilo(1)">Personalizado 1</button>
+      <button class="stbut1 btn btn-primary colours border-0 shadow-none m-0" style="width:15%" onclick="guardarEstilo(1)"><i class="fa-solid fa-circle-plus"></i></button>
+    </div>
+
+
+    <div class="btn-group d-flex w-100 mb-1" role="group">
+      <button class="stbut2 stbutname2 btn btn-primary colours border-0 shadow-none me-1 d-flex justify-content-start" style="width:80%" onclick="google.script.run.aplicarEstilo(2)">Personalizado 2</button>
+      <button class="stbut2 btn btn-primary colours border-0 shadow-none m-0" style="width:15%" onclick="guardarEstilo(2)"><i class="fa-solid fa-circle-plus"></i></button>
+    </div>
+  
+
+    <div class="btn-group d-flex w-100" role="group">
+      <button class="stbut3 stbutname3 btn btn-primary colours border-0 shadow-none me-1 d-flex justify-content-start" style="width:80%" onclick="google.script.run.aplicarEstilo(3)">Personalizado 3</button>
+      <button class="stbut3 btn btn-primary colours border-0 shadow-none m-0" style="width:15%" onclick="guardarEstilo(3)"><i class="fa-solid fa-circle-plus"></i></button>
+    </div>
+
+
+
+  </div>
+
+<script>
+
+  let estiloActual = 0;
+
+  function guardarEstilo(numEstilo) {
+
+    let styleName = document.getElementById('style-name').value;
+    if (styleName == '') styleName = `Personalizado ${numEstilo}`
+
+    google.script.run.withSuccessHandler(
+
+    function (obj) {
+
+      let botones = document.getElementsByClassName('stbut'+numEstilo);
+      Array.from(botones).forEach(boton => {
+        boton.style.color = obj.colorLetra;
+        boton.style.backgroundColor = obj.colorFondo;
+      })
+
+      let botonesNombre = document.getElementsByClassName('stbutname'+numEstilo);
+      Array.from(botonesNombre).forEach(boton => {
+        //boton.style.color = obj.colorLetra;
+        if (obj.colorNames !== '') boton.innerText = obj.colorNames;
+      })
+
+      $('#style-name').val('');
+    }
+
+    ).guardarEstilo(numEstilo, styleName);
+  }
+
+
+
+</script>
+
+
+  
+<script>
+
+  let obj = JSON.parse("<?=JSON.stringify(obj)?>");
+  let opt1;
+  let colours = [
+    'F3E5F5-8E24AA',
+    'E0F7FA-26C6DC',
+    'FFFDE7-FFAB00',
+    'ECFDF5-00C853',
+    'FFEBEE-F44336',
+    'ECEFF1-546E7A',
+    'FFF8E1-FB8C00',
+  ]
+
+function mainState(){
+  colours.forEach(element => {
+    let [background, color] = element.split('-');
+    let colourSplit = element.split('-');
+    $(`#${element}`).css({
+      "background-color": `#${background}`,
+      "color" : `#${color}`
+    })
+  });
+
+}
+
+function getButtonProperties(obj) {
+  Object.keys(obj).forEach(propiedad => {
+    if (propiedad.slice(0,10) == 'colorFondo') {
+      let botones = document.getElementsByClassName('stbut'+propiedad.slice(10));
+      Array.from(botones).forEach(boton => boton.style.backgroundColor = obj[propiedad]);
+    } else if (propiedad.slice(0,10) == 'colorLetra') {
+      let botones = document.getElementsByClassName('stbut'+propiedad.slice(10));
+      Array.from(botones).forEach(boton => boton.style.color = obj[propiedad]);
+    } else if (propiedad.slice(0,10) == 'colorNames') {
+      let botones = document.getElementsByClassName('stbutname'+propiedad.slice(10));
+      Array.from(botones).forEach(boton => boton.innerText = obj[propiedad]);
+    }
+  });
+}
+
+function morphColor(id) {
+  /*
+  let [background, color] = id.split('-');
+  if (opt1 == 'v-reg') id = `${background}-${color}`;
+  if (opt1 == 'v-bold') id = `${color}-${background}`;
+*/
+  let opt = document.getElementById("select-var").value;
+  google.script.run.withSuccessHandler().colorize(id, opt);
+}
+
+$(document).ready(function() {
+
+headerLight()
+google.script.run.withSuccessHandler().autoLoader();
+mainState()
+getButtonProperties(obj)
+
+
+$('#select-var').change(function(){
+  opt1 = document.getElementById("select-var").value;
+  if (opt1 == 'v-reg') {
+
+    mainState()
+
+  } else if (opt1 == 'v-bold') {
+
+    colours.forEach(element => {
+      let [background, color] = element.split('-');
+      $(`#${element}`).css({
+        "background-color": `#${color}`,
+        "color" : `#${background}`
+      })
+    });
+
+  }
+})
+
+});
+
+</script>
+
+<script>
+
+  function afterSidebarLoads(){
+    setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 300);
+  }
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    afterSidebarLoads();
+  });
+</script>
+
+<?!= HtmlService.createHtmlOutputFromFile('public/helpers/swal').getContent(); ?>
+<?!= HtmlService.createHtmlOutputFromFile('public/helpers/footer').getContent(); ?>
+
+</body>
+</html>

@@ -178,7 +178,7 @@
         <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('postLessons')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Enviar mensajes de Chat</button>
         <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('createTimeTriggerSpecifcDate')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Programar base de mensajes</button>
 
-        <button class="btn btn-primary index shadow-none w-100" id="adaptDeleteButton" onclick="execNoSuccess('deleteProperty', 'adaptedSpreadsheet')"><i class="fa-solid fa-unlock fa-margin fa-fw"></i>Desbloquear Adaptar Cuadro</button>
+        <button class="btn btn-primary index shadow-none w-100" id="adaptDeleteButton" onclick="execNoSuccess('deleteProperty', 'adaptedSpreadsheet')"><i class="fa-solid fa-unlock fa-margin fa-fw"></i>Desbloquear botón adaptar</button>
 
 
 
@@ -190,7 +190,7 @@
         </div>
         <button class="btn btn-primary index shadow-none w-100" onclick="execDirect('sidebarSMDevs')"><i class="fa-solid fa-margin fa-fw fa-file-circle-check"></i>Gestor de hojas</button>
         <button class="btn btn-primary index shadow-none w-100" onclick="execDirect('sidebarDSDevs')"><i class="fa-solid fa-margin fa-fw fa-wand-magic-sparkles"></i>Morph Document Studio</button>
-        <button class="btn btn-primary index shadow-none w-100 ult" onclick="execDirect('sidebarCLDevs')"><i class="fa-solid fa-margin fa-fw fa-swatchbook"></i>Hoja de estilos</button>
+        <button class="btn btn-primary index shadow-none w-100 ult" onclick="execDirect('sidebarCLDevs')"><i class="fa-solid fa-margin fa-fw fa-swatchbook"></i>Guía de estilos</button>
       </div>
 
 
@@ -261,6 +261,9 @@ function check_password () {
         document.getElementById('hidden_div').style.display = 'block';
     } else if (password == 'mupdate') {
       document.getElementById('manualUpdateDiv').style.display = 'block';
+    } else if (password == 'desbutadaptar') {
+      execNoSuccess('deleteProperty', 'adaptedSpreadsheet');
+      execDirect('sidebarIndex');
     } else {
       $('#invalid-developer').html('<small>La clave es incorrecta.</small>').addClass("show");
       field.classList.add("is-invalid"); setTimeout(function(){validatePassword(field);  $('#invalid-developer').removeClass("show").addClass("collapse") }, 3500);

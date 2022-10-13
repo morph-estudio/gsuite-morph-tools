@@ -11,20 +11,20 @@ function adaptarCuadroAntiguo() {
 
   if (sheetnames.indexOf('ACTUALIZAR') > -1) {
     let sh_act = ss.getSheetByName('ACTUALIZAR');
-    let sh = ss.insertSheet('LINK', 0);
-    templateFormat(sh);
-    templateText(sh);
-    deleteEmptyRows(); removeEmptyColumns();
+    sh_act.setName('LINK');
+    let sh_link = ss.insertSheet('LINK_temp', 0);
+    templateFormat(sh_link); templateText(sh_link); deleteEmptyRows(); removeEmptyColumns();
     ss.deleteSheet(sh_act);
-    sh.setTabColor('FFFF00');
+    sh_link.setName('LINK').setTabColor('FFFF00');
   }
+
 
   let oldSheets = ['TXT LIMPIO','TXT FT','TXT VN'];
   let newSheets = ['TXT SUPERFICIES','TXT FALSOS TECHOS','TXT VENTANAS'];
 
   for (let i = 0; i < oldSheets.length; i++) {
     if (sheetnames.indexOf(oldSheets[i]) > -1) {
-      ss.getSheetByName(oldSheets[i]).setName(newSheets[i]);
+      ss.getSheetByName(oldSheets[i]).setName(newSheets[i]).setTabColor('00FF00');
     }
   }
 
@@ -238,20 +238,6 @@ function exportXML() {
   }
   return ContentService.createTextOutput(content)
     .setMimeType(ContentService.MimeType.XML).downloadAsFile('Hola');
-}
-
-function colorize(cols) {
-  /*
-    let payload = {
-      "black": "#000",
-      "white": "#fff"
-      }
-  */
-  const [background, color] = cols.split('-');
-  Logger.log(background); Logger.log(color);
-  let selection = ss().getSelection();
-  let currentCell = selection.getActiveRange();
-  currentCell.setBackgroundColor(`#${background}`).setFontColor(`#${color}`);
 }
 
 /**
