@@ -14,6 +14,9 @@
 
 <?!= HtmlService.createHtmlOutputFromFile('public/helpers/navbar').getContent(); ?>
 
+<!-- <?!= HtmlService.createHtmlOutputFromFile('public/helpers/csv').getContent(); ?> -->
+
+
 
 <div class="accordion" id="accordionExample">
   <div class="accordion-item">
@@ -54,9 +57,8 @@
         <!--<div class="btn-group d-flex" role="group">
           <button class="btn btn-primary index shadow-none half w-50" title="Ajusta las filas al texto existente" onclick="execNoSuccess('autoResizeAllRows')"><i class="fa-solid fa-margin fa-fw fa-sliders"></i>Fit Filas</button>
           <button class="btn btn-primary index shadow-none w-50" title="Ajusta las columnas al texto existente" onclick="execNoSuccess('autoResizeAllCols')"><i class="fa-solid fa-margin fa-fw fa-sliders"></i>Fit Colms</button>
+          <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('postLessons')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Enviar mensajes de Chat</button>
         </div>-->
-
-        <!--<button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('postLessons')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Enviar mensajes de Chat</button>-->
 
       </div>
     </div>
@@ -94,14 +96,6 @@
           <button class="btn btn-success mainbtn btn-xl w-100" id="adaptButton" onclick="execFunction('adaptarCuadroAntiguo', 'El cuadro se ha adaptado correctamente.')">Adaptar cuadro antiguo</button>
           <!--<button class="btn btn-primary mainbtn btn-lg-gmt w-100 mt-4" id="adaptDeleteButton" onclick="execNoSuccess('deleteProperty', 'adaptedSpreadsheet')">Adaptar cuadro antiguo</button>-->
         </div>
-
-        <!--<p>Si tienes problemas con el actualizador automático puedes usar el <a href="https://sites.google.com/morphestudio.es/morph-pills/i-d/scripting/gsuite-morph-tools?authuser=0#h.ll0ic3i4hbnx" target="_blank"><b>método manual</b></a>:</p>
-
-        <div class="btn-group w-100" role="group" aria-label="Actualizador manual">
-          <button type="button" id="csManual1" class="btn btn-outline-primary shadow-none" onclick="execFunction('manualUpdaterTemplate', 'Se ha generado una plantilla para el cuadro.')">PLANTILLA</button>
-          <button type="button" id="csManual2" class="btn btn-outline-primary shadow-none" onclick="swalConfirm('morphCSUpdater', 'El cuadro se ha actualizado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">ACT</button>
-          <button type="button" id="csManual3" class="btn btn-outline-primary shadow-none" onclick="swalConfirm('morphFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">CONG</button>
-        </div>-->
 
       </div>
     </div>
@@ -142,36 +136,33 @@
     </h2>
     <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
 
-<div id="password_div">
-      <div class="accordion-body mt-2 pb-0 mb-4">
-      <div class="card bg-light" >
-        <div class="card-body">
+      <div id="password_div">
+        <div class="accordion-body mt-2 pb-0 mb-4">
+          <div class="card bg-light" >
+            <div class="card-body">
       
+              <label for="hidden_password" class="form-label"><i class="fa-solid fa-key fa-margin fa-fw"></i>Introduce una clave:</label>
+              <div class="input-group flex-nowrap update rounded-pill">
+                <!--<span class="input-group-text"><i class="fas fa-lock"></i></span>-->
+                <input name="password" type="password" value="" class="input form-control shadow-none" id="hidden_password" required="true" onkeydown = "if (event.keyCode == 13) document.getElementById('hideSectionButton').click()"/>
+                <span class="input-group-text" onclick="password_show_hide();">
+                  <i class="fas fa-eye fa-fw" id="show_eye"></i>
+                  <i class="fas fa-eye-slash d-none fa-fw" id="hide_eye"></i>
+                </span>
+              </div>
+              <div id="invalid-developer" class="text-danger mt-2 collapse">asdf</div>
+              <button class="btn btn-secondary btn-lg-gmt w-100 mt-2" id="hideSectionButton">Desbloquear</button>
 
-<label for="hidden_password" class="form-label"><i class="fa-solid fa-key fa-margin fa-fw"></i>Introduce una clave:</label>
-<div class="input-group flex-nowrap update rounded-pill">
-  <!--<span class="input-group-text"><i class="fas fa-lock"></i></span>-->
-  <input name="password" type="password" value="" class="input form-control shadow-none" id="hidden_password" required="true" onkeydown = "if (event.keyCode == 13) document.getElementById('hideSectionButton').click()"/>
-  <span class="input-group-text" onclick="password_show_hide();">
-    <i class="fas fa-eye fa-fw" id="show_eye"></i>
-    <i class="fas fa-eye-slash d-none fa-fw" id="hide_eye"></i>
-  </span>
-</div>
-<div id="invalid-developer" class="text-danger mt-2 collapse">asdf</div>
-<button class="btn btn-secondary btn-lg-gmt w-100 mt-2" id="hideSectionButton">Desbloquear</button>
-
-
-
+            </div>
+          </div>
         </div>
-      </div>
-      
-      </div>
       </div>
 
       <div id="hidden_div" style="display: none;" class="mt-4">
         <div class="accordion-body pb-0">
           <h3 class="menu-h3 mb-3"><i class="fa-solid fa-margin fa-fw fa-laptop-code"></i>Funciones en desarrollo</h3>
         </div>
+
         <button class="btn btn-primary index shadow-none w-100" onclick="swalConfirm('botBrainSave', 'Se ha acualizado la IA de Morph Robot', 'Por favor, no utilices esta función avanzada si no sabes lo que estás haciendo. Confirma para continuar.')"><i class="fa-solid fa-brain fa-margin fa-fw"></i>Actualizar cerebro de robot</button>
         <button class="btn btn-primary index shadow-none w-100" onclick="swalConfirm('morphFastFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.')"><i class="fa-solid fa-margin fa-snowflake fa-fw"></i>Congelador rápido</button>
         <button class="btn btn-primary index shadow-none w-100" onclick="execFunction('saveSheetAsTSV')"><i class="fa-solid fa-margin fa-file-excel fa-fw"></i>Exportar TSV con fórmulas</button>
@@ -179,10 +170,6 @@
         <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('createTimeTriggerSpecifcDate')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Programar base de mensajes</button>
 
         <button class="btn btn-primary index shadow-none w-100" id="adaptDeleteButton" onclick="execNoSuccess('deleteProperty', 'adaptedSpreadsheet')"><i class="fa-solid fa-unlock fa-margin fa-fw"></i>Desbloquear botón adaptar</button>
-
-
-
-        
         <button class="btn btn-primary index shadow-none w-100 ult" onclick="swalinfo()"><i class="fa-solid fa-gear fa-margin fa-fw fa-spin" style="--fa-animation-duration: 6s;"></i>Destructor de mundos</button>
 
         <div class="accordion-body pb-0 mt-4">
@@ -193,24 +180,14 @@
         <button class="btn btn-primary index shadow-none w-100 ult" onclick="execDirect('sidebarCLDevs')"><i class="fa-solid fa-margin fa-fw fa-swatchbook"></i>Guía de estilos</button>
       </div>
 
-
-      <div id="manualUpdateDiv" style="display: none;" class="mt-4 mb-2">
-        <div class="accordion-body">
-        <h3 class="menu-h3 mb-3"><i class="fa-solid fa-margin fa-fw fa-crop"></i>Actualizador manual</h3>
-        <p>Si tienes problemas con el actualizador automático puedes usar el <a href="https://sites.google.com/morphestudio.es/morph-pills/i-d/scripting/gsuite-morph-tools?authuser=0#h.ll0ic3i4hbnx" target="_blank"><b>método manual</b></a>:</p>
-
-        <div class="btn-group w-100" role="group" aria-label="Actualizador manual">
-          <button type="button" id="csManual1" class="btn btn-outline-primary shadow-none" onclick="execFunction('manualUpdaterTemplate', 'Se ha generado una plantilla para el cuadro.')">PLANTILLA</button>
-          <button type="button" id="csManual2" class="btn btn-outline-primary shadow-none" onclick="swalConfirm('morphCSUpdater', 'El cuadro se ha actualizado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">ACT</button>
-          <button type="button" id="csManual3" class="btn btn-outline-primary shadow-none" onclick="swalConfirm('morphFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">CONG</button>
-        </div>
-      </div>
-      </div>
-
+      <?!= HtmlService.createHtmlOutputFromFile('public/helpers/mupdate').getContent(); ?>
+      <?!= HtmlService.createHtmlOutputFromFile('public/helpers/csv').getContent(); ?>
 
       
+      </div>
+
     </div>
-  </div>
+
 
   <div class="accordion-item last">
     <h2 class="accordion-header" id="headingFive">
@@ -236,83 +213,124 @@
 
 <script>
 
-function afterSidebarLoads(){
-  setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 300);
-}
+  function afterSidebarLoads(){
+    setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 300);
+  }
 
 </script>
 
 <script>
 
-function check_password () {
-  btnLoading('#hideSectionButton', 'Validando...');
-  var field = document.getElementById('hidden_password');
-  var password = field.value;
+  function check_password () {
+    btnLoading('#hideSectionButton', 'Validando...');
+    var field = document.getElementById('hidden_password');
+    var password = field.value;
 
-  if (password == '') {
-    $('#invalid-developer').html('<small>El campo no puede estar vacío.</small>').addClass("show");
-    field.classList.add("is-invalid"); setTimeout(function(){validatePassword(field); $('#invalid-developer').removeClass("show").addClass("collapse") }, 3500);
-    btnReset("#hideSectionButton");
-  // check_userRole(field);
-  } else {
-    google.script.run.withSuccessHandler(function(data){
-    if (data.includes(password)) {
-        // $('#password_div').hide();
-        document.getElementById('hidden_div').style.display = 'block';
-    } else if (password == 'mupdate') {
-      document.getElementById('manualUpdateDiv').style.display = 'block';
-    } else if (password == 'desbutadaptar') {
-      execNoSuccess('deleteProperty', 'adaptedSpreadsheet');
-      execDirect('sidebarIndex');
+    if (password == '') {
+      $('#invalid-developer').html('<small>El campo no puede estar vacío.</small>').addClass("show");
+      field.classList.add("is-invalid"); setTimeout(function(){validatePassword(field); $('#invalid-developer').removeClass("show").addClass("collapse") }, 3500);
+      btnReset("#hideSectionButton");
     } else {
-      $('#invalid-developer').html('<small>La clave es incorrecta.</small>').addClass("show");
-      field.classList.add("is-invalid"); setTimeout(function(){validatePassword(field);  $('#invalid-developer').removeClass("show").addClass("collapse") }, 3500);
+      google.script.run.withSuccessHandler(function(data){
+      if (data.includes(password)) {
+          // $('#password_div').hide();
+          document.getElementById('hidden_div').style.display = 'block';
+      } else if (password == 'mupdate') {
+        document.getElementById('manualUpdateDiv').style.display = 'block';
+      } else if (password == 'icsv') {
+        document.getElementById('icsv').style.display = 'block';
+        /*async function secondFunction(){
+          await getSavedCSVImport();
+          // now wait for firstFunction to finish...
+          document.getElementById('icsv').style.display = 'block';
+        } */
+      } else if (password == 'desbutadaptar') {
+        execNoSuccess('deleteProperty', 'adaptedSpreadsheet');
+        execDirect('sidebarIndex');
+      } else {
+        $('#invalid-developer').html('<small>La clave es incorrecta.</small>').addClass("show");
+        field.classList.add("is-invalid"); setTimeout(function(){validatePassword(field);  $('#invalid-developer').removeClass("show").addClass("collapse") }, 3500);
+      }
+      btnReset("#hideSectionButton");
+      $('#hidden_password').val('');  
+      }).getDevPassword('DevAreaKeys');
     }
-    btnReset("#hideSectionButton");
-    $('#hidden_password').val('');  
-    }).getDevPassword('DevAreaKeys');
   }
-}
 
-function validatePassword(field) {
-  field.classList.remove("is-invalid");
-}
-
-function check_userRole(field) {
-  let protection = JSON.parse("<?=JSON.stringify(protection)?>");
-  if (protection === true) {
-      // $('#password_div').hide();
-      document.getElementById('hidden_div').style.display = 'block';
-  } else {
-    document.getElementById('hidden_div').style.display = 'none';
-    //$('#invalid-developer').html('No puedes acceder porque no tienes permisos de desarrollador.');
-    //field.classList.add("is-invalid"); setTimeout(function(){validatePassword(field)}, 4000);
-    //btnReset("#hideSectionButton");
+  function validatePassword(field) {
+    field.classList.remove("is-invalid");
   }
-}
 
-function validatePassword(field) {
-  field.classList.remove("is-invalid");
-}
+  function check_userRole(field) {
+    let protection = JSON.parse("<?=JSON.stringify(protection)?>");
+    if (protection === true) {
+        document.getElementById('hidden_div').style.display = 'block';
+    } else {
+      document.getElementById('hidden_div').style.display = 'none';
+    }
+  }
 
-function updateButtonClicked() {
-      let updatePrefix = document.getElementById('updatePrefixID').value;
-      let prefixAll = document.getElementById("prefix-all-switch").checked;
-      let btnID = 'csUpdater';
+  function validatePassword(field) {
+    field.classList.remove("is-invalid");
+  }
 
-      var rowData = {
-            updatePrefix: updatePrefix,
-            prefixAll: prefixAll,
-          };
+  function updateButtonClicked() {
+    let updatePrefix = document.getElementById('updatePrefixID').value;
+    let prefixAll = document.getElementById("prefix-all-switch").checked;
+    let btnID = 'csUpdater';
 
-      swalConfirm('morphCSUpdater', 'El cuadro se ha actualizado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', btnID, rowData);
-      //swalConfirm('documentStudio', 'Los documentos se han generado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', rowData);
-      //onclick="swalConfirm('morphCSUpdater', 'El cuadro se ha actualizado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)"
-}
+    var rowData = {
+          updatePrefix: updatePrefix,
+          prefixAll: prefixAll,
+        };
+
+    swalConfirm('morphCSUpdater', 'El cuadro se ha actualizado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', btnID, rowData);
+  }
+
+</script>
+
+<script>
+
+  function password_show_hide() {
+    var x = document.getElementById("hidden_password");
+    var show_eye = document.getElementById("show_eye");
+    var hide_eye = document.getElementById("hide_eye");
+    hide_eye.classList.remove("d-none");
+    if (x.type === "password") {
+      x.type = "text";
+      show_eye.style.display = "none";
+      hide_eye.style.display = "block";
+    } else {
+      x.type = "password";
+      show_eye.style.display = "block";
+      hide_eye.style.display = "none";
+    }
+  }
+
+</script>
+
+<script>
+
+  function adaptButtonDisable() {
+    $('#adaptButton').prop('disabled', true);
+    $('#adaptButton').html('Ya se ha adaptado');
+  }
+
+  function getSavedProperties() {
+    let data = JSON.parse("<?=JSON.stringify(isAdapted)?>");
+    let dataExtracted = data;
+    if (data == 'true') {
+      adaptButtonDisable()
+    }
+  }
+  function checkReturn(arg) {
+    if(arg === 'true') { return true; } else { return false; }
+  }
 
 </script>
 
 <script> // Script to order buttons alphabetically (and add ult_class to last child)
+
   'use strict';
   const buttonContainer = document.getElementById('button-container');
   const sortedButtons = [... buttonContainer.children].sort((buttonA, buttonB) => {
@@ -334,54 +352,15 @@ function updateButtonClicked() {
 
 <script>
 
-function password_show_hide() {
-  var x = document.getElementById("hidden_password");
-  var show_eye = document.getElementById("show_eye");
-  var hide_eye = document.getElementById("hide_eye");
-  hide_eye.classList.remove("d-none");
-  if (x.type === "password") {
-    x.type = "text";
-    show_eye.style.display = "none";
-    hide_eye.style.display = "block";
-  } else {
-    x.type = "password";
-    show_eye.style.display = "block";
-    hide_eye.style.display = "none";
-  }
-}
-
-</script>
-
-<script>
-
-  function adaptButtonDisable() {
-    $('#adaptButton').prop('disabled', true);
-    $('#adaptButton').html('Ya se ha adaptado');
-  }
-
-  function getSavedProperties() {
-    let data = JSON.parse("<?=JSON.stringify(isAdapted)?>");
-    let dataExtracted = data;
-    //window.alert(dataExtracted)
-    if (data == 'true') {
-      adaptButtonDisable()
-    }
-    //document.getElementById("adaptButton").disabled = checkReturn(dataExtracted['adaptedSpreadsheet']);
-  }
-  function checkReturn(arg) {
-    if(arg === 'true') { return true; } else { return false; }
-  }
-
-</script>
-
-<script>
   document.getElementById('hideSectionButton').addEventListener("click", check_password);
   document.getElementById('csUpdater').addEventListener("click", updateButtonClicked);
   document.addEventListener('DOMContentLoaded', () => {
     check_userRole();
     afterSidebarLoads();
     getSavedProperties();
+    getSavedCSVImport();
   });
+
 </script>
 
 <?!= HtmlService.createHtmlOutputFromFile('public/helpers/swal').getContent(); ?>

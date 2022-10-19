@@ -173,7 +173,7 @@ function getControlPanel(sh, file, btnID) {
       let files = DriveApp.getFolderById(fldrA[i]).getFilesByType(MimeType.GOOGLE_SHEETS);
       while (files.hasNext()) {
         let filePC = files.next();
-        if (filePC.getName().includes(pcMask)) {
+        if (filePC.getName().toLowerCase().includes(pcMask.toLowerCase())) {
           filA.push(filePC.getName(), filePC.getId(), filePC.getUrl(), fldrA[i]);
         }
       }

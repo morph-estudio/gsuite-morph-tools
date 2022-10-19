@@ -8,12 +8,12 @@ function execFunction(fa, sc, rw) {
   [fa](rw);
 }
 
-function execNoSuccess(fa, rw) {
+function execNoSuccess(fa, rw, rw2) {
   swaload()
   google.script.run
   .withSuccessHandler(success)
   .withFailureHandler(swalerror)
-  [fa](rw);
+  [fa](rw, rw2);
 }
 function success() {
   swal.close();

@@ -2,13 +2,23 @@
 # Change Log
 Documentación de cambios del proyecto.
 
-## [ 1.5.2 ] - 2022/09/07
+## [ 1.5.3 ] - 2022/10/18
+
+### Added
+
+- Herramienta para importar rápidamente múltiples archivos CSV a una hoja de Google Sheets, especificando la celda de inserción.
 
 ### Fixed
 
+- Arreglada búsqueda "Case Sensitive" del panel de control y carpeta de superficies.
+
+## [ 1.5.2 ] - 2022/10/07
+
+### Added
+
 - Se ha añadido un botón temporal para adaptar los cuadros de superficies anteriores al nuevo sistema de actualización.
 
-## [ 1.5.1 ] - 2022/09/03
+## [ 1.5.1 ] - 2022/10/03
 
 ### Added
 
