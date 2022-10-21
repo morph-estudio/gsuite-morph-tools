@@ -91,11 +91,29 @@
         </div>
 
         <div class="mt-4">
-          <h3><i class="fa-solid fa-margin fa-fw fa-triangle-exclamation"></i>Transición de cuadros</h3>
+          <h3 class="mb-3"><i class="fa-solid fa-margin fa-fw fa-triangle-exclamation"></i>Transición de cuadros</h3>
           <p>Si es un cuadro anterior a <u>Octubre 2022</u> debes adaptarlo antes de actualizar.</p>
           <button class="btn btn-success mainbtn btn-xl w-100" id="adaptButton" onclick="execFunction('adaptarCuadroAntiguo', 'El cuadro se ha adaptado correctamente.')">Adaptar cuadro antiguo</button>
           <!--<button class="btn btn-primary mainbtn btn-lg-gmt w-100 mt-4" id="adaptDeleteButton" onclick="execNoSuccess('deleteProperty', 'adaptedSpreadsheet')">Adaptar cuadro antiguo</button>-->
         </div>
+
+        <!--<hr class="side">
+
+        <div class="">
+          <h3 class="mb-3"><i class="fa-solid fa-margin fa-fw fa-window-restore"></i>Histórico de superficies</h3>
+          <p>Debes situarte en la hoja <u>Histórico CONSTRUIDAS</u> antes de crear un punto histórico.</p>
+          <button class="btn btn-success mainbtn btn-xl w-100" id="adaptButton" onclick="swalConfirm('crearPuntoHistorico', 'Se ha creado una marca temporal en el histórico.', 'Asegúrate de estar en la hoja adecuada. Confirma para continuar.')">Crear punto histórico</button>
+        </div>-->
+
+
+
+
+
+
+
+
+
+
 
       </div>
     </div>
@@ -158,28 +176,8 @@
         </div>
       </div>
 
-      <div id="hidden_div" style="display: none;" class="mt-4">
-        <div class="accordion-body pb-0">
-          <h3 class="menu-h3 mb-3"><i class="fa-solid fa-margin fa-fw fa-laptop-code"></i>Funciones en desarrollo</h3>
-        </div>
 
-        <button class="btn btn-primary index shadow-none w-100" onclick="swalConfirm('botBrainSave', 'Se ha acualizado la IA de Morph Robot', 'Por favor, no utilices esta función avanzada si no sabes lo que estás haciendo. Confirma para continuar.')"><i class="fa-solid fa-brain fa-margin fa-fw"></i>Actualizar cerebro de robot</button>
-        <button class="btn btn-primary index shadow-none w-100" onclick="swalConfirm('morphFastFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.')"><i class="fa-solid fa-margin fa-snowflake fa-fw"></i>Congelador rápido</button>
-        <button class="btn btn-primary index shadow-none w-100" onclick="execFunction('saveSheetAsTSV')"><i class="fa-solid fa-margin fa-file-excel fa-fw"></i>Exportar TSV con fórmulas</button>
-        <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('postLessons')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Enviar mensajes de Chat</button>
-        <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('createTimeTriggerSpecifcDate')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Programar base de mensajes</button>
-
-        <button class="btn btn-primary index shadow-none w-100" id="adaptDeleteButton" onclick="execNoSuccess('deleteProperty', 'adaptedSpreadsheet')"><i class="fa-solid fa-unlock fa-margin fa-fw"></i>Desbloquear botón adaptar</button>
-        <button class="btn btn-primary index shadow-none w-100 ult" onclick="swalinfo()"><i class="fa-solid fa-gear fa-margin fa-fw fa-spin" style="--fa-animation-duration: 6s;"></i>Destructor de mundos</button>
-
-        <div class="accordion-body pb-0 mt-4">
-          <h3 class="menu-h3 mb-3"><i class="fa-solid fa-margin fa-fw fa-square-caret-down"></i>Menú para developers</h3>
-        </div>
-        <button class="btn btn-primary index shadow-none w-100" onclick="execDirect('sidebarSMDevs')"><i class="fa-solid fa-margin fa-fw fa-file-circle-check"></i>Gestor de hojas</button>
-        <button class="btn btn-primary index shadow-none w-100" onclick="execDirect('sidebarDSDevs')"><i class="fa-solid fa-margin fa-fw fa-wand-magic-sparkles"></i>Morph Document Studio</button>
-        <button class="btn btn-primary index shadow-none w-100 ult" onclick="execDirect('sidebarCLDevs')"><i class="fa-solid fa-margin fa-fw fa-swatchbook"></i>Guía de estilos</button>
-      </div>
-
+      <?!= HtmlService.createHtmlOutputFromFile('public/helpers/developer').getContent(); ?>
       <?!= HtmlService.createHtmlOutputFromFile('public/helpers/mupdate').getContent(); ?>
       <?!= HtmlService.createHtmlOutputFromFile('public/helpers/csv').getContent(); ?>
 
@@ -210,6 +208,10 @@
   </div>
 
 </div>
+
+<script>
+  var wsNames = JSON.parse("<?=JSON.stringify(wsNames)?>");
+</script>
 
 <script>
 
@@ -348,6 +350,7 @@
 
   $("#button-container").children().last().addClass("ult");
 
+
 </script>
 
 <script>
@@ -359,6 +362,7 @@
     afterSidebarLoads();
     getSavedProperties();
     getSavedCSVImport();
+
   });
 
 </script>

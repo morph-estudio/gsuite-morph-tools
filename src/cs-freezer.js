@@ -76,16 +76,19 @@ function morphFreezer(btnID) {
   let url = `https://docs.google.com/feeds/download/spreadsheets/Export?key=${destinationId}&exportFormat=xlsx`;
 
   if (btnID === 'superFreezerButton') {
-    let params = {
-      method: "get",
-      headers: {"Authorization": "Bearer " + ScriptApp.getOAuthToken()},
-      muteHttpExceptions: true,
-    };
-    let blob = UrlFetchApp.fetch(url, params).getBlob();
-    blob.setName(`${ss.getName()} - ${freezerDate} - CONGELADO.xlsx`);
+
     const ui = SpreadsheetApp.getUi();
     let confirm = Browser.msgBox('Documento Excel', '¿Quieres crear una copia en formato Excel en la misma carpeta?', Browser.Buttons.OK_CANCEL);
-    if (confirm == 'ok') { DriveApp.getFolderById(parentFolderID).createFile(blob); }
+    if (confirm == 'ok') {
+      let params = {
+        method: "get",
+        headers: {"Authorization": "Bearer " + ScriptApp.getOAuthToken()},
+        muteHttpExceptions: true,
+      };
+      let blob = UrlFetchApp.fetch(url, params).getBlob();
+      blob.setName(`${ss.getName()} - ${freezerDate} - CONGELADO.xlsx`);
+      DriveApp.getFolderById(parentFolderID).createFile(blob);
+    }
   } else if (btnID === 'csFreezer' || 'csManual3') {
     sh.getRange('B9').setValue(url).setFontColor('#0000FF'); // Add XLSX download url to sheet
     sh.getRange('B7').setNote(null).setNote(`Último congelado: ${dateNow} por ${userMail}`); // Last Update Note

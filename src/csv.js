@@ -1,15 +1,16 @@
 function getCSVFilesData(rowData, counter) {
 
-  const sh = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-
   for (let i = 0; i <= counter; i++) {
 
     let formData = [
       rowData[`csvURL${i}`],
-      rowData[`csvCELL${i}`]
+      rowData[`csvCELL${i}`],
+      rowData[`selSht${i}`]
     ];
 
-    let [csvURL, csvCELL] = formData;
+    let [csvURL, csvCELL, selSht] = formData;
+
+    let sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(selSht);
 
     let fileURL = csvURL;
     let fileID = getIdFromUrl(fileURL);

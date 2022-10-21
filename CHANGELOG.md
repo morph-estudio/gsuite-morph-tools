@@ -7,10 +7,12 @@ Documentación de cambios del proyecto.
 ### Added
 
 - Herramienta para importar rápidamente múltiples archivos CSV a una hoja de Google Sheets, especificando la celda de inserción.
+- Herramienta para crear marcas temporales en el histórico de superficies.
 
 ### Fixed
 
 - Arreglada búsqueda "Case Sensitive" del panel de control y carpeta de superficies.
+- Selector de hojas para la herramienta Importar CSV.
 
 ## [ 1.5.2 ] - 2022/10/07
 

@@ -40,6 +40,7 @@ function sidebarIndex() {
   let html = HtmlService.createTemplateFromFile('public/index');
   html.protection = getDevPermission('DevAreaMails'); // html.navBarHEX = '#FFCCBC';
   html.isAdapted = getDocProperty('adaptedSpreadsheet'); // html.navBarHEX = '#FFCCBC';
+  html.wsNames = getWorksheetNamesArray();
   html = html.evaluate().setTitle(barTitleIX); ui().showSidebar(html);
 }
 

@@ -1,17 +1,20 @@
-<div id="icsv" style="display: none;" class="mt-3 mb-2">
+<div id="icsv" style="display: none;" class="mt-3 mb-2"> <!-- -->
 
 <div class="accordion-body p-3 mt-2">
 
   <h3 class="menu-h3 mb-3"><i class="fa-solid fa-margin fa-fw fa-file-csv"></i>Importar CSV</h3>
 
-  <div id="newinput">
-    <div id="row" class="input-group flex-nowrap update rounded-pill mb-2">
+  <div id="newinput" class="rounded">
+    <div id="row">
+    <select id="selSht0" class="form-select shadow-none mb-1"></select>
+    <div class="input-group flex-nowrap update mb-3">
       <span class="input-group-text"><i class="fa-solid fa-link"></i></span>
       <input type="text" class="form-control shadow-none" id="csvURL0" placeholder="https://drive.google.com/file/">
       <span class="input-group-text"><i class="fa-solid fa-table-cells-large"></i></span>
       <input type="text" class="form-control shadow-none" style="width:5% !important" id="csvCELL0" placeholder="A1">
       <button class="btn btn-dark disabled" id="" type="button"><i class="fa-solid fa-wifi fa-fw"></i></button>
     </div>
+  </div>
   </div>
 
   <div class="d-flex mt-3 mb-1">
@@ -21,18 +24,20 @@
 
   <button class="btn btn-primary btn-xl w-100 shadow-none mt-1" id="csvMainButton">Importar CSV</button>
 
-  <!--<button class="btn btn-danger btn-xl w-100 shadow-none mt-1" id="csvMainButton" onClick="alert(counter)">Counter</button>
+  <!-- <button class="btn btn-danger btn-xl w-100 shadow-none mt-1" id="csvMainButton" onClick="alert(counter)">Counter</button>
   <button class="btn btn-danger btn-xl w-100 shadow-none mt-1" id="csvMainButton" onClick="alert(dat)">Object</button>
 
-  <button class="btn btn-outline-danger btn-lg-gmt w-35 shadow-none ms-1 pt-1 pb-1" id="deleteButton" onclick="swalConfirm('deleteProperties', 'Se ha eliminado la configuración', 'Se eliminará la configuración guardada.')">Borrar</button> -->
+  <button class="btn btn-danger btn-xl w-100 shadow-none mt-1" id="deleteButton" onclick="swalConfirm('deleteProperties', 'Se ha eliminado la configuración', 'Se eliminará la configuración guardada.')">Borrar</button>-->
 
 </div>
 
-</div>
+</div> <!-- -->
 
 <script>
 
   var counter = 0;
+  //var wsNames = JSON.parse("<?=JSON.stringify(wsNames)?>");
+  
   var csvURL; var csvCELL;
   var rowData = {};
   var newRowAdd;
@@ -40,7 +45,9 @@
   $("#moreFields").click(function () {
     ++counter;
     newRowAdd =
-    `<div id="row${counter}" class="input-group flex-nowrap update rounded-pill mb-2">` +
+    `<div id="row${counter}">` +
+    `<select id="selSht${counter}" class="form-select shadow-none mb-1" aria-describedby="email-field-help"></select>` +
+    '<div class="input-group flex-nowrap update mb-3">' +
     '<span class="input-group-text"><i class="fa-solid fa-link"></i></span>' +
     `<input type="text" class="form-control shadow-none" id="csvURL${counter}" placeholder="https://drive.google.com/file/">` +
     '<span class="input-group-text"><i class="fa-solid fa-table-cells-large"></i></span>' +
@@ -49,6 +56,7 @@
     '<i class="fa-solid fa-trash fa-fw"></i></button> </div>';
 
     $('#newinput').append(newRowAdd);
+    afterDropDrownArrayReturneds2(wsNames, counter);
   });
 
   function reply_click(clicked_id) {
@@ -57,6 +65,33 @@
     })
     --counter;
   }
+
+
+function afterDropDrownArrayReturneds(wsNames){
+
+  //alert(wsNames);
+  let emailField = document.getElementById("selSht0");
+  //emailField.innerHTML = "";
+  //addDefaultChild(emailField, 'Selecciona campo email');
+  addDropdownElementss(wsNames, selSht0)
+  
+}
+
+function addDropdownElementss(wsNames, field) {
+  //alert(wsNames);
+  wsNames.forEach(function(r){
+    let option = document.createElement("option");
+    option.textContent = r;
+    field.appendChild(option);
+  });
+  
+}
+
+function afterDropDrownArrayReturneds2(wsNames, i){
+  let emailField = document.getElementById(`selSht${i}`);
+  addDropdownElementss(wsNames, emailField)
+}
+
 
 </script>
 
@@ -70,8 +105,10 @@
     for (let i = 0; i <= counter; i++) {
       csvURL = document.getElementById(`csvURL${i}`).value; //alert(csvURL);
       csvCELL = document.getElementById(`csvCELL${i}`).value; //alert(csvCELL);
+      selSTH = document.getElementById(`selSht${i}`).value; //alert(csvCELL);
       rowData[`csvURL${i}`] = csvURL;
       rowData[`csvCELL${i}`] = csvCELL;
+      rowData[`selSht${i}`] = selSTH;
     }
 
     rowData[`newRowAdd`] = newRowAdd;
@@ -101,20 +138,24 @@
 
       for (let i = 1; i <= counter; i++) {
         newRowAdd =
-        `<div id="row${i}" class="input-group flex-nowrap update rounded-pill mb-2">` +
-        '<span class="input-group-text"><i class="fa-solid fa-link"></i></span>' +
-        `<input type="text" class="form-control shadow-none" id="csvURL${i}" placeholder="https://drive.google.com/file/">` +
-        '<span class="input-group-text"><i class="fa-solid fa-table-cells-large"></i></span>' +
-        `<input type="text" class="form-control shadow-none" id="csvCELL${i}" placeholder="A1">` +
-        `<button class="btn btn-danger" id="deleteRow${i}" type="button" onClick="reply_click(this.id)">` +
-        '<i class="fa-solid fa-trash fa-fw"></i></button> </div>';
+          `<div id="row${i}">` +
+          `<select id="selSht${i}" class="form-select shadow-none mb-1" aria-describedby="email-field-help"></select>` +
+          '<div class="input-group flex-nowrap update mb-3">' +
+          '<span class="input-group-text"><i class="fa-solid fa-link"></i></span>' +
+          `<input type="text" class="form-control shadow-none" id="csvURL${i}" placeholder="https://drive.google.com/file/">` +
+          '<span class="input-group-text"><i class="fa-solid fa-table-cells-large"></i></span>' +
+          `<input type="text" class="form-control shadow-none" id="csvCELL${i}" placeholder="A1">` +
+          `<button class="btn btn-danger" id="deleteRow${i}" type="button" onClick="reply_click(this.id)">` +
+          '<i class="fa-solid fa-trash fa-fw"></i></button> </div>';
 
         $('#newinput').append(newRowAdd);
+        afterDropDrownArrayReturneds2(wsNames, i)
       }
 
       for (let i = 0; i <= counter; i++) {
         if (typeof dataExtracted[`csvURL${i}`] !== 'undefined') document.getElementById(`csvURL${i}`).value = dataExtracted[`csvURL${i}`];
         if (typeof dataExtracted[`csvCELL${i}`] !== 'undefined') document.getElementById(`csvCELL${i}`).value = dataExtracted[`csvCELL${i}`];
+        if (typeof dataExtracted[`selSht${i}`] !== 'undefined') document.getElementById(`selSht${i}`).value = dataExtracted[`selSht${i}`];
       }
     }).getDocProperties();
   }
@@ -122,4 +163,15 @@
   document.getElementById("csvMainButton").addEventListener("click", afterButtonCSVimport);
   document.getElementById("saveCSVOptions").addEventListener("click", afterButtonCSVoptions);
 
+function cas() {
+  afterDropDrownArrayReturneds(wsNames)
+}
+</script>
+
+<script>
+
+  $(document).ready(function() {
+   // var emailDropdowns = JSON.parse("<?=JSON.stringify(emailDropdowns)?>");
+    cas();
+  });
 </script>

@@ -12,6 +12,15 @@ function getWorksheetNames() {
   return sheetNames;
 }
 
+function getWorksheetNamesArray() {
+  let sheetNames = new Array();
+  let sheets = ss().getSheets();
+  sheets.forEach(sh => {
+    sheetNames.push( sh.getName());
+  });
+  return sheetNames;
+}
+
 function deleteWorksheets(sheetNamesToDeleteAsString, rowData) {
   const ss = SpreadsheetApp.getActive();
 

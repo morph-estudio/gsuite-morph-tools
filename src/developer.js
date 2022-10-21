@@ -2,6 +2,65 @@
  * adaptarCuadroAntiguo
  * Script para adaptar cuadros de superficies antiguos a la nueva estructura automática.
  */
+function crearPuntoHistorico() {
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sh = ss.getActiveSheet();
+  let dateNow = Utilities.formatDate(new Date(), 'GMT+2', 'dd/MM/yyyy');
+
+  let firstCell = 'G1';
+  let columnIndex;
+  columnIndex = sh.getRange(firstCell).getColumn();
+  let lastColumn = sh.getLastColumn(); Logger.log(lastColumn)
+  let checkRange = sh.getRange(1, lastColumn).getValue();
+
+  if (checkRange == "N/A") {
+    //sh.insertColumnAfter(6); sh.setColumnWidth(7, 100);
+    
+    let copyRange = sh.getRange(1, 4, sh.getLastRow(), 1);
+    copyRange.copyTo(sh.getRange(1, columnIndex), {contentsOnly:true}); /**/
+    sh.getRange(firstCell).setValue(dateNow);
+    return;
+  }
+    
+
+  let copyRange = sh.getRange(1, 4, sh.getLastRow(), 3);
+  sh.insertColumns(columnIndex, 3);
+  sh.setColumnWidth(columnIndex, 100); sh.setColumnWidth(columnIndex + 1, 110); sh.setColumnWidth(columnIndex + 2, 150);
+  sh.getRange('H:I').shiftRowGroupDepth(1);
+
+  copyRange.copyTo(sh.getRange(1, columnIndex), {contentsOnly:true});
+  let dateHeader = sh.getRange(firstCell);
+  dateHeader.setValue(dateNow);
+
+  let copyRange2 = sh.getRange(1, columnIndex, sh.getLastRow(), 1);
+  let sheetID = sh.getSheetId();
+  copyRange2.copyFormatToRange(sheetID, columnIndex, columnIndex, 1, sh.getLastRow())
+  //copyRange2.copyTo(sh.getRange(1, columnIndex), {formatOnly:true});
+  let copyRange3 = sh.getRange(1, columnIndex - 2, sh.getLastRow(), 2);
+  copyRange3.copyTo(sh.getRange(1, columnIndex + 1), {formatOnly:true});
+
+  let boldColor = dateHeader.getBackground();
+  copyRange2.setBorder(null, true, null, null, null, null, boldColor, SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+  copyRange2.setBorder(null, null, null, true, null, null, boldColor, SpreadsheetApp.BorderStyle.SOLID);
+
+  
+
+  sh.getRange(1, columnIndex + 1).setFormula('="diferencia con "&TO_TEXT($J$1)');
+
+  
+
+  sh.getRange(2, columnIndex + 1).setValue("").setFormula('=ARRAYFORMULA(IF(B2:B<>"";G2:G-J2:J;))');
+  sh.getRange(3, columnIndex + 1, sh.getLastRow() - 2, 1).clearContent();
+/**/
+
+}
+
+
+/**
+ * adaptarCuadroAntiguo
+ * Script para adaptar cuadros de superficies antiguos a la nueva estructura automática.
+ */
 function adaptarCuadroAntiguo() {
   let ss = SpreadsheetApp.getActive();
   let sheetnames = getSheetnames(ss);

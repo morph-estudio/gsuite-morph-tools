@@ -149,6 +149,7 @@ function refreshButtonPush(){
 }
 
 function addDropdownElements(arrayOfArrays, field) {
+  alert(arrayOfArrays)
   arrayOfArrays.forEach(function(r){
     let option = document.createElement("option");
     option.textContent = r[0];
@@ -160,6 +161,7 @@ function addDropdownElements(arrayOfArrays, field) {
 }
 
 function afterDropDrownArrayReturned(arrayOfArrays){
+  alert(emailDropdown)
   let emailField = document.getElementById("email-field");
   emailField.innerHTML = "";
   addDefaultChild(emailField, 'Selecciona campo email');
