@@ -2,12 +2,29 @@
 # Change Log
 Documentación de cambios del proyecto.
 
-## [ 1.5.3 ] - 2022/10/18
+## [ 1.6.0 ] - 2022/11/04
 
 ### Added
 
-- Herramienta para importar rápidamente múltiples archivos CSV a una hoja de Google Sheets, especificando la celda de inserción.
+- Herramienta para ajustar la altura de las filas seccionadas.
+- Añadida opción en el "listado de archivos" para insertar imágenes de una carpeta.
+- Actualizador para el cuadro de mediciones.
+- Nueva sección Interoperabilidad, con las siguientes herramientas:
+  - Herramienta para conectar hojas de Google Sheets.
+  - Herramienta para importar rápidamente múltiples archivos CSV a una hoja de Google Sheets, especificando la celda de inserción.
 - Herramienta para crear marcas temporales en el histórico de superficies.
+
+### Changed
+
+- La herramienta de listado de archivos empieza el listado en la celda seleccionada.
+- Retirada la herramienta para crear estructuras de carpetas (temporalmente).
+- Eliminada la paginación en el gestor de hojas: ahora aparece toda la lista de una.
+
+### Fixed
+
+- Arreglado error al importar TXT vacíos en el actualizador de cuadros.
+
+## [ 1.5.3 ] - 2022/10/18
 
 ### Fixed
 

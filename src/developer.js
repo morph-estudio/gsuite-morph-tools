@@ -1,6 +1,152 @@
+function claus(p) {
+  Logger.log('Holaa')
+}
+
 /**
- * adaptarCuadroAntiguo
- * Script para adaptar cuadros de superficies antiguos a la nueva estructura automática.
+ * adjustRowsHeight
+ * Ajusta la altura de las filas seleccionadas.
+ */
+function adjustRowsHeight(rowData) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sh = ss.getActiveSheet();
+
+  let formData = [rowData.heightSelectedNumber];
+  let [heightSelectedNumber] = formData;
+
+  let a = sh.getSelection().getActiveRange().getValues();
+  let ab = sh.getSelection().getActiveRange().getA1Notation();
+  let abs = ab.split(':'); let abst = getSplitA1Notation(abs[0]);
+  sh.setRowHeights(abst[1], a.length, heightSelectedNumber);
+}
+
+/**
+ * getSplitA1Notation
+ * Separa las letras y números de una notación A1 de Google Sheets.
+ */
+function getSplitA1Notation(cell) {
+  let splitArray = cell.split(/([0-9]+)/);
+  return splitArray;
+}
+
+/**
+ * letterToColumn
+ * Devuelve el número de columna en función de la letra introducida para una hoja de Google Sheets.
+ */
+function letterToColumn(letter) {
+  let column = 0, length = letter.length;
+  for (var i = 0; i < length; i++) {
+    column += (letter.charCodeAt(i) - 64) * Math.pow(26, length - i - 1);
+  }
+  return column;
+}
+
+/**
+ * insertCellImage
+ * Inserta las imágenes de una carpeta en
+ */
+function insertCellImage(rowData) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sh = ss.getActiveSheet();
+
+  let formData = [rowData.listFolderID, rowData.useA1]; let [folderUrl, useA1] = formData;
+  let folderID;
+
+  if (useA1) {
+      folderUrl = sh.getRange(1, 1).getNote();
+      folderID = getIdFromUrl(folderUrl);
+    } else {
+      folderID = getIdFromUrl(folderUrl);
+  }
+
+  let folder = DriveApp.getFolderById(folderID);
+  let contents = folder.getFiles();
+  let cnt = 0;
+  let file;
+  let downloadList = [];
+
+  let selectedCell = sh.getActiveCell().getA1Notation();
+  let splitArray = getSplitA1Notation(selectedCell);
+
+  while (contents.hasNext()) {
+      file = contents.next();
+      cnt++;
+      downloadList.push(file.getDownloadUrl())
+  };
+
+  downloadList.forEach((el, i) => {
+    let image = SpreadsheetApp
+                 .newCellImage()
+                 .setSourceUrl(el)
+                 .build();
+    let count = Number(splitArray[1]) + Number(i); Logger.log('count ' + count); Logger.log(downloadList.length);
+    let range = sh.getRange(count, letterToColumn(splitArray[0]), 1, 1);
+    range.setValue(image)
+  });
+}
+
+/**
+ * sheetConnect
+ * Conecta hojas entre distintos documentos de Google Sheets.
+ */
+function sheetConnect(rowData) {
+
+  let formData = [
+    rowData[`sheetConnectSheetname`],
+    rowData[`sheetConnectTargetURL`],
+    rowData[`sheetConnectLinkList`]
+  ];
+
+  let [sheetConnectSheetname, sheetConnectTargetURL, sheetConnectLinkList] = formData;
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sh = ss.getActiveSheet();
+  let ss_url = ss.getUrl();
+
+  let sourceSheet = ss.getSheetByName(sheetConnectSheetname);
+  let sourceSheetTabColor = sourceSheet.getTabColor();
+  let target = SpreadsheetApp.openById(getIdFromUrl(sheetConnectTargetURL));
+  let targetSheet = sourceSheet.copyTo(target);
+  targetSheet.setName(sheetConnectSheetname).setTabColor(sourceSheetTabColor);
+  targetSheet.clearContents();
+
+  let linkRange; let targetSheetLink;
+
+  if (sheetConnectLinkList == false) {
+    targetSheetLink = target.getSheetByName('LINK');
+    Logger.log(targetSheetLink.getLastRow());
+
+    if (targetSheetLink.getRange('B10').getValue() != `URL Archivo de origen`) {
+
+      linkRange = targetSheetLink.getRange(targetSheetLink.getLastRow() + 1, 1, 1, 2);
+      
+      linkRange.setValues([[`Hoja conectada / Source File`, `URL Archivo de origen`]])
+        .setBackground('#fff').setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontFamily('Inconsolata').setFontWeight('bold')
+        .setHorizontalAlignment('center');
+
+    }
+
+    let sheetLink = target.getUrl() + '#gid=' + targetSheet.getSheetId(); Logger.log(sheetLink)
+
+    linkRange = targetSheetLink.getRange(targetSheetLink.getLastRow() + 1, 1, 1, 2);
+    linkRange2 = targetSheetLink.getRange(targetSheetLink.getLastRow() + 1, 1, 1, 1);
+    
+    linkRange.setValues([[`=hyperlink("${sheetLink}";"${sheetConnectSheetname}"& " / ${ss.getName()}")`, `${ss_url}`]])
+      .setBackground('#fafafa').setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontFamily('Montserrat').setFontWeight('normal')
+      .setHorizontalAlignment('left').setFontColor('#0000FF');
+    linkRange2.setBackground('#fff').setFontColor('#78909c')
+
+    let urlRange = targetSheetLink.getRange(targetSheetLink.getLastRow(), 2, 1, 1).getValue();
+
+    targetSheet.getRange('A1').setFormula(`=IMPORTRANGE("LINK!B${targetSheetLink.getLastRow()}";"${sheetConnectSheetname}!A1:AZZ50000")`);
+
+  }
+
+  targetSheet.getRange('A1').setFormula(`=IMPORTRANGE("${ss_url}";"${sheetConnectSheetname}!A1:AZZ50000")`)
+}
+
+/**
+ * crearPuntoHistorico
+ * Crea un nuevo histórico en el histórico del cuadro de superficies.
  */
 function crearPuntoHistorico() {
 
@@ -22,8 +168,7 @@ function crearPuntoHistorico() {
     sh.getRange(firstCell).setValue(dateNow);
     return;
   }
-    
-
+  
   let copyRange = sh.getRange(1, 4, sh.getLastRow(), 3);
   sh.insertColumns(columnIndex, 3);
   sh.setColumnWidth(columnIndex, 100); sh.setColumnWidth(columnIndex + 1, 110); sh.setColumnWidth(columnIndex + 2, 150);
@@ -44,16 +189,9 @@ function crearPuntoHistorico() {
   copyRange2.setBorder(null, true, null, null, null, null, boldColor, SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
   copyRange2.setBorder(null, null, null, true, null, null, boldColor, SpreadsheetApp.BorderStyle.SOLID);
 
-  
-
   sh.getRange(1, columnIndex + 1).setFormula('="diferencia con "&TO_TEXT($J$1)');
-
-  
-
   sh.getRange(2, columnIndex + 1).setValue("").setFormula('=ARRAYFORMULA(IF(B2:B<>"";G2:G-J2:J;))');
   sh.getRange(3, columnIndex + 1, sh.getLastRow() - 2, 1).clearContent();
-/**/
-
 }
 
 
@@ -108,12 +246,15 @@ function adaptarCuadroAntiguo() {
     ui.alert('Aviso', 'No se ha encontrado la carpeta de Exportaciones .txt dentro de la carpeta del Cuadro de Superficies. Debes modificarlo manualmente añadiendo "ExpTXT" en el nombre (siguiendo la estructura PXXXXX-A-CS-ExpTXT)', ui.ButtonSet.OK)
   }
 
+  setCuadroAdaptado();
+}
+
+function setCuadroAdaptado() {
   PropertiesService.getDocumentProperties().setProperties({
     'adaptedSpreadsheet': true,
   });
 
-  sidebarIndex()
-
+  sidebarIndex();
 }
 
 /**

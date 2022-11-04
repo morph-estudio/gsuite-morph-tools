@@ -8,11 +8,17 @@
       <div class="invalid-feedback">
       Introduce una URL/ID correcta.
       </div>
-      <div id="template-id-2-help" class="form-text mt-2">Esta herramienta eliminará el contenido de la hoja activa para crear la lista.</div>
+      <div id="destination-folder-help" class="form-text">Selecciona la celda donde empezará el listado antes de ejecutar.</div>
 
       <div class="form-check form-switch mt-3">
         <input class="form-check-input" type="checkbox" onchange="document.getElementById('list-files').disabled = this.checked" role="switch" id="use-a1" >
-        <label class="form-check-label" for="use-a1">Usar celda A1</label>
+        <label class="form-check-label" for="use-a1">Usar nota en celda A1</label>
+      </div>
+      
+
+      <div class="form-check form-switch mt-1">
+        <input class="form-check-input" type="checkbox" role="switch" id="list-image-folder" >
+        <label class="form-check-label" for="list-image-folder">Insertar carpeta de imágenes</label>
       </div>
 
         <button class="btn btn-primary mainbtn btn-lg-gmt w-100 mt-3" id="listButton">Listar archivos</button>
@@ -20,6 +26,16 @@
     </div>
   </div>
 </form>
+
+  <div class="mt-2 mb-2">
+  <label for="heightNumber" class="form-label mt-3">Altura de filas</label>
+  <div class="input-group flex-nowrap update ">
+    <span class="input-group-text"><i class="fa-solid fa-arrow-up-1-9"></i></span>
+    <input type="text" class="form-control shadow-none" id="heightNumber" placeholder="ej: 100">
+    <button class="btn btn-primary shadow-none" type="button" id="increase-rows-height">Go!</button>
+  </div>
+  <div class="form-text">Introduce la altura <b>en píxeles</b> mientras tienes seleccionado el rango de filas.</div>
+  </div>
 
 <script>
 
@@ -29,14 +45,29 @@ function afterButtonClicked(){
 
     var listFolderID = document.getElementById("list-files");
     var useA1 = document.getElementById("use-a1").checked;
+    var listImageFolder = document.getElementById("list-image-folder").checked;
     var rowData = {
       listFolderID: listFolderID.value,
       useA1: useA1,
     };
       swaload();
-      google.script.run.withSuccessHandler(e => {swalsuccess('Los archivos se han listado correctamente.'), afterSubmit(e)}).withFailureHandler(swalerror).listFilesInFolder(rowData);
-
+      if (listImageFolder) {
+        google.script.run.withSuccessHandler(e => {swalsuccess('Las imágenes se han listado correctamente.'), afterSubmit(e)}).withFailureHandler(swalerror).insertCellImage(rowData);
+      } else {
+        google.script.run.withSuccessHandler(e => {swalsuccess('Los archivos se han listado correctamente.'), afterSubmit(e)}).withFailureHandler(swalerror).listFilesInFolder(rowData);
+      }
   }
+}
+
+function blabla(){
+
+    var heightSelectedNumber = document.getElementById("heightNumber").value;
+    var rowData = {
+      heightSelectedNumber
+    }
+
+  execNoSuccess('adjustRowsHeight', rowData);
+
 }
 
 function afterSubmit(e){
@@ -67,5 +98,6 @@ function validate(){
 }
 
 document.getElementById("listButton").addEventListener("click",afterButtonClicked);
+document.getElementById("increase-rows-height").addEventListener("click",blabla);
   
   </script>

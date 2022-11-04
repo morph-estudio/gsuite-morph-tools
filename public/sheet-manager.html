@@ -6,9 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.css">
+  <link href="https://unpkg.com/bootstrap-table@1.21.0/dist/extensions/reorder-rows/bootstrap-table-reorder-rows.css" rel="stylesheet">
   <?!= HtmlService.createHtmlOutputFromFile('public/helpers/header').getContent(); ?>
   <?!= HtmlService.createHtmlOutputFromFile('public/stylesheet').getContent(); ?>
   <script src="https://unpkg.com/bootstrap-table@1.21.0/dist/bootstrap-table.min.js"></script>
+  <script src="https://unpkg.com/bootstrap-table@1.21.0/dist/extensions/reorder-rows/bootstrap-table-reorder-rows.min.js"></script>
+  
+  
 </head>
 
 <body>
@@ -27,7 +31,7 @@
 
 <input type="text" class="form-control form-control-lg border-0 border-bottom rounded-0 mt-0 shadow-none" id="sheet-deleter-search" placeholder="Buscar hojas..." aria-describedby="destination-folder-help">
 
-<div class="body-padding">
+<div class="body-padding pb-3">
 
   
 
@@ -45,21 +49,27 @@
   <table class="table table-striped borderless"
     id="table"
     data-toolbar="#toolbar"
-    data-pagination="true"
+    data-pagination="false"
     data-pagination-h-align="left"
     data-search="true"
     data-search-selector="#sheet-deleter-search"
-    data-click-to-select="true"
+    data-click-to-select="false"
     data-page-list="[7, 15, 20, all]"
     data-page-size="7"
+    data-pagination-pages-by-side="1"
+    data-pagination-successively-size="1"
     data-maintain-meta-data="true"
+    data-use-row-attr-func="true"
+    data-reorderable-rows="true"
     >
     <thead>
       <tr>
         <th data-field="state" data-checkbox="true"></th>
+        <!-- <th data-field="id">ID</th> -->
         <th data-field="name">Hojas</th>
       </tr>
     </thead>
+
   </table>
 </div>
 
@@ -155,9 +165,32 @@ $(document).ready(function() {
   document.getElementById("refresh-button").addEventListener("click", WorksheetDeleteApp.refreshWorksheets)
 </script>
 
+<script type="text/javascript">
+
+$(document).ready(function() {
+  // Initialise the table
+  $("#table").tableDnD();
+});
+
+$(document).change(function() {
+  $("#table").tableDnD();
+});
+
+$(function () {
+    $('#table').on('reorder-row.bs.table', function (e, data){
+        alert('close')
+    });
+});
+
+</script>
+
+
 
 <?!= HtmlService.createHtmlOutputFromFile('public/helpers/swal').getContent(); ?>
 <?!= HtmlService.createHtmlOutputFromFile('public/helpers/footer').getContent(); ?>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/TableDnD/0.9.1/jquery.tablednd.js" integrity="sha256-d3rtug+Hg1GZPB7Y/yTcRixO/wlI78+2m08tosoRn7A=" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/bootstrap-table@1.21.0/dist/extensions/reorder-rows/bootstrap-table-reorder-rows.min.js"></script>
 
 
 </body>

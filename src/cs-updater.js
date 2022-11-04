@@ -22,8 +22,9 @@ function morphCSUpdater(btnID, rowData) {
 
   let [updatePrefix, prefixAll] = formData;  
 
-  if (btnID === 'csUpdater') {
-    sh.clear().clearFormats();
+  if (btnID === 'csUpdater' || btnID === 'mediciones') {
+    sh.getRange(1,1,9,2).clear();
+    sh.getRange(1,3,1,2).clear();
     templateFormat(sh); // Formato de celdas
   }
 
@@ -34,7 +35,10 @@ function morphCSUpdater(btnID, rowData) {
   let carpetaBase = DriveApp.getFolderById(carpetaBaseID);
 
   // Panel de control
+/**/
 
+
+try {
   let filA = getControlPanel(sh, file, btnID);
   let [filePanelName, filePanelId, filePanelUrl, folderPanelcId] = filA;
 
@@ -42,15 +46,20 @@ function morphCSUpdater(btnID, rowData) {
   let folderPanelcName = DriveApp.getFolderById(folderPanelcId);
   panelControl.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
 
+  sh.getRange('B1').setValue(filePanelUrl);
+  sh.getRange('B5').setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${folderPanelcId}";"${folderPanelcName}")`).setFontColor('#0000FF');
+  sh.getRange('B6').setValue(folderPanelcId);
+} catch(error) {
+
+}
+
   // Set Template Values
 
   templateText(sh);
 
-  sh.getRange('B1').setValue(filePanelUrl);
   sh.getRange('B3').setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${carpetaBaseID}";"${carpetaBase}")`).setFontColor('#0000FF');
   sh.getRange('B4').setValue(carpetaBaseID);
-  sh.getRange('B5').setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${folderPanelcId}";"${folderPanelcName}")`).setFontColor('#0000FF');
-  sh.getRange('B6').setValue(folderPanelcId);
+
 
   // ImportRange Permission
 
@@ -68,9 +77,9 @@ function morphCSUpdater(btnID, rowData) {
 
   let list = [];
 
-  if (btnID === 'csUpdater') {
-    sh.getRange(3, 3, 6, 2).clear();
-
+  if (btnID === 'csUpdater' || btnID === 'mediciones') {
+    sh.getRange(3, 3, sh.getLastRow(), 2).clear();
+  Logger.log('mostacho')
     let searchFor = 'title contains "ExpTXT"';
     let names =[];
     let expFolderIds=[];
@@ -142,11 +151,18 @@ function morphCSUpdater(btnID, rowData) {
     let tsvUrl = `https://drive.google.com/uc?id=${txtFileId}&x=.tsv`;
     let tsvContent = UrlFetchApp.fetch(tsvUrl, {muteHttpExceptions: true }).getContentText();
     let tsvData = Utilities.parseCsv(tsvContent, '\t');
-    let sheetPaste = ss.getSheetByName(`${txtFileSheet}`) || ss.insertSheet(`${txtFileSheet}`, 100);
+    let sheetPaste = ss.getSheetByName(`${txtFileSheet}`) || ss.insertSheet(`${txtFileSheet}`, 200);
     sh.activate();
-    sheetPaste.setTabColor('F1C232').hideSheet();
+    SpreadsheetApp.flush();
+    sheetPaste.setTabColor('00FF00').hideSheet();
     sheetPaste.clear();
-    sheetPaste.getRange(1, 1, tsvData.length, tsvData[0].length).setValues(tsvData);
+
+    try {
+      sheetPaste.getRange(1, 1, tsvData.length, tsvData[0].length).setValues(tsvData);
+    } catch (err) {
+      //throw new Error(`El documento [${txtFileName}] no tiene contenido.`);
+    }
+
     SpreadsheetApp.flush();
   };
 
@@ -154,10 +170,12 @@ function morphCSUpdater(btnID, rowData) {
   deleteEmptyRows(); removeEmptyColumns();
   sh.activate();
 }
-
+/**/
 function getControlPanel(sh, file, btnID) {
   let filA = [];
+  Logger.log(btnID)
 
+try {
   if (btnID === 'csUpdater') {
     let parents = file.getParents();
     let fldrA = [];
@@ -178,20 +196,74 @@ function getControlPanel(sh, file, btnID) {
         }
       }
     }
+  } else if (btnID === 'mediciones') {
+
+    Logger.log('id mediciones a tope')
+
+    let parents = file.getParents();
+    let fldrA = [];
+    while (parents.hasNext()) {
+      let f = parents.next();
+      let f_id = f.getId();
+      fldrA.push(f_id);
+      parents = f.getParents();
+    };
+    
+    Logger.log(fldrA);
+
+    let pcMask = 'Panel de control'; let folders;
+    for (let i = 0; i < fldrA.length; i++) {
+      let files = DriveApp.getFolderById(fldrA[i]);
+      Logger.log(files.getName())
+      folders = files.getFolders();
+
+      while (folders.hasNext()) {
+        let folder = folders.next();
+        let findValues1 = ["Proyecto Base", "Arquitectura"];
+
+        if (findValues1.some(word => folder.getName().includes(word))) {
+          Logger.log('he encontrado la puta carpeta' + folder.getName())
+          let folders2 = folder.getFolders();
+          while (folders2.hasNext()) {
+            let folder2 = folders2.next(); Logger.log(folder2.getName())
+            if (folder2.getName().includes('Doc Escrita')) {
+              Logger.log('he entrado en' + folder2.getName())
+              let folder2id = folder2.getId();
+              let files2 = DriveApp.getFolderById(folder2id).getFilesByType(MimeType.GOOGLE_SHEETS); Logger.log('files2 ' + files2)
+              
+              while (files2.hasNext()) {
+                let filePC = files2.next();
+                Logger.log('filepcname ' + filePC.getName())
+                if (filePC.getName().toLowerCase().includes(pcMask.toLowerCase())) {
+                  Logger.log('panel de control name' + filePC.getName())
+                  filA.push(filePC.getName(), filePC.getId(), filePC.getUrl(), folder2id);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
   } else if (btnID === 'csManual2') {
     let filePanelUrl = sh.getRange(1, 2).getValue();
     let filePanelId = getIdFromUrl(filePanelUrl);
     let filePC = DriveApp.getFileById(filePanelId);
     filA.push(filePC.getName(), filePanelId, filePanelUrl, filePC.getParents().next().getId());
   }
+  Logger.log('filA' + filA)
   return filA;
+} catch(error) {
+  alert(error)
+}
+
 }
 
 function templateText(sh) {
   sh.getRange('A1').setValue('URL PANEL DE CONTROL');
   sh.getRange('B2').setValue('Carpetas referentes');
-  sh.getRange('A3').setValue('CARPETA CUADRO SUP.');
-  sh.getRange('A4').setValue('ID CARPETA CUADRO SUP.');
+  sh.getRange('A3').setValue('CARPETA CUADRO');
+  sh.getRange('A4').setValue('ID CARPETA CUADRO');
   sh.getRange('A5').setValue('CARPETA PANEL DE CONTROL');
   sh.getRange('A6').setValue('ID CARPETA PANEL DE CONTROL');
   sh.getRange('A7').setValue('CARPETA BACKUP');
@@ -205,7 +277,7 @@ function templateText(sh) {
 
 function templateFormat(sh) {
   // Estilo global
-  sh.getRange(1, 1, sh.getMaxRows(), sh.getMaxColumns()).setFontSize(14).setFontFamily('Montserrat').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
+  sh.getRange(1, 1, 9, 4).setFontSize(14).setFontFamily('Montserrat').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
     .setVerticalAlignment('middle')
     .setFontColor('#78909c');
   // Col A

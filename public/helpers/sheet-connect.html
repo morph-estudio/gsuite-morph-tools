@@ -1,0 +1,83 @@
+<!-- <div id="icsv" style="display: none;" class="mt-3 mb-2">  -->
+
+
+  <h3 class="menu-h3 mb-3"><i class="fa-solid fa-margin fa-fw fa-network-wired"></i>Conectar G-Sheets</h3>
+
+  <div id="" class="rounded">
+    <select id="selSheet" class="form-select shadow-none mb-1"></select>
+    <div class="input-group flex-nowrap update mb-3">
+      <span class="input-group-text"><i class="fa-solid fa-link"></i></span>
+      <input type="text" class="form-control shadow-none" id="connectSheetURL" placeholder="https://drive.google.com/file/">
+    </div>
+
+    <div class="form-check mt-2 mb-2">
+      <input class="form-check-input shadow-none" id="connectSheetLinkList" type="checkbox" >
+      <label class="form-check-label" style="top:3px" for="connectSheetLinkList">
+        No listar en la hoja LINK
+      </label>
+    </div>
+
+  </div>
+
+
+
+  <button class="btn btn-primary mainbtn w-100 shadow-none mt-1" id="connectSheetButton">Conectar hojas</button>
+
+  <!-- <button class="btn btn-danger btn-xl w-100 shadow-none mt-1" id="csvMainButton" onClick="alert(counter)">Counter</button>
+  <button class="btn btn-danger btn-xl w-100 shadow-none mt-1" id="csvMainButton" onClick="alert(dat)">Object</button>
+
+  <button class="btn btn-danger btn-xl w-100 shadow-none mt-1" id="deleteButton" onclick="swalConfirm('deleteProperties', 'Se ha eliminado la configuración', 'Se eliminará la configuración guardada.')">Borrar</button>-->
+
+
+
+<!--</div>  -->
+
+<script>
+
+const SheetConnect = {};
+
+SheetConnect.loadWorksheetNames = function(wsNames) {
+
+  let selectField = document.getElementById("selSheet");
+  SheetConnect.addSelectElements(wsNames, selectField)
+  
+}
+
+SheetConnect.addSelectElements = function(wsNames, field) {
+
+  wsNames.forEach(function(r){
+    let option = document.createElement("option");
+    option.textContent = r;
+    field.appendChild(option);
+  });
+  
+}
+
+SheetConnect.sheetConnectForm = function() {
+
+    sheetConnectSheetname = document.getElementById(`selSheet`).value;
+    sheetConnectTargetURL = document.getElementById(`connectSheetURL`).value;
+    sheetConnectLinkList = document.getElementById(`connectSheetLinkList`).checked;
+    rowData[`sheetConnectSheetname`] = sheetConnectSheetname;
+    rowData[`sheetConnectTargetURL`] = sheetConnectTargetURL;
+    rowData[`sheetConnectLinkList`] = sheetConnectLinkList;
+
+  return rowData;
+}
+
+SheetConnect.sheetConnectButton = function() {
+  //execNoSuccess('sheetConnect', SheetConnect.sheetConnectForm());
+  swalConfirm('sheetConnect', 'Las hojas se han conectado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', SheetConnect.sheetConnectForm())
+}
+
+</script>
+
+<script>
+
+  $(document).ready(function() {
+    SheetConnect.loadWorksheetNames(wsNames);
+  });
+
+  document.getElementById(`connectSheetButton`).addEventListener("click", SheetConnect.sheetConnectButton);
+
+</script>

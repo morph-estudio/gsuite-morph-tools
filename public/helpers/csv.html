@@ -1,6 +1,6 @@
-<div id="icsv" style="display: none;" class="mt-3 mb-2"> <!-- -->
+<!--<div id="icsv" style="display: none;" class="mt-3 mb-2">  -->
 
-<div class="accordion-body p-3 mt-2">
+<div class="mt-4">
 
   <h3 class="menu-h3 mb-3"><i class="fa-solid fa-margin fa-fw fa-file-csv"></i>Importar CSV</h3>
 
@@ -22,7 +22,7 @@
     <button class="btn btn-outline-secondary btn-lg-gmt w-50 shadow-none ms-1" id="saveCSVOptions">Guardar</button>
   </div>
 
-  <button class="btn btn-primary btn-xl w-100 shadow-none mt-1" id="csvMainButton">Importar CSV</button>
+  <button class="btn btn-primary mainbtn w-100 shadow-none mt-1" id="csvMainButton">Importar CSV</button>
 
   <!-- <button class="btn btn-danger btn-xl w-100 shadow-none mt-1" id="csvMainButton" onClick="alert(counter)">Counter</button>
   <button class="btn btn-danger btn-xl w-100 shadow-none mt-1" id="csvMainButton" onClick="alert(dat)">Object</button>
@@ -31,7 +31,7 @@
 
 </div>
 
-</div> <!-- -->
+<!--</div>  -->
 
 <script>
 
@@ -117,7 +117,8 @@ function afterDropDrownArrayReturneds2(wsNames, i){
   }
 
   function afterButtonCSVimport() {
-    execNoSuccess('getCSVFilesData', csvImportForm(), counter);
+    //execNoSuccess('getCSVFilesData', csvImportForm(), counter);
+    swalConfirm('getCSVFilesData', 'Se han importado todos los archivos.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', csvImportForm(), counter);
   }
 
   function afterButtonCSVoptions() {

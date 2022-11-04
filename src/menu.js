@@ -2,8 +2,8 @@
  * Global Variables + Global Functions
  */
 
-const morphDivision = '(I+D)'; const morphDev = '(Devs)'
-const titleIX = 'G-Suite Morph Tools'; const barTitleIX = `💡 ${titleIX} ${morphDivision}`;
+const morphDivision = '(I+D)'; const morphDev = '(Devs)'; const gmtVersion = '1.5.7'
+const titleIX = 'G-Suite Morph Tools'; const barTitleIX = `💡 ${titleIX} ${gmtVersion}`;
 const titleDS = 'Morph Document Studio'; const barTitleDS = `✨ ${titleDS} ${morphDivision}`;
 const titleSM = 'Gestor de hojas'; const barTitleSM = `📋 ${titleSM} ${morphDivision}`;
 const titleCL = 'Guía de estilo'; const barTitleCL = `🎨 ${titleCL} ${morphDivision}`;

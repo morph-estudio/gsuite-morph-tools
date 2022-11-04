@@ -168,6 +168,9 @@ function listFilesInFolder(rowData) {
   let maxR = sh.getMaxRows();
   let maxC = sh.getMaxColumns();
 
+  let a1cell = sh.getActiveCell().getA1Notation();
+  let splitArray = getSplitA1Notation(a1cell);
+
   sh.getRange(2, 1, 1, 3).setFontWeight('bold');
 
   let formData = [rowData.listFolderID, rowData.useA1];
@@ -183,7 +186,7 @@ function listFilesInFolder(rowData) {
   let fldr = DriveApp.getFolderById(fldr_id);
   let files = fldr.getFiles();
   let names = [];
-  sh.getRange(3, 1, maxR, maxC).clearContent();
+  //sh.getRange(splitArray[1], 1, maxR, maxC).clearContent();
   while (files.hasNext()) {
     f = files.next();
     f_url = f.getUrl();
@@ -192,9 +195,9 @@ function listFilesInFolder(rowData) {
     names.push([f_name,f_url,f_mime]);
   }
   let result = [['Filename', 'File URL', 'Type'], ...names.sort()];
-  sh.getRange(2, 1, names.length + 1, 3).setValues(result);
+  sh.getRange(splitArray[1], letterToColumn(splitArray[0]), names.length + 1, 3).setValues(result);
 
-  autoResizeAllRows(); autoResizeAllCols(); sh.setColumnWidth(1, 300); sh.setColumnWidth(2, 300);
+  //autoResizeAllRows(); autoResizeAllCols(); sh.setColumnWidth(1, 300); sh.setColumnWidth(2, 300);
 }
 
 function waiting(ms) {

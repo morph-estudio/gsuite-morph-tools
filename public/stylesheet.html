@@ -150,6 +150,7 @@ hr.side {
 .btn-xl {
   font-size: var(--fontsize-three);
   font-weight: var(--fontweight-bold);
+  line-height: 1.4em;
   padding: 10px 10px;
 }
 .btn-refresh {
@@ -188,11 +189,11 @@ hr.side {
 .btn.btn-primary.index.half{ border-right: 1px dotted var(--primary-color); }
 .btn.gmt {
   border: none;
-  padding: 10px 15px;
+  padding: 12px 15px;
   font-size: var(--fontsize-three);
   text-align: center;
   line-height: var(--primary-lineheight);
-  font-weight: 400;
+  font-weight: 500;
   transition: all .15s linear;
   -moz-transition: all .15s linear;
 }
@@ -482,13 +483,20 @@ table th:nth-child(2){
   text-align: left !important;
 }
 .swal2-show{
-  position: -webkit-sticky;
-  position: sticky;
+  position: sticky ;
   top: 0;
 }
 .swal2-container.swal2-center.swal2-backdrop-show {
-height: 100%;
-  }
+//height: 100%;
+}
+.swal2-container{
+//height: 100vh !important;
+}
+.swal2-modal{
+position: relative;
+top: 0px; /* dynamically updated to current offsetTop */
+sticky: top calc(-1 * var(--height)), bottom calc(100% - var(--height));
+}
 
 // Morph Alsan Switch
 
@@ -571,5 +579,7 @@ input:checked + .slider .off { display: none; }
 .slider.round:before {
   border-radius: 50%;
 }
+
+
 
 </style>

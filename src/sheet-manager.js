@@ -8,7 +8,7 @@
 function getWorksheetNames() {
   let sheetNames = new Array();
   let sheets = ss().getSheets();
-  for (let i = 0 ; i < sheets.length ; i++) sheetNames.push( { name: sheets[i].getName() } )
+  for (let i = 0 ; i < sheets.length ; i++) sheetNames.push( { 'id': i, 'name': sheets[i].getName() } )
   return sheetNames;
 }
 
@@ -29,9 +29,11 @@ function deleteWorksheets(sheetNamesToDeleteAsString, rowData) {
   let sheetsToDelete = [];
 
   let sheetNamesParsed = JSON.parse(sheetNamesToDeleteAsString);
+  Logger.log('selected sheets ' + sheetNamesParsed)
   sheetNamesParsed = sheetNamesParsed.forEach((obj) => {
     sheetsToDelete.push(obj.name);
   });
+  Logger.log('selected sheets ' + sheetsToDelete)
 
   sheetsToDelete.forEach((sheet) => {
     let shtd = ss.getSheetByName(sheet);

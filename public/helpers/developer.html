@@ -1,4 +1,4 @@
-<div id="hidden_div" style="display: none;" class="mt-4">
+<div id="hidden_div" style="display: none;" class="">
 
   <div class="accordion-body pb-0">
     <h3 class="menu-h3 mb-3"><i class="fa-solid fa-margin fa-fw fa-laptop-code"></i>Funciones en desarrollo</h3>
@@ -10,7 +10,9 @@
   <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('postLessons')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Enviar mensajes de Chat</button>
   <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('createTimeTriggerSpecifcDate')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Programar base de mensajes</button>
 
-  <button class="btn btn-primary index shadow-none w-100" id="adaptDeleteButton" onclick="execNoSuccess('deleteProperty', 'adaptedSpreadsheet')"><i class="fa-solid fa-unlock fa-margin fa-fw"></i>Desbloquear botón adaptar</button>
+  <button class="btn btn-primary index shadow-none w-100" id="adaptDeleteButton" onclick="execNoSuccess('deleteProperty', 'adaptedSpreadsheet'), execDirect('sidebarIndex')"><i class="fa-solid fa-unlock fa-margin fa-fw"></i>Desbloquear botón adaptar</button>
+  <button class="btn btn-primary index shadow-none w-100" id="adaptDeleteButton" onclick="execNoSuccess('setCuadroAdaptado')"><i class="fa-solid fa-lock fa-margin fa-fw"></i>Bloquear botón adaptar</button>
+  
   <button class="btn btn-primary index shadow-none w-100 ult" onclick="swalinfo()"><i class="fa-solid fa-gear fa-margin fa-fw fa-spin" style="--fa-animation-duration: 6s;"></i>Destructor de mundos</button>
 
   <div class="accordion-body pb-0 mt-4">
@@ -18,7 +20,7 @@
   </div>
   <button class="btn btn-primary index shadow-none w-100" onclick="execDirect('sidebarSMDevs')"><i class="fa-solid fa-margin fa-fw fa-file-circle-check"></i>Gestor de hojas</button>
   <button class="btn btn-primary index shadow-none w-100" onclick="execDirect('sidebarDSDevs')"><i class="fa-solid fa-margin fa-fw fa-wand-magic-sparkles"></i>Morph Document Studio</button>
-  <button class="btn btn-primary index shadow-none w-100 ult" onclick="execDirect('sidebarCLDevs')"><i class="fa-solid fa-margin fa-fw fa-swatchbook"></i>Guía de estilos</button>
+  <button class="btn btn-primary index shadow-none w-100 ult" onclick="execDirect('sidebarCLDevs')"><i class="fa-solid fa-margin fa-fw fa-swatchbook"></i>Guía de estilos WIP</button>
 
   <div class="accordion-body mt-4 pb-3">
 
