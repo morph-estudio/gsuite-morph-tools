@@ -1,11 +1,13 @@
 /**
- * Gsuite Morph Tools - CS Updater 1.5.0
+ * Gsuite Morph Tools - CS Updater 1.6.0
  * Developed by alsanchezromero
  *
  * Copyright (c) 2022 Morph Estudio
  */
 
 function morphCSUpdater(btnID, rowData) {
+
+  // Get the main variables
   const ss = SpreadsheetApp.getActive();
   let sh = ss.getSheetByName('LINK') || ss.insertSheet('LINK', 1);
   let ss_id = ss.getId();
@@ -13,77 +15,83 @@ function morphCSUpdater(btnID, rowData) {
   let dateNow = Utilities.formatDate(new Date(), 'GMT+2', 'dd/MM/yyyy - HH:mm:ss');
 
   let file = DriveApp.getFileById(ss_id);
-  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  Logger.log(`Archivo: ${file.getName()}, Sharing: ${file.getSharingAccess()}`);
 
+  // Set Sharing Access for the main file
+  if(file.getSharingAccess() != 'ANYONE_WITH_LINK') file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+  // Variables obtained from the user configuration
   let formData = [
     rowData.updatePrefix,
     rowData.prefixAll,
+    rowData.updateLinkPage
   ];
-
-  let [updatePrefix, prefixAll] = formData;  
+  let [updatePrefix, prefixAll, updateLinkPage] = formData;  
 
   if (btnID === 'csUpdater' || btnID === 'mediciones') {
-    sh.getRange(1,1,9,2).clear();
-    sh.getRange(1,3,1,2).clear();
-    templateFormat(sh); // Formato de celdas
+    if (updateLinkPage === true) {
+      sh.getRange(1,1,9,2).clear();
+      sh.getRange(1,3,1,2).clear();
+      linkPageTemplateFormat(sh); // Formato de celdas
+    }
   }
 
-  // Carpeta Cuadro de Superficies
+  // "Cuadro" Main Folder
 
   let parents = file.getParents();
-  let carpetaBaseID = parents.next().getId();
-  let carpetaBase = DriveApp.getFolderById(carpetaBaseID);
+  let carpetaCuadroBaseID = parents.next().getId();
+  Logger.log(`Carpeta de archivo: ${carpetaCuadroBaseID}`);
+  let carpetaCuadroBase = DriveApp.getFolderById(carpetaCuadroBaseID);
 
-  // Panel de control
-/**/
+  // Get the Control Panel and Control Panel Folder
 
+  if (updateLinkPage === true) {
+    try {
+      let filA = getControlPanel(sh, file, btnID);
+      let [filePanelName, filePanelId, filePanelUrl, folderPanelcId] = filA;
+      Logger.log("Ha traspasado la barrera del updateLinkPage")
+      let controlPanelFile = DriveApp.getFileById(filePanelId);
+      let folderPanelcName = DriveApp.getFolderById(folderPanelcId);
+      if(controlPanelFile.getSharingAccess() != 'ANYONE_WITH_LINK') controlPanelFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
 
-try {
-  let filA = getControlPanel(sh, file, btnID);
-  let [filePanelName, filePanelId, filePanelUrl, folderPanelcId] = filA;
+      sh.getRange('B1').setValue(filePanelUrl);
+      sh.getRange('B5').setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${folderPanelcId}";"${folderPanelcName}")`).setFontColor('#0000FF');
+      sh.getRange('B6').setValue(folderPanelcId);
+    } catch(error) {
+    }
 
-  let panelControl = DriveApp.getFileById(filePanelId);
-  let folderPanelcName = DriveApp.getFolderById(folderPanelcId);
-  panelControl.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    // LINK Page Template Text
 
-  sh.getRange('B1').setValue(filePanelUrl);
-  sh.getRange('B5').setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${folderPanelcId}";"${folderPanelcName}")`).setFontColor('#0000FF');
-  sh.getRange('B6').setValue(folderPanelcId);
-} catch(error) {
+    linkPageTemplateText(sh);
+    sh.getRange('B3').setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${carpetaCuadroBaseID}";"${carpetaCuadroBase}")`).setFontColor('#0000FF');
+    sh.getRange('B4').setValue(carpetaCuadroBaseID);
 
-}
-
-  // Set Template Values
-
-  templateText(sh);
-
-  sh.getRange('B3').setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${carpetaBaseID}";"${carpetaBase}")`).setFontColor('#0000FF');
-  sh.getRange('B4').setValue(carpetaBaseID);
-
+  }
 
   // ImportRange Permission
 
   let sectoresID = '1CuMcYrtT6NXwxa9fMEIOTgRfkPySnNwKvA_1dyarCro';
 
-  importRangeToken(ss_id, carpetaBaseID);
+  importRangeToken(ss_id, carpetaCuadroBaseID);
   importRangeToken(ss_id, sectoresID);
 
-  sh.getRange('C1').setValue('=IMPORTRANGE(B1;"Instrucciones!A1")');
-  sh.getRange('D1').setValue('=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1CuMcYrtT6NXwxa9fMEIOTgRfkPySnNwKvA_1dyarCro";"DB-SI!B2")');
+  if (updateLinkPage === true) {
+    sh.getRange('C1').setValue('=IMPORTRANGE(B1;"Instrucciones!A1")');
+    sh.getRange('D1').setValue('=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1CuMcYrtT6NXwxa9fMEIOTgRfkPySnNwKvA_1dyarCro";"DB-SI!B2")');
+  }
 
-  Utilities.sleep(250);
+  Utilities.sleep(200);
 
-  // Localizar archivos TXT exportados
+  // Locate exported TXT files and make a list array
 
   let list = [];
 
   if (btnID === 'csUpdater' || btnID === 'mediciones') {
-    sh.getRange(3, 3, sh.getLastRow(), 2).clear();
-  Logger.log('mostacho')
+    sh.getRange(3, 3, sh.getLastRow() - 2, 2).clearContent();
     let searchFor = 'title contains "ExpTXT"';
     let names =[];
     let expFolderIds=[];
-    let expFolder = carpetaBase.searchFolders(searchFor);
+    let expFolder = carpetaCuadroBase.searchFolders(searchFor);
     let expFolderDef; let expFolderId; let expFolderName;
     while (expFolder.hasNext()) {
       expFolderDef = expFolder.next();
@@ -113,52 +121,43 @@ try {
 
     let result = [['Archivos exportados', 'IDs', 'Hoja'], ...list.filter((r) => r[0].includes('.txt')).sort()];
 
-    
-    let resultCrop = result.map((val) => val.slice(0, -1));
+  
+    let resultCrop = result.map((val) => val.slice(0, -1)); Logger.log(`Result.length: ${result.length}`)
     sh.getRange(2, 3, result.length, 2).setValues(resultCrop);
 
-    // Filelist Styling
+    // TXT File List Styling in LINK page
 
     sh.getRange(3, 3, list.length, 2).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
     .setFontSize(14).setFontFamily('Montserrat').setFontColor('#78909c').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP).setVerticalAlignment('middle');
     sh.getRange(3, 3, list.length, 1).setFontWeight('bold');
     sh.getRange(3, 4, list.length, 1).setBackground('#fafafa');
-  } else if (btnID === 'csManual2') {
-    let txtFileId_FT = sh.getRange(3, 4).getValue();
-    let txtFile_FT = DriveApp.getFileById(txtFileId_FT);
-    let txtFileId_SP = sh.getRange(4, 4).getValue();
-    let txtFile_SP = DriveApp.getFileById(txtFileId_SP);
-    let txtFileId_VN = sh.getRange(5, 4).getValue();
-    let txtFile_VN = DriveApp.getFileById(txtFileId_VN);
-    let files = [txtFile_FT, txtFile_SP, txtFile_VN];
 
-    txtFile_FT.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-    txtFile_SP.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-    txtFile_VN.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-
-    files.forEach((file) => {
-      list.push([file.getName(), file.getId(), file.getName().slice(0, -4).replace('Sheets ', '').toUpperCase()]);
-    });
   }
 
-  // Copy data in Sheets
+  // Copy .txt data in Sheets /**/
 
   SpreadsheetApp.flush();
 
   for (const [txtFileName, txtFileId, txtFileSheet] of list) {
     let txt_file = DriveApp.getFileById(txtFileId);
-    txt_file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    //Logger.log(`File: ${txtFileName}, Sharing_Before: ${txt_file.getSharingAccess().toString()}`);
+    if(txt_file.getSharingAccess().toString() != 'ANYONE_WITH_LINK') txt_file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    //Logger.log(`File: ${txtFileName}, Sharing_After: ${txt_file.getSharingAccess().toString()}`);
     let tsvUrl = `https://drive.google.com/uc?id=${txtFileId}&x=.tsv`;
     let tsvContent = UrlFetchApp.fetch(tsvUrl, {muteHttpExceptions: true }).getContentText();
+    SpreadsheetApp.flush();
     let tsvData = Utilities.parseCsv(tsvContent, '\t');
+    SpreadsheetApp.flush();
     let sheetPaste = ss.getSheetByName(`${txtFileSheet}`) || ss.insertSheet(`${txtFileSheet}`, 200);
     sh.activate();
-    SpreadsheetApp.flush();
     sheetPaste.setTabColor('00FF00').hideSheet();
     sheetPaste.clear();
 
     try {
+      SpreadsheetApp.flush();
+      Logger.log(`DataRows: ${tsvData.length}, DataCols: ${tsvData[0].length}`)
       sheetPaste.getRange(1, 1, tsvData.length, tsvData[0].length).setValues(tsvData);
+      SpreadsheetApp.flush();
     } catch (err) {
       //throw new Error(`El documento [${txtFileName}] no tiene contenido.`);
     }
@@ -170,10 +169,13 @@ try {
   deleteEmptyRows(); removeEmptyColumns();
   sh.activate();
 }
-/**/
+
+/**
+ * getControlPanel
+ * Function to search the Control Panel Document in the Folder Structure
+ */
 function getControlPanel(sh, file, btnID) {
   let filA = [];
-  Logger.log(btnID)
 
 try {
   if (btnID === 'csUpdater') {
@@ -208,8 +210,7 @@ try {
       fldrA.push(f_id);
       parents = f.getParents();
     };
-    
-    Logger.log(fldrA);
+
 
     let pcMask = 'Panel de control'; let folders;
     for (let i = 0; i < fldrA.length; i++) {
@@ -251,7 +252,6 @@ try {
     let filePC = DriveApp.getFileById(filePanelId);
     filA.push(filePC.getName(), filePanelId, filePanelUrl, filePC.getParents().next().getId());
   }
-  Logger.log('filA' + filA)
   return filA;
 } catch(error) {
   alert(error)
@@ -259,7 +259,11 @@ try {
 
 }
 
-function templateText(sh) {
+/**
+ * linkPageTemplateText
+ * Add text values to LINK page
+ */
+function linkPageTemplateText(sh) {
   sh.getRange('A1').setValue('URL PANEL DE CONTROL');
   sh.getRange('B2').setValue('Carpetas referentes');
   sh.getRange('A3').setValue('CARPETA CUADRO');
@@ -275,7 +279,11 @@ function templateText(sh) {
   sh.getRange('D2').setValue('IDs');
 }
 
-function templateFormat(sh) {
+/**
+ * linkPageTemplateFormat
+ * Basic Styling on LINK page
+ */
+function linkPageTemplateFormat(sh) {
   // Estilo global
   sh.getRange(1, 1, 9, 4).setFontSize(14).setFontFamily('Montserrat').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
     .setVerticalAlignment('middle')
@@ -310,7 +318,11 @@ function templateFormat(sh) {
   sh.setRowHeight(1, 35); sh.setRowHeight(2, 50);
 }
 
-function importRangeToken(ss_id, tokenID) { // TokenID is the ID of destination Google Sheet
+/**
+ * importRangeToken
+ * This function set automatic permission for ImportRange functions. TokenID is the ID of destination Google Sheet
+ */
+function importRangeToken(ss_id, tokenID) { // 
   let url = `https://docs.google.com/spreadsheets/d/${ss_id}/externaldata/addimportrangepermissions?donorDocId=${tokenID}`;
   let token = ScriptApp.getOAuthToken();
   let params = {
@@ -324,12 +336,13 @@ function importRangeToken(ss_id, tokenID) { // TokenID is the ID of destination 
   UrlFetchApp.fetch(url, params);
 }
 
+/*
 function manualUpdaterTemplate() {
   const ss = SpreadsheetApp.getActive();
   let sh = ss.getSheetByName('LINK') || ss.insertSheet('LINK', 1);
 
   sh.clear().clearFormats();
-  templateText(sh);
+  linkPageTemplateText(sh);
 
   sh.getRange('C2').setValue('Archivos exportados');
   sh.getRange('D2').setValue('IDs');
@@ -337,7 +350,7 @@ function manualUpdaterTemplate() {
   sh.getRange('C4').setValue('TXT Sheets Superficies.txt');
   sh.getRange('C5').setValue('TXT Sheets Ventanas.txt');
 
-  templateFormat(sh); // Formato de celdas
+  linkPageTemplateFormat(sh); // Formato de celdas
 
   // Control Panel 
   sh.getRangeList(['B1', 'B8']).setBackground('#FFFDE7').setBorder(true, true, true, true, true, true, '#FBC02D', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
@@ -355,3 +368,24 @@ function manualUpdaterTemplate() {
   deleteEmptyRows(); removeEmptyColumns();
   sh.activate();
 }
+
+ else if (btnID === 'csManual2') { // This code only applies with the Manual Updater
+  
+    let txtFileId_FT = sh.getRange(3, 4).getValue();
+    let txtFile_FT = DriveApp.getFileById(txtFileId_FT);
+    let txtFileId_SP = sh.getRange(4, 4).getValue();
+    let txtFile_SP = DriveApp.getFileById(txtFileId_SP);
+    let txtFileId_VN = sh.getRange(5, 4).getValue();
+    let txtFile_VN = DriveApp.getFileById(txtFileId_VN);
+    let files = [txtFile_FT, txtFile_SP, txtFile_VN];
+
+    txtFile_FT.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    txtFile_SP.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    txtFile_VN.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+    files.forEach((file) => {
+      list.push([file.getName(), file.getId(), file.getName().slice(0, -4).replace('Sheets ', '').toUpperCase()]);
+    });
+  
+  }
+*/

@@ -1,11 +1,11 @@
 /**
- * Gsuite Morph Tools - CS Freezer 1.5.0
+ * Gsuite Morph Tools - CS Freezer 1.7.0
  * Developed by alsanchezromero
  *
  * Copyright (c) 2022 Morph Estudio
  */
 
-function morphFreezer(btnID) {
+function morphFreezer(btnID, sheetSelection) {
   let ss = SpreadsheetApp.getActive();
   let sh = ss.getSheetByName('LINK');
   let ss_id = ss.getId();
@@ -17,13 +17,20 @@ function morphFreezer(btnID) {
   let userMail = Session.getActiveUser().getEmail();
   let dateNow = Utilities.formatDate(new Date(), 'GMT+2', 'dd/MM/yyyy - HH:mm:ss');
   let freezerDate = Utilities.formatDate(new Date(), 'GMT+2', 'yyyyMMdd');
+  let selectionArray = [];
+
+  if (btnID === 'actPartialFreezer') {
+    sheetSelection.forEach((obj) => {
+      selectionArray.push(ss.getSheetByName(obj));
+    });
+  }
 
   let backupFolderId;
   if (btnID === 'csFreezer' || btnID === 'csManual3') {
     backupFolderId = freezerCS(sh, backupFolderSearch, btnID); // Destination Folder (Específico cuadro de superficies)
   }
 
-  let tempSheets = createTemporalSheets(ss) // Copy each sheet in the source Spreadsheet by removing the formulas as the temporal sheets
+  let tempSheets = createTemporalSheets(ss, btnID, selectionArray) // Copy each sheet in the source Spreadsheet by removing the formulas as the temporal sheets
 
   // Copy the source Spreadsheet
 
@@ -36,18 +43,20 @@ function morphFreezer(btnID) {
 
   tempSheets.forEach((sheet) => {
     ss.deleteSheet(sheet);
+    SpreadsheetApp.flush();
   });
 
-  SpreadsheetApp.flush();
+  // Check Google Forms links and delete them from destination file
 
-  // Delete the original sheets from the copied Spreadsheet and rename the copied sheets
-
-  let formUrl = destination.getSheets()[0].getFormUrl(); // Remove form links
+  let formUrl = destination.getSheets()[0].getFormUrl();
   if (formUrl) {
     FormApp.openByUrl(formUrl).removeDestination();
     let formID = getIdFromUrl(formUrl);
     DriveApp.getFileById(formID).setTrashed(true);
+    SpreadsheetApp.flush();
   };
+
+  // Delete the original sheets from the copied Spreadsheet and rename the copied sheets
 
   deleteAndRenameSheets(destination);
 
@@ -62,7 +71,7 @@ function morphFreezer(btnID) {
 
   // Move file to the destination folder
 
-  if (btnID === 'superFreezerButton') {
+  if (btnID === 'superFreezerButton' || btnID === 'actPartialFreezer') {
     DriveApp.getFolderById(parentFolderID).addFile(destinationFile);
     destinationFile.getParents().next().removeFile(destinationFile);
   };
@@ -71,25 +80,17 @@ function morphFreezer(btnID) {
     destinationFile.getParents().next().removeFile(destinationFile);
   };
 
-  // Export to XLSX let xlsDownloadUrl = exportToXLSS(ss, destinationId);
-
   let url = `https://docs.google.com/feeds/download/spreadsheets/Export?key=${destinationId}&exportFormat=xlsx`;
 
-  if (btnID === 'superFreezerButton') {
+  if (btnID === 'superFreezerButton' || btnID === 'actPartialFreezer') {
 
-    const ui = SpreadsheetApp.getUi();
     let confirm = Browser.msgBox('Documento Excel', '¿Quieres crear una copia en formato Excel en la misma carpeta?', Browser.Buttons.OK_CANCEL);
     if (confirm == 'ok') {
-      let params = {
-        method: "get",
-        headers: {"Authorization": "Bearer " + ScriptApp.getOAuthToken()},
-        muteHttpExceptions: true,
-      };
-      let blob = UrlFetchApp.fetch(url, params).getBlob();
-      blob.setName(`${ss.getName()} - ${freezerDate} - CONGELADO.xlsx`);
-      DriveApp.getFolderById(parentFolderID).createFile(blob);
+      exportToXLSS(ss, url, freezerDate, parentFolderID);
     }
-  } else if (btnID === 'csFreezer' || 'csManual3') {
+  }
+  
+  if (btnID === 'csFreezer' || 'csManual3') {
     sh.getRange('B9').setValue(url).setFontColor('#0000FF'); // Add XLSX download url to sheet
     sh.getRange('B7').setNote(null).setNote(`Último congelado: ${dateNow} por ${userMail}`); // Last Update Note
     sh.activate();
@@ -134,16 +135,27 @@ function freezerCS(sh, backupFolderSearch, btnID) {
 
 /**
  * createTemporalSheets
- * Copia todas las hojas eliminando todas las fórmulas para dejar resultados planos
+ * Make temporal copy of sheets with frozen values
  */
-function createTemporalSheets(ss) {
-  let dstSheet; let src;
-  let tempSheets = ss.getSheets().filter((sh) => !sh.isSheetHidden()).map((sheet) => {
+function createTemporalSheets(ss, btnID, selectionArray) {
+  let dstSheet; let src; let sheetsToFreeze; 
+
+  if (btnID === 'actPartialFreezer') { // Freeze only selected sheets in partial freezer
+    sheetsToFreeze = selectionArray;
+  } else {
+    sheetsToFreeze = ss.getSheets();
+  }
+
+  let tempSheets = sheetsToFreeze.filter((sh) => !sh.isSheetHidden()).map((sheet) => {
     dstSheet = sheet.copyTo(ss).setName(`${sheet.getSheetName()}_temp`);
+    SpreadsheetApp.flush();
     src = dstSheet.getDataRange();
+    SpreadsheetApp.flush();
     src.copyTo(src, { contentsOnly: true });
+    SpreadsheetApp.flush();
     return dstSheet;
   });
+
   return tempSheets;
 }
 
@@ -175,9 +187,8 @@ function deleteAndRenameSheets(destination) {
  * exportToXLSS
  * Crea un archivo XLSS a partir del ID de un archivo de Google Sheets
  */
-function exportToXLSS(ss, destinationId) {
+function exportToXLSS(ss, url, freezerDate, parentFolderID) {
   try {
-    let url = `https://docs.google.com/feeds/download/spreadsheets/Export?key=${destinationId}&exportFormat=xlsx`;
 
     let params = {
       method: 'get',
@@ -186,10 +197,8 @@ function exportToXLSS(ss, destinationId) {
     };
 
     let blob = UrlFetchApp.fetch(url, params).getBlob();
-    blob.setName(`${ss.getName()}.xlsx`);
-    UrlFetchApp.getRequest(url, params);
-
-    return url;
+    blob.setName(`${ss.getName()} - ${freezerDate} - CONGELADO.xlsx`);
+    DriveApp.getFolderById(parentFolderID).createFile(blob);
   } catch (f) {
     // Logger.log(f.toString());
   }

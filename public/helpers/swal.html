@@ -1,5 +1,10 @@
 <script>
 
+function scrollToPageCenter() {
+  //$(document).scrollTop($(document).height()/2);
+  $("html, body").animate({ scrollTop: $(window).height()/1.25 }, 300, 'linear');
+}
+
 function execFunction(fa, sc, rw) {
   swaload()
   google.script.run
@@ -56,6 +61,8 @@ function swalinfo(e) {
 }
 
 function swalConfirm(fa, sc, tx, rw, rw2) {
+  //$("html, body").animate({ scrollTop: $('swalconfirming').offset().top + $('swalconfirming').height() / 2 }, 200, 'linear');
+  scrollToPageCenter();
   Swal.fire({
     text: tx,
     icon: 'info',
@@ -67,8 +74,14 @@ function swalConfirm(fa, sc, tx, rw, rw2) {
     confirmButtonText: `Continuar`,
     confirmButtonColor: '#0D6EFD',
     customClass: {
-      popup: 'swal-container',
+      popup: 'swalconfirming',
     }
+    /*
+    customClass: {
+      //container: 'swal2custom-container',
+      //popup: 'swal2custom-popup',
+    }
+    */
   }).then((result) => {
     if (result.isConfirmed) {
       swaload()

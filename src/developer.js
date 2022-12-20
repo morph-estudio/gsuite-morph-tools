@@ -1,6 +1,115 @@
 function claus(p) {
   Logger.log('Holaa')
 }
+function fastInit() {
+  Logger.log('Hola')
+}
+
+function printValidation(rowData) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getActiveSheet();
+
+  let formData = [
+    rowData.secuencialFilename,
+    rowData.secuencialDestFolder,
+    rowData.secuencialSize,
+    rowData.secuencialOrientation,
+    rowData.secuencialMarTopBottom,
+    rowData.secuencialMarLeftRight,
+    rowData.secuencialFitw,
+    rowData.secuencialGridlines,
+    rowData.secuencialFzr
+  ];
+
+  let [secuencialFilename, secuencialDestFolder, secuencialSize, secuencialOrientation, secuencialMarTopBottom, secuencialMarLeftRight, secuencialFitw, secuencialGridlines, secuencialFzr] = formData;
+
+  let selection = ss.getSelection();
+  let currentCell = selection.getCurrentCell().getA1Notation();
+  let ss_id = ss.getId();
+  let ss_url = ss.getUrl();
+  let file = DriveApp.getFileById(ss_id);
+  let parentFolder;
+  secuencialDestFolder == '' ? parentFolder = file.getParents().next() : parentFolder = DriveApp.getFolderById(getIdFromUrl(secuencialDestFolder));
+
+  let dv = sh.getRange(currentCell).getDataValidation();
+  let critVal = dv.getCriteriaValues();
+  let validationValues = critVal[0].getValues();
+  validationValues = transpose(validationValues)[0];
+  validationValues = validationValues.filter(n => n)
+
+  let fileName; let blob; Logger.log(validationValues);
+  
+  validationValues.forEach((name) => {
+    sh.getRange(currentCell).setValue(name);
+    SpreadsheetApp.flush();
+    if(secuencialFilename.includes('{{cell}}')) {
+      fileName = secuencialFilename.replace('{{cell}}', name);
+    } else {
+      fileName = secuencialFilename;
+    }
+    blob = _getAsBlob(ss_url, sh, secuencialSize, secuencialOrientation, secuencialMarTopBottom, secuencialMarLeftRight, secuencialFitw, secuencialGridlines, secuencialFzr);
+    blob = blob.setName(fileName);
+    parentFolder.createFile(blob);
+  });
+}
+
+function _getAsBlob(url, sheet, secuencialSize, secuencialOrientation, secuencialMarTopBottom, secuencialMarLeftRight, secuencialFitw, secuencialGridlines, secuencialFzr, range) {
+  var rangeParam = ''
+  var sheetParam = ''
+  if (range) {
+    rangeParam =
+      '&r1=' + (range.getRow() - 1)
+      + '&r2=' + range.getLastRow()
+      + '&c1=' + (range.getColumn() - 1)
+      + '&c2=' + range.getLastColumn()
+  }
+  if (sheet) {
+    sheetParam = '&gid=' + sheet.getSheetId()
+  }
+  // A credit to https://gist.github.com/Spencer-Easton/78f9867a691e549c9c70
+  // these parameters are reverse-engineered (not officially documented by Google)
+  // they may break overtime.
+  var exportUrl = url.replace(/\/edit.*$/, '')
+      + '/export?exportFormat=pdf&format=pdf'
+      + '&size=' + secuencialSize
+      + '&portrait=' + secuencialOrientation
+      + '&fitw=' + secuencialFitw
+      + '&top_margin=' + secuencialMarTopBottom
+      + '&bottom_margin=' + secuencialMarTopBottom
+      + '&left_margin=' + secuencialMarLeftRight
+      + '&right_margin=' + secuencialMarLeftRight
+      + '&sheetnames=false&printtitle=false'
+      + '&pagenum=UNDEFINED' // change it to CENTER to print page numbers
+      + '&gridlines=' + secuencialGridlines
+      + '&fzr=' + secuencialFzr
+      + sheetParam
+      + rangeParam
+      
+  // Logger.log('exportUrl=' + exportUrl)
+  var response
+  var i = 0
+  for (; i < 5; i += 1) {
+    response = UrlFetchApp.fetch(exportUrl, {
+      muteHttpExceptions: true,
+      headers: { 
+        Authorization: 'Bearer ' +  ScriptApp.getOAuthToken(),
+      },
+    })
+    if (response.getResponseCode() === 429) {
+      // printing too fast, retrying
+      Utilities.sleep(3000)
+    } else {
+      break
+    }
+  }
+  
+  if (i === 5) {
+    throw new Error('Printing failed. Too many sheets to print.')
+  }
+  
+  return response.getBlob()
+}
+
 
 /**
  * adjustRowsHeight
@@ -48,7 +157,8 @@ function insertCellImage(rowData) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sh = ss.getActiveSheet();
 
-  let formData = [rowData.listFolderID, rowData.useA1]; let [folderUrl, useA1] = formData;
+  let formData = [rowData.listFolderID, rowData.useA1, rowData.imageFolderPublicURL, rowData.imageFolderFileID, rowData.imageFolderImage, rowData.imageFolderArrayFormula];
+  let [folderUrl, useA1, imageFolderPublicURL, imageFolderFileID, imageFolderImage, imageFolderArrayFormula] = formData;
   let folderID;
 
   if (useA1) {
@@ -66,21 +176,50 @@ function insertCellImage(rowData) {
 
   let selectedCell = sh.getActiveCell().getA1Notation();
   let splitArray = getSplitA1Notation(selectedCell);
+  let baseURL = 'https://drive.google.com/uc?id='
 
   while (contents.hasNext()) {
       file = contents.next();
       cnt++;
-      downloadList.push(file.getDownloadUrl())
+      Logger.log(file.getMimeType())
+      if ([MimeType.JPEG, MimeType.PNG, MimeType.GIF].includes(file.getMimeType())) {
+        downloadList.push(file)
+        Logger.log('fileperm ' + file.getSharingAccess())
+        if(file.getSharingAccess() != 'ANYONE_WITH_LINK') file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+        }
   };
 
-  downloadList.forEach((el, i) => {
-    let image = SpreadsheetApp
-                 .newCellImage()
-                 .setSourceUrl(el)
-                 .build();
+  downloadList.sort().forEach((el, i) => {
+
+    let paste = [
+      []
+    ];
+
+    if (imageFolderPublicURL) paste[0].push(baseURL + el.getId())
+    if (imageFolderFileID) paste[0].push(el.getId())
+
+    Logger.log('pasteado ' + paste); Logger.log(paste.length)
     let count = Number(splitArray[1]) + Number(i); Logger.log('count ' + count); Logger.log(downloadList.length);
-    let range = sh.getRange(count, letterToColumn(splitArray[0]), 1, 1);
-    range.setValue(image)
+
+    if (imageFolderPublicURL || imageFolderFileID) {
+      let range = sh.getRange(count, letterToColumn(splitArray[0]), 1, paste[0].length);
+      range.setValues(paste)
+    }
+
+    if (imageFolderImage) {
+      let image = SpreadsheetApp
+                  .newCellImage()
+                  .setSourceUrl(baseURL + el.getId())
+                  .build();
+
+      let range2 = sh.getRange(count, letterToColumn(splitArray[0]) + paste[0].length, 1, 1);
+      range2.setValue(image)
+    } else {
+      if (imageFolderArrayFormula) {
+        let range3 = sh.getRange(Number(splitArray[1]), letterToColumn(splitArray[0]) + paste[0].length, 1, 1);
+        range3.setFormula(`=ARRAYFORMULA(IMAGE($${splitArray[0]}$${Number(splitArray[1])}:$${splitArray[0]}$${Number(splitArray[1]) + downloadList.length - 1}))`);
+      }
+    }
   });
 }
 
@@ -210,7 +349,7 @@ function adaptarCuadroAntiguo() {
     let sh_act = ss.getSheetByName('ACTUALIZAR');
     sh_act.setName('LINK');
     let sh_link = ss.insertSheet('LINK_temp', 0);
-    templateFormat(sh_link); templateText(sh_link); deleteEmptyRows(); removeEmptyColumns();
+    linkPageTemplateFormat(sh_link); linkPageTemplateText(sh_link); deleteEmptyRows(); removeEmptyColumns();
     ss.deleteSheet(sh_act);
     sh_link.setName('LINK').setTabColor('FFFF00');
   }
@@ -273,7 +412,10 @@ function getSheetnames(ss) {
  * Devuelve los valores de una columna en documento Sheets externo a través de su título.
  */
 function getDatabaseColumn(headerName) {
-  const parsedDB = JSON.parse(UrlFetchApp.fetch('https://opensheet.elk.sh/1lcymggGAbACfKuG0ceMDWIIB9zWuxgVtSR9qpgNq4Ng/Permissions').getContentText());
+  let params = {
+    muteHttpExceptions: true,
+  };
+  const parsedDB = JSON.parse(UrlFetchApp.fetch('https://opensheet.elk.sh/1lcymggGAbACfKuG0ceMDWIIB9zWuxgVtSR9qpgNq4Ng/Permissions', params).getContentText());
   const dbColumn = parsedDB.map(i => i[headerName]);
   return dbColumn;
 }

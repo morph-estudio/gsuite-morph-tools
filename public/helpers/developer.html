@@ -1,4 +1,4 @@
-<div id="hidden_div" style="display: none;" class="">
+<div id="devmenuhidden" style="display: none;" class="devhiddensection mt-4">
 
   <div class="accordion-body pb-0">
     <h3 class="menu-h3 mb-3"><i class="fa-solid fa-margin fa-fw fa-laptop-code"></i>Funciones en desarrollo</h3>
@@ -22,12 +22,108 @@
   <button class="btn btn-primary index shadow-none w-100" onclick="execDirect('sidebarDSDevs')"><i class="fa-solid fa-margin fa-fw fa-wand-magic-sparkles"></i>Morph Document Studio</button>
   <button class="btn btn-primary index shadow-none w-100 ult" onclick="execDirect('sidebarCLDevs')"><i class="fa-solid fa-margin fa-fw fa-swatchbook"></i>Guía de estilos WIP</button>
 
-  <div class="accordion-body mt-4 pb-3">
+</div>
 
-      <h3 class="menu-h3 mb-3"><i class="fa-solid fa-margin fa-fw fa-window-restore"></i>Histórico de superficies</h3>
-      <p>Debes situarte en la hoja <u>Histórico CONSTRUIDAS</u> antes de crear un punto histórico.</p>
-      <button class="btn btn-success mainbtn btn-xl w-100" id="adaptButton" onclick="swalConfirm('crearPuntoHistorico', 'Se ha creado una marca temporal en el histórico.', 'Asegúrate de estar en la hoja adecuada. Confirma para continuar.')">Crear punto histórico</button>
+<div id="hisconhidden" style="display: none" class="accordion-body mt-4 pb-3 devhiddensection">
+    <h3 class="menu-h3 mb-3"><i class="fa-solid fa-margin fa-fw fa-window-restore"></i>Histórico de superficies</h3>
+    <p>Debes situarte en la hoja <u>Histórico CONSTRUIDAS</u> antes de crear un punto histórico.</p>
+    <button class="btn btn-success mainbtn btn-xl w-100" id="adaptButton"onclick="swalConfirm('crearPuntoHistorico', 'Se ha creado una marca temporal en el histórico.', 
+    'Asegúrate de estar en la hoja adecuada. Confirma para continuar.')">Crear punto histórico</button>
+</div>
 
+<div id="pdfsechidden" style="display: none" class="accordion-body mt-4 pb-3 devhiddensection">
+
+  <h3 class="menu-h3 mb-3"><i class="fa-regular fa-margin fa-fw  fa-file-pdf"></i>Crear PDF Secuencial</h3>
+  <p>Selecciona la <u>celda desplegable</u> antes de darle al botón.</p>
+
+  <label for="pdfsecFilename" class="form-label"></i>Nombre del archivo</label>
+  <div class="input-group flex-nowrap update">
+    <span class="input-group-text"><i class="fa-solid fa-file-signature"></i></span>
+    <input type="text" class="form-control shadow-none" id="pdfsecFilename" placeholder="Ficha de {{cell}}">
+  </div>
+  <div id="template-id-help" class="form-text mt-2">Puedes usar el código {{cell}} para incluir el valor de la celda desplegable.</div>
+
+  <label for="pdfsecFolder" class="form-label mt-3"></i>URL Carpeta de destino</label>
+  <div class="input-group flex-nowrap update">
+    <span class="input-group-text"><i class="fa-regular fa-folder"></i></span>
+    <input type="text" class="form-control shadow-none" id="pdfsecFolder">
+  </div>
+  <div id="template-id-help" class="form-text mt-2">Deja vacío el campo para usar la misma carpeta que este documento.</div>
+
+  <div class="mt-3">
+    <label for="pdfsecSize" class="form-label">Tamaño</label>
+    <select class="form-select shadow-none" id="pdfsecSize" >
+      <option value="a3">A3</option>
+      <option value="a4" selected>A4</option>
+      <option value="a5">A5</option>
+      <option value="letter">Letter</option>
+      <option value="tabloid">Tabloid</option>
+      <option value="legal">Legal</option>
+      <option value="statement">Statement</option>
+      <option value="executive">Executive</option>
+    </select>
   </div>
 
+  <div class="mt-3">
+    <label for="pdfsecOrientation" class="form-label">Orientación</label>
+    <select class="form-select shadow-none" id="pdfsecOrientation" >
+      <option value="True" selected>Vertical</option>
+      <option value="False">Horizontal</option>
+    </select>
+  </div>
+
+  <label for="pdfsecMargins" class="form-label mt-3"></i>Márgenes</label>
+  <div class="input-group flex-nowrap update" id="pdfsecMargins">
+    <span class="input-group-text"><i class="fa-solid fa-arrows-up-down"></i></span>
+    <input type="text" class="form-control shadow-none" id="pdfsecMarginTopBottom" placeholder="0.75" value="0.75">
+    <span class="input-group-text"><i class="fa-solid fa-arrows-left-right"></i></span>
+    <input type="text" class="form-control shadow-none" id="pdfsecMarginLeftRight" placeholder="0.7" value="0.7">
+  </div>
+
+  <div class="form-check form-switch mt-3">
+    <input class="form-check-input" type="checkbox" role="switch" id="pdfsecFitw" checked>
+    <label class="form-check-label" for="pdfsecFitw">Ajustar al ancho del documento</label>
+  </div>
+  
+  <div class="form-check form-switch mt-2">
+    <input class="form-check-input" type="checkbox" role="switch" id="pdfsecGridlines">
+    <label class="form-check-label" for="pdfsecGridlines">Mostrar rejilla Sheets</label>
+  </div>
+
+  <div class="form-check form-switch mt-2">
+    <input class="form-check-input" type="checkbox" role="switch" id="pdfsecFzr">
+    <label class="form-check-label" for="pdfsecFzr">Repetir encabezados en cada hoja</label>
+  </div>
+
+    <button class="btn btn-success mainbtn btn-xl w-100 mt-3" id="adaptButton" onclick="secuencialFileClicked()">Crear PDFs</button>
 </div>
+
+<script>
+
+  function secuencialFileClicked() {
+    let secuencialFilename = document.getElementById('pdfsecFilename').value;
+    let secuencialDestFolder = document.getElementById('pdfsecFolder').value;
+    let secuencialSize = document.getElementById('pdfsecSize').value;
+    let secuencialOrientation = document.getElementById('pdfsecOrientation').value;
+    let secuencialMarTopBottom = document.getElementById('pdfsecMarginTopBottom').value;
+    let secuencialMarLeftRight = document.getElementById('pdfsecMarginLeftRight').value;
+    let secuencialFitw = document.getElementById('pdfsecFitw').checked;
+    let secuencialGridlines = document.getElementById('pdfsecGridlines').checked;
+    let secuencialFzr = document.getElementById('pdfsecFzr').checked;
+
+    let rowData = {
+          secuencialFilename,
+          secuencialDestFolder,
+          secuencialSize,
+          secuencialOrientation,
+          secuencialMarTopBottom,
+          secuencialMarLeftRight,
+          secuencialFitw,
+          secuencialGridlines,
+          secuencialFzr
+        };
+
+    swalConfirm('printValidation', 'Se han generado todos los archivos PDF.', 'Asegúrate de tener seleccionada la celda desplegable. Confirma para continuar.', rowData);
+  }
+
+</script> 

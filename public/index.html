@@ -81,10 +81,15 @@
             <input type="text" class="form-control shadow-none" id="updatePrefixID" placeholder="Por defecto: TXT">
           </div>
 
-          <div class="form-check form-switch mb-3 mt-0">
+          <div class="form-check form-switch mt-0">
             <input class="form-check-input" type="checkbox" role="switch" id="prefix-all-switch" onclick="document.getElementById('updatePrefixID').disabled = this.checked">
-            <label class="form-check-label" style="position:relative;top:2px" for="prefix-all-switch">Añadir todos los archivos</label>
-          </div>       
+            <label class="form-check-label" style="position:relative;top:2px" for="prefix-all-switch" title="Añade todos los archivos de la carpeta independientemente de su prefijo.">Añadir todos los archivos</label>
+          </div>
+
+          <div class="form-check form-switch mb-3 mt-0">
+            <input class="form-check-input" type="checkbox" role="switch" id="update-linkpage">
+            <label class="form-check-label" style="position:relative;top:2px" for="update-linkpage" title="Busca de nuevo el panel de control, carpetas referentes y formatea el texto.">Actualizar hoja LINK</label>
+          </div>         
 
           <button id="csUpdater" class="btn btn-warning gmt sup w-100 shadow-none mb-1">Actualizar cuadro de superficies</button>
           <button id="csFreezer" class="btn btn-primary gmt inf blue w-100 shadow-none" onclick="swalConfirm('morphFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">Congelar cuadro de superficies</button>
@@ -178,7 +183,7 @@
 
       <div id="password_div">
         
-          <div class="card bg-light border-0 border-top border-bottom rounded-0 mt-2 mb-4" >
+          <div class="card bg-light border-0 border-top rounded-0 mt-2" >
             <div class="card-body">
       
               <label for="hidden_password" class="form-label"><i class="fa-solid fa-key fa-margin fa-fw"></i>Introduce una clave:</label>
@@ -257,26 +262,33 @@
     } else {
       google.script.run.withSuccessHandler(function(data){
       if (data.includes(password)) {
-          // $('#password_div').hide();
-          document.getElementById('hidden_div').style.display = 'block';
-      } else if (password == 'mupdate') {
-        document.getElementById('manualUpdateDiv').style.display = 'block';
-      } else if (password == 'icsv') {
-        document.getElementById('icsv').style.display = 'block';
-        /*async function secondFunction(){
-          await getSavedCSVImport();
-          // now wait for firstFunction to finish...
-          document.getElementById('icsv').style.display = 'block';
-        } */
-      } else if (password == 'desbutadaptar') {
-        execNoSuccess('deleteProperty', 'adaptedSpreadsheet');
-        execDirect('sidebarIndex');
+        let x = document.getElementsByClassName("devhiddensection");
+        for (let i = 0; i < x.length; i++) {
+            x[i].style.display = 'block';
+        }
       } else {
-        $('#invalid-developer').html('<small>La clave es incorrecta.</small>').addClass("show");
-        field.classList.add("is-invalid"); setTimeout(function(){validatePassword(field);  $('#invalid-developer').removeClass("show").addClass("collapse") }, 3500);
+        switch (password) {
+          case 'icsv':
+            document.getElementById('icsv').style.display = 'block';
+            break;
+          case 'pdfsec':
+            document.getElementById('pdfsechidden').style.display = 'block';
+            break;
+          case 'hiscon':
+            document.getElementById('hisconhidden').style.display = 'block';
+            break;
+          case 'desbutadaptar':
+            execNoSuccess('deleteProperty', 'adaptedSpreadsheet');
+            execDirect('sidebarIndex');
+            break;
+          default:
+          $('#invalid-developer').html('<small>La clave es incorrecta.</small>').addClass("show");
+          field.classList.add("is-invalid"); setTimeout(function(){validatePassword(field);  $('#invalid-developer').removeClass("show").addClass("collapse") }, 3500);
+        }
       }
       btnReset("#hideSectionButton");
-      $('#hidden_password').val('');  
+      $('#hidden_password').val('');
+
       }).getDevPassword('DevAreaKeys');
     }
   }
@@ -288,9 +300,20 @@
   function check_userRole(field) {
     let protection = JSON.parse("<?=JSON.stringify(protection)?>");
     if (protection === true) {
-        document.getElementById('hidden_div').style.display = 'block';
+
+      let x = document.getElementsByClassName("devhiddensection");
+      let i;
+      for (i = 0; i < x.length; i++) {
+          x[i].style.display = 'block';
+      }
+
     } else {
-      document.getElementById('hidden_div').style.display = 'none';
+
+      let x = document.getElementsByClassName("devhiddensection");
+      let i;
+      for (i = 0; i < x.length; i++) {
+          x[i].style.display = 'none';
+      }
     }
   }
 
@@ -301,11 +324,13 @@
   function updateButtonClicked() {
     let updatePrefix = document.getElementById('updatePrefixID').value;
     let prefixAll = document.getElementById("prefix-all-switch").checked;
+    let updateLinkPage = document.getElementById("update-linkpage").checked; 
     let btnID = 'csUpdater';
 
     var rowData = {
-          updatePrefix: updatePrefix,
-          prefixAll: prefixAll,
+          updatePrefix,
+          prefixAll,
+          updateLinkPage
         };
 
     swalConfirm('morphCSUpdater', 'El cuadro se ha actualizado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', btnID, rowData);
@@ -402,6 +427,8 @@
   });
 
 </script>
+
+
 
 <?!= HtmlService.createHtmlOutputFromFile('public/helpers/swal').getContent(); ?>
 <?!= HtmlService.createHtmlOutputFromFile('public/helpers/footer').getContent(); ?>

@@ -268,8 +268,26 @@ hr.side {
   text-decoration: underline;
 }
 
-
-
+.greybutton1{ background-color: #37474F}
+.greybutton1:hover{ background-color: #455A64}
+.greybutton1:active{ background-color: #37474F}
+.greybutton2{ background-color: #78909C}
+.greybutton2:hover{ background-color: #90A4AE}
+.greybutton2:active{ background-color: #78909C}
+.viewSheetButton {
+  background: none;
+  color: #9E9E9E;
+  padding: none;
+  border: none;
+  font-weight: bold;
+}
+.viewSheetButton:hover {
+  background: none;
+  color: #212121;
+  padding: none;
+  border: none;
+  font-weight: bold;
+}
 
 // Bootstrap Menu
 
@@ -402,18 +420,25 @@ border: none;
   background-color: #E0E0E0;
   opacity: 1.0 !important;
 }
-.table-striped>tbody>tr:last-child>td:last-child{
-  border-radius: 0 0 10px 0;
-}
-.table-striped>tbody>tr:last-child>td:nth-last-child(2){
-  border-radius: 0 0 0 10px;
-}
 table th:first-child{
   border-radius: 10px 0 0 0;
 }
-table th:nth-child(2){
+table th:last-child{
   border-radius: 0 10px 0 0;
 }
+.table-striped>tbody>tr:last-child>td:last-child{
+  border-radius: 0 0 10px 0;
+}
+.table-striped>tbody>tr:last-child>td:first-child{
+  border-radius: 0 0 0 10px;
+}
+.table tr {
+  border: none;
+}
+.table td {
+  padding: 4px 5px;
+}
+
 .table-striped>thead th {
   background-color: #9E9E9E;
   color: white;
@@ -489,8 +514,21 @@ table th:nth-child(2){
 .swal2-container.swal2-center.swal2-backdrop-show {
 //height: 100%;
 }
-.swal2-container{
-//height: 100vh !important;
+.swal2custom-container{
+  height: 100vh;
+  position: overflow-y;
+  top: 0;
+  bottom: 0;
+}
+.swal2custom-popup {
+  vertical-align: middle;
+  width: 100%;
+  display: inline-block;
+  height: 50%;
+  position: absolute;
+  top: 0;
+  bottom: 0%;
+  margin: auto;
 }
 .swal2-modal{
 position: relative;
@@ -579,6 +617,20 @@ input:checked + .slider .off { display: none; }
 .slider.round:before {
   border-radius: 50%;
 }
+
+
+
+
+.form-check-label {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
 
 
 

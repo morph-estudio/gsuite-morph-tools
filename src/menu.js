@@ -2,10 +2,10 @@
  * Global Variables + Global Functions
  */
 
-const morphDivision = '(I+D)'; const morphDev = '(Devs)'; const gmtVersion = '1.5.7'
+const morphDivision = '(I+D)'; const morphDev = '(Devs)'; const gmtVersion = '1.7.2'
 const titleIX = 'G-Suite Morph Tools'; const barTitleIX = `💡 ${titleIX} ${gmtVersion}`;
-const titleDS = 'Morph Document Studio'; const barTitleDS = `✨ ${titleDS} ${morphDivision}`;
 const titleSM = 'Gestor de hojas'; const barTitleSM = `📋 ${titleSM} ${morphDivision}`;
+const titleDS = 'Morph Document Studio'; const barTitleDS = `✨ ${titleDS} ${morphDivision}`;
 const titleCL = 'Guía de estilo'; const barTitleCL = `🎨 ${titleCL} ${morphDivision}`;
 
 
@@ -24,8 +24,8 @@ function onOpen(e) {
   
   SpreadsheetApp.getUi().createAddonMenu()
     .addItem(titleIX, 'sidebarIndex')
-    .addItem(titleDS, 'sidebarDS')
     .addItem(titleSM, 'sidebarSM')
+    .addItem(titleDS, 'sidebarDS')
     //.addItem(titleCL, 'sidebarCL')
     .addSeparator()
     .addItem('Changelog', 'sidebarChangelog')

@@ -2,6 +2,28 @@
 # Change Log
 Documentación de cambios del proyecto.
 
+## [ 1.7.0 ] - 2022/12/18
+
+### Added
+
+- Nuevas funciones en el gestor de hojas:
+  - Opción para ocultar / mostrar hojas.
+  - En la tabla se añade un botón para ir rápidamente a cada hoja.
+  - Ahora la lista de hojas puede ordenarse manualmente mediante Drag & Drop, pudiendo reordenarse las hojas de un documento a través del botón "Reordenar".
+  - Nueva herramienta: congelador parcial, para crear un documento congelado solo con las hojas seleccionadas.
+- Nueva herramienta: Crear PDF Secuencial. Imprime múltiples PDF basados para cada opción de una lista desplegable en Google Sheets.
+
+### Changed
+
+- En el gestor de hojas las hojas ocultas ahora aparecen en color gris claro.
+- Cambios estéticos y optimización del código de la sección de desarrollo.
+
+## [ 1.6.1 ] - 2022/11/04
+
+### Fixed
+
+- Optimización del problema de importación TXT con archivos grandes. El nuevo código consigue mejores tiempos en la actualización de cuadros.
+
 ## [ 1.6.0 ] - 2022/11/04
 
 ### Added
