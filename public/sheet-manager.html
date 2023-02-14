@@ -25,12 +25,9 @@
 
 <?!= HtmlService.createHtmlOutputFromFile('public/helpers/navbar').getContent(); ?>
 
-<div class="btn-group d-flex" role="group">
-  <button id="refresh-button" class="btn btn-secondary rounded-0 shadow-none ps-3 border-0 greybutton1" style="">Actualizar hojas</button>
-  <button id="reorderButton" class="btn btn-secondary rounded-0 shadow-none ps-3 border-0 greybutton2" style="">Reordenar</button>
-</div>
+<button id="refresh-button" class="btn btn-secondary rounded-0 shadow-none ps-3 border-0 greybutton2 w-100" style="">Refrescar lista de hojas</button>
 
-<button id="delete-button" class="btn btn-primary btn-xl w-100 rounded-0 shadow-none pt-2 pb-2 ps-3" style="font-size: 26px;">Ejecutar</button>
+<button id="delete-button" class="btn btn-primary btn-xl w-100 rounded-0 shadow-none pt-2 pb-2 ps-3 centerScroll" style="font-size: 26px;">Ejecutar</button>
 
 <select id="select-action" class="form-select form-select-lg border-0 border-bottom rounded-0 mt-0 shadow-none" data-role="select" data-filter="false">
   <option value="actDelete" selected="selected">Eliminar</option>
@@ -43,20 +40,36 @@
 
 <input type="text" class="form-control form-control-lg border-0 border-bottom rounded-0 mt-0 shadow-none" id="sheet-deleter-search" placeholder="Buscar hojas..." aria-describedby="destination-folder-help">
 
-<div class="body-padding pb-3">
+<div class="body-padding w-100 ps-2 pe-2 pt-1 pb-3">
 
-  
-
-  <div id="errorNotSheets" class="toast fade hide shadow-sm w-100 mt-2" role="alert" aria-live="assertive" aria-atomic="true">
+  <div id="errorNotSheets" class="toast fade hide shadow-sm w-100 mt-1" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="toast-header">
       <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
       <strong class="me-auto">Advertencia</strong>
       <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
     <div class="toast-body">
-      No has seleccionado ninguna hoja.
+      
     </div>
   </div>
+
+<div class="mt-3">
+  <div class="btn-group d-flex" role="group">
+    <button id="moveSheetButton" class="btn btn-secondary shadow-none ps-3 border-0 brownbutton2 centerScroll" style="border-radius: 10px 0px 0px 0px">Mover</button>
+    <button id="reorderButton" class="btn btn-secondary shadow-none ps-3 border-0 brownbutton1 centerScroll" style="border-radius: 0px 10px 0px 0px">Reordenar todo<span data-bs-toggle="tooltip" data-bs-placement="right" title="Para reordenar en masa, haz 'clic y arrastrar' en la lista de hojas inferior y luego presiona este botón.">
+  <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:1px; color: #fff"></i>
+</span></button>
+  </div>
+
+  <div id="" class="rounded">
+    <div class="input-group flex-nowrap update border-0 rounded-0">
+      <span class="input-group-text greyborder" style="border-radius: 0px 0px 0px 10px">Mover</span>
+      <select id="selSht1" class="form-select shadow-none rounded-0 greyborder sheetSelect"></select>
+      <span class="input-group-text rounded-0 greyborder">tras</span>
+      <select id="selSht2" class="form-select shadow-none sheetSelect greyborder" style="border-radius: 0px 0px 10px 0px"></select>
+    </div>
+  </div>
+</div>
 
   <table class="table table-striped borderless"
     id="table"
@@ -76,10 +89,10 @@
     >
     <thead>
       <tr>
-        <th data-field="state" data-checkbox="true"></th>
+        <th data-field="state" data-checkbox="true" class="col-2"></th>
         <!-- <th data-field="id">ID</th> -->
-        <th data-field="name" class="listOfSheets">Hojas</th>
-        <th data-field="button"></th>
+        <th data-field="name" class="listOfSheets col-8">Hojas</th>
+        <th data-field="button" class="col-2"></th>
       </tr>
     </thead>
 
@@ -91,35 +104,47 @@
 <script>
   const WorksheetDeleteApp = {};
   var $table = $('#table')
-  var wsNames = JSON.parse("<?=JSON.stringify(wsNames)?>");
+  const wsNamesParsed = JSON.parse("<?=JSON.stringify(wsNames)?>");
   var dataids = [];
 
   WorksheetDeleteApp.loadWorksheetNames = function() {
     var data = [];
 
-    Object.keys(wsNames).forEach(function(key){ 
-      var value = wsNames[key]; 
+    Object.keys(wsNamesParsed).forEach(function(key){
+      var value = wsNamesParsed[key];
       data.push(value);
       dataids.push(JSON.parse(key));
     });
-    $table.bootstrapTable({data: wsNames});
-    
-    //alert(JSON.stringify(wsNames))
-    WorksheetDeleteApp.updateHiddenSheets(wsNames);
+
+    $table.bootstrapTable({data: wsNamesParsed});
+
+    WorksheetDeleteApp.updateSheetSelectors(wsNamesParsed);
+    WorksheetDeleteApp.updateHiddenSheets(wsNamesParsed);
 
     setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 250);
-    //alert(JSON.stringify($table.bootstrapTable('getData', false)))
   }
 
   WorksheetDeleteApp.updateHiddenSheets = function(sheetData) {
     $("#table tr:not(:has(th))").each(function(i) {
       let isHidden = JSON.stringify(sheetData[i].ishidden);
-      //alert(`${JSON.stringify(wsNames[i])} es ${isHidden}`);
+      //alert(`${JSON.stringify(wsNamesParsed[i])} es ${isHidden}`);
       if (isHidden == "true") {
         let self = $(this);
         self.find("td:eq(1)").css('color', '#9E9E9E');
       }
     });
+  }
+
+  WorksheetDeleteApp.updateSheetSelectors = function(sheetData) {
+    $('.sheetSelect').empty();
+    let optionDefault = document.createElement("option");
+    optionDefault.textContent = '📄';
+    $('.sheetSelect').append(optionDefault);
+    for (i = 0; i < sheetData.length; i++){
+      let option = document.createElement("option");
+      option.textContent = sheetData[i]["name"];
+      $('.sheetSelect').append(option)
+    }
   }
 
 </script>
@@ -129,12 +154,13 @@
     google.script.run.withSuccessHandler(sheetNames => {
         $table.bootstrapTable('removeAll');
         $table.bootstrapTable('append', sheetNames);
-        btnReset('#refresh-button');
+        WorksheetDeleteApp.updateSheetSelectors(sheetNames);
         WorksheetDeleteApp.updateHiddenSheets(sheetNames);
+        btnReset('#refresh-button');
     }).getWorksheetNames()
   }
 
-  WorksheetDeleteApp.deleteSheets = function(){
+  WorksheetDeleteApp.deleteSheets = function(option){
     var sheetNamesToDeleteAsString = JSON.stringify($table.bootstrapTable('getSelections'));
     var sdAction = document.getElementById('select-action').value;
     var rowData = {
@@ -142,8 +168,14 @@
     };
 
     swaload()
-    google.script.run.withSuccessHandler(e => {WorksheetDeleteApp.refreshWorksheets(), WorksheetDeleteApp.successValues(sdAction)})
-    .withFailureHandler(swalerror).worksheetManagement(sheetNamesToDeleteAsString, rowData)
+    if (option == 'congelador parcial') {
+      google.script.run.withSuccessHandler(e => {WorksheetDeleteApp.refreshWorksheets(), WorksheetDeleteApp.successValues(sdAction)})
+      .withFailureHandler(swalerror).morphFreezer('actPartialFreezer', sheetNamesToDeleteAsString)
+    } else {
+      google.script.run.withSuccessHandler(e => {WorksheetDeleteApp.refreshWorksheets(), WorksheetDeleteApp.successValues(sdAction)})
+      .withFailureHandler(swalerror).worksheetManagement(sheetNamesToDeleteAsString, rowData)
+    }
+
   }
 </script>
 
@@ -154,8 +186,8 @@
     let optionSelected = $('#select-action option:selected').text().toLowerCase();
     let hojaplurales; if (numberOfSheets > 1) { hojaplurales = `hojas` } else { hojaplurales = `hoja` }
 
-    if (numberOfSheets === 0) { 
-      $('#errorNotSheets').toast({delay: 4000}).toast("show");
+    if (numberOfSheets === 0) {
+      $('.toast-body').html('No has seleccionado ninguna hoja.'); $('#errorNotSheets').toast({delay: 3500}).toast("show");
     } else {
       let swalFireText;
       if (optionSelected == 'congelador parcial') {
@@ -174,17 +206,27 @@
         cancelButtonText: `Cancelar`,
         confirmButtonText: `Continuar`,
         confirmButtonColor: '#0D6EFD',
-        customClass: {
-          popup: 'swal-container',
-        }
       }).then((result) => {
         if (result.isConfirmed) {
-          WorksheetDeleteApp.deleteSheets();
+          WorksheetDeleteApp.deleteSheets(optionSelected);
         } else if (result.isDenied) {
           return;
         }
       })
     }
+  }
+
+  WorksheetDeleteApp.moveSingleSheetActions = function(){
+    let moveSheet = document.getElementById('selSht1').value;
+    let moveSheetAfter = document.getElementById('selSht2').value;
+    //execNoSuccess('moveSingleSheet', moveSheet, moveSheetAfter);
+    /**/
+    if (moveSheet == '📄' || moveSheetAfter == '📄') {
+      $('.toast-body').html(`Debes seleccionar las hojas en el selector 'mover (hoja) tras (hoja)'.`); $('#errorNotSheets').toast({delay: 3500}).toast("show");
+    } else {
+      execNoSuccess('moveSingleSheet', moveSheet, moveSheetAfter);
+    }
+    
   }
 
   WorksheetDeleteApp.successValues = function(sdAction){
@@ -196,10 +238,8 @@
 <script>
   $('#reorderButton').click(function () {
     let rowReorderedsend = $table.bootstrapTable('getData', false);
-    swaload()
-    google.script.run.withSuccessHandler(e => {WorksheetDeleteApp.refreshWorksheets(), success()}).withFailureHandler(swalerror).rearrangeSheets(rowReorderedsend)
+    swalConfirmAdv('rearrangeSheets', e => {WorksheetDeleteApp.refreshWorksheets(), success()}, 'Se reordenarán todas las hojas conforme a la tabla. Confirma para continuar.', rowReorderedsend);
   })
-
 
 	$(document).on("click", ".viewSheetButton", function(){
     
@@ -214,7 +254,7 @@
   });
 
   $("#table").on('search.bs.table', function (t){
-    WorksheetDeleteApp.updateHiddenSheets(wsNames);
+    WorksheetDeleteApp.updateHiddenSheets(wsNamesParsed);
   });
 </script>
 
@@ -223,7 +263,9 @@
   $(document).ready(function() {
     headerLight();
     google.script.run.fastInit();
+    //WorksheetDeleteApp.addDropdownElements(wsNamesArray);
     WorksheetDeleteApp.loadWorksheetNames();
+
     // Initialise the table reorder
     $('#table').tableDnD();
   });
@@ -234,6 +276,7 @@
 
   document.getElementById("delete-button").addEventListener("click", WorksheetDeleteApp.openDialogActions)
   document.getElementById("refresh-button").addEventListener("click", WorksheetDeleteApp.refreshWorksheets)
+  document.getElementById("moveSheetButton").addEventListener("click", WorksheetDeleteApp.moveSingleSheetActions)
   $("#refresh-button").click(function() {
       btnLoading('#refresh-button', 'Actualizando...');
   });

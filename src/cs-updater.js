@@ -1,5 +1,5 @@
 /**
- * Gsuite Morph Tools - CS Updater 1.6.0
+ * Gsuite Morph Tools - CS Updater 1.8.0
  * Developed by alsanchezromero
  *
  * Copyright (c) 2022 Morph Estudio
@@ -7,65 +7,62 @@
 
 function morphCSUpdater(btnID, rowData) {
 
-  // Get the main variables
+  // Main variables
+
   const ss = SpreadsheetApp.getActive();
-  let sh = ss.getSheetByName('LINK') || ss.insertSheet('LINK', 1);
-  let ss_id = ss.getId();
-  let userMail = Session.getActiveUser().getEmail();
-  let dateNow = Utilities.formatDate(new Date(), 'GMT+2', 'dd/MM/yyyy - HH:mm:ss');
-
-  let file = DriveApp.getFileById(ss_id);
-  Logger.log(`Archivo: ${file.getName()}, Sharing: ${file.getSharingAccess()}`);
-
+  var sh = ss.getSheetByName('LINK') || ss.insertSheet('LINK', 1);
+  var ss_id = ss.getId();
+  var userMail = Session.getActiveUser().getEmail();
+  var dateNow = Utilities.formatDate(new Date(), 'GMT+1', 'dd/MM/yyyy - HH:mm:ss');
+  const txtFolderName = `ExpTXT`;
+  var file = DriveApp.getFileById(ss_id);
+  Logger.log(`FILE: ${file.getName()}`);
+  var fileSharing = file.getSharingAccess();
+  var functionErrors = [];
+  
   // Set Sharing Access for the main file
-  if(file.getSharingAccess() != 'ANYONE_WITH_LINK') file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
 
-  // Variables obtained from the user configuration
-  let formData = [
+  if (fileSharing != 'ANYONE_WITH_LINK') file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+  // Variables obtained from user configuration
+  var formData = [
     rowData.updatePrefix,
     rowData.prefixAll,
-    rowData.updateLinkPage
+    rowData.updateLinkPage,
+    rowData.keepSheetVisibility,
+    rowData.updateDebugReport
   ];
-  let [updatePrefix, prefixAll, updateLinkPage] = formData;  
 
-  if (btnID === 'csUpdater' || btnID === 'mediciones') {
-    if (updateLinkPage === true) {
-      sh.getRange(1,1,9,2).clear();
-      sh.getRange(1,3,1,2).clear();
-      linkPageTemplateFormat(sh); // Formato de celdas
-    }
-  }
+  var [updatePrefix, prefixAll, updateLinkPage, keepSheetVisibility, updateDebugReport] = formData;
+  let backupOriginalFormula = sh.getRange('B8').getFormula();
+  let backupOriginalValues = sh.getRange(9, 2, 2, 1).getValues();
+  sh.getRange(1, 1, sh.getMaxRows(), 4).clear();
 
-  // "Cuadro" Main Folder
+  // Main Format and Column A Text
 
-  let parents = file.getParents();
-  let carpetaCuadroBaseID = parents.next().getId();
-  Logger.log(`Carpeta de archivo: ${carpetaCuadroBaseID}`);
+  var textColumnA = [['URL PANEL DE CONTROL'], [null], ['CARPETA PANEL DE CONTROL'], ['ID CARPETA PANEL DE CONTROL'], ['CARPETA CUADRO'], ['ID CARPETA CUADRO'], ['CARPETA EXPORTACIONES'], ['CARPETA BACKUP'], ['ID CARPETA BACKUP'], ['DESCARGAR ARCHIVO XLSX']];
+  sh.getRange(1, 1, textColumnA.length, 1).setValues(textColumnA);
+
+  linkPageTemplateFormat(sh); // Cell Format
+
+  // File Folder
+
+  let carpetaCuadroBaseID = file.getParents().next().getId();
   let carpetaCuadroBase = DriveApp.getFolderById(carpetaCuadroBaseID);
+  Logger.log(`SHARING: ${fileSharing}, BTN_ID: ${btnID}, FILE FOLDER: ${carpetaCuadroBaseID}`);
 
-  // Get the Control Panel and Control Panel Folder
+  // Control Panel and Control Panel Folder
 
-  if (updateLinkPage === true) {
-    try {
-      let filA = getControlPanel(sh, file, btnID);
-      let [filePanelName, filePanelId, filePanelUrl, folderPanelcId] = filA;
-      Logger.log("Ha traspasado la barrera del updateLinkPage")
-      let controlPanelFile = DriveApp.getFileById(filePanelId);
-      let folderPanelcName = DriveApp.getFolderById(folderPanelcId);
-      if(controlPanelFile.getSharingAccess() != 'ANYONE_WITH_LINK') controlPanelFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  let controlPanelFileName, controlPanelFileURL, controlPanelFolderID, controlPanelFolder;
 
-      sh.getRange('B1').setValue(filePanelUrl);
-      sh.getRange('B5').setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${folderPanelcId}";"${folderPanelcName}")`).setFontColor('#0000FF');
-      sh.getRange('B6').setValue(folderPanelcId);
-    } catch(error) {
-    }
-
-    // LINK Page Template Text
-
-    linkPageTemplateText(sh);
-    sh.getRange('B3').setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${carpetaCuadroBaseID}";"${carpetaCuadroBase}")`).setFontColor('#0000FF');
-    sh.getRange('B4').setValue(carpetaCuadroBaseID);
-
+  try {
+    let controlPanelData = getControlPanel(file, btnID);
+    [controlPanelFileName, controlPanelFileID, controlPanelFileURL, controlPanelFolder] = controlPanelData;
+    controlPanelFolderID = controlPanelFolder.getId();
+    let controlPanelFile = DriveApp.getFileById(controlPanelFileID);
+    if(controlPanelFile.getSharingAccess().toString() != 'ANYONE_WITH_LINK') controlPanelFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  } catch (err) {
+    functionErrors.push(`No se ha encontrado el panel de control del proyecto, pero no te preocupes, no es un error relevante. Revisa si está en la carpeta correcta y vuelve a actualizar o introduce la URL manualmente.`)
   }
 
   // ImportRange Permission
@@ -75,208 +72,281 @@ function morphCSUpdater(btnID, rowData) {
   importRangeToken(ss_id, carpetaCuadroBaseID);
   importRangeToken(ss_id, sectoresID);
 
-  if (updateLinkPage === true) {
-    sh.getRange('C1').setValue('=IMPORTRANGE(B1;"Instrucciones!A1")');
-    sh.getRange('D1').setValue('=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1CuMcYrtT6NXwxa9fMEIOTgRfkPySnNwKvA_1dyarCro";"DB-SI!B2")');
-  }
+  Utilities.sleep(100);
 
-  Utilities.sleep(200);
-
-  // Locate exported TXT files and make a list array
+  // Locate exported TXT folder
 
   let list = [];
 
-  if (btnID === 'csUpdater' || btnID === 'mediciones') {
-    sh.getRange(3, 3, sh.getLastRow() - 2, 2).clearContent();
-    let searchFor = 'title contains "ExpTXT"';
-    let names =[];
-    let expFolderIds=[];
-    let expFolder = carpetaCuadroBase.searchFolders(searchFor);
-    let expFolderDef; let expFolderId; let expFolderName;
-    while (expFolder.hasNext()) {
-      expFolderDef = expFolder.next();
-      expFolderId = expFolderDef.getId();
-      expFolderIds.push(expFolderId);
-      expFolderName = expFolderDef.getName();
-      names.push(expFolderName);
-    }
+  if (sh.getDataRange().isBlank() == false) sh.getRange(3, 3, sh.getLastRow() - 2, 2).clear();
+  let searchFor = 'title contains "ExpTXT"';
+  let expFolder = carpetaCuadroBase.searchFolders(searchFor);
+  let expFolderDef = expFolder.next();
+  let expFolderID = expFolderDef.getId();
+  let expFolderName = expFolderDef.getName();
 
-    keepNewestFilesOfEachNameInAFolder(expFolderDef); // Delete duplicated files in Exports Folder
+  // Column B and ImportRange Values
 
-    let sufix = updatePrefix || 'TXT'; // mask
-    let files = expFolderDef.getFiles();
-    while (files.hasNext()) {
-      file = files.next();
-      filename = file.getName();
-      if (prefixAll === true) {
-        if (filename.includes('.txt')) {
-          list.push([file.getName(), file.getId(), file.getName().slice(0, -4).replace('Sheets ', '').toUpperCase()]);
-        }
-      } else {
-        if (filename.includes(sufix)) {
-          list.push([file.getName(), file.getId(), file.getName().slice(0, -4).replace('Sheets ', '').toUpperCase()]);
-        }
+  let controlPanelFolderText = controlPanelFolder == undefined ? '' : `=hyperlink("https://drive.google.com/corp/drive/folders/${controlPanelFolderID}";"${controlPanelFolder}")`;
+
+  var textImportRange = [['=IMPORTRANGE(B1;"Instrucciones!A1")', '=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1CuMcYrtT6NXwxa9fMEIOTgRfkPySnNwKvA_1dyarCro";"DB-SI!B2")']];
+  var textColumnB = [
+    [controlPanelFileURL],
+    ['Carpetas principales'],
+    [controlPanelFolderText],
+    [controlPanelFolderID],
+    [`=hyperlink("https://drive.google.com/corp/drive/folders/${carpetaCuadroBaseID}";"${carpetaCuadroBase}")`],
+    [carpetaCuadroBaseID],
+    [`=hyperlink("https://drive.google.com/corp/drive/folders/${expFolderID}";"${expFolderName}")`]
+  ];
+  
+  sh.getRange(1, 2, textColumnB.length, 1).setValues(textColumnB);
+  sh.getRange(1, 3, 1, 2).setValues(textImportRange);
+  sh.getRange('B8').setFormula(backupOriginalFormula); sh.getRange(9, 2, 2, 1).setValues(backupOriginalValues);
+
+  // Array List of export files
+
+  keepNewestFilesOfEachNameInAFolder(expFolderDef); // Delete duplicated files in Exports Folder
+
+  let prefijo = [updatePrefix] || ['TXT','MED']; // prefix mask
+  let files = expFolderDef.getFiles();
+  while (files.hasNext()) {
+    file = files.next();
+    filename = file.getName();
+    if (prefixAll === true) {
+      if (filename.includes('.txt')) {
+        list.push([file.getName(), file.getId(), file.getName().slice(0, -4).replace('Sheets ', '').toUpperCase()]);
+      }
+    } else {
+      if (prefijo.some(prefix => filename.includes(prefix))) {
+        list.push([file.getName(), file.getId(), file.getName().slice(0, -4).replace('Sheets ', '').toUpperCase()]);
       }
     }
-
-    let result = [['Archivos exportados', 'IDs', 'Hoja'], ...list.filter((r) => r[0].includes('.txt')).sort()];
-
-  
-    let resultCrop = result.map((val) => val.slice(0, -1)); Logger.log(`Result.length: ${result.length}`)
-    sh.getRange(2, 3, result.length, 2).setValues(resultCrop);
-
-    // TXT File List Styling in LINK page
-
-    sh.getRange(3, 3, list.length, 2).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-    .setFontSize(14).setFontFamily('Montserrat').setFontColor('#78909c').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP).setVerticalAlignment('middle');
-    sh.getRange(3, 3, list.length, 1).setFontWeight('bold');
-    sh.getRange(3, 4, list.length, 1).setBackground('#fafafa');
-
   }
 
-  // Copy .txt data in Sheets /**/
+  if (list.length < 1) throw new Error(`No se ha encontrado ningun archivo en la carpeta ${txtFolderName} que cumpla los criterios seleccionados.`);
+
+  let result = [['Archivos exportados', 'Archivos exportados: IDs', 'Hoja'], ...list.filter((r) => r[0].includes('.txt')).sort()];
+  let resultCrop = result.map((val) => val.slice(0, -1));
+  sh.getRange(2, 3, result.length, 2).setValues(resultCrop);
+  Logger.log(`Export Folder: ${expFolderDef.getName()}, Number of files to import: ${result.length - 1}`)
+
+  // Export List Format
+
+  sh.getRange(3, 3, list.length, 2).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+  .setFontSize(14).setFontFamily('Montserrat').setFontColor('#78909c').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP).setVerticalAlignment('middle');
+  sh.getRange(3, 3, list.length, 1).setFontWeight('bold');
+  sh.getRange(3, 4, list.length, 1).setBackground('#fafafa');
+
+  // Copy TXT data in Sheets
+
+  let txt_file, txt_sharing, tsvUrl, tsvContent, sheetPaste, sheetId;
+  let loggerData = [];
+
+  if (sh.getRange('B7').getNote() != '') sh.getRange('B7').clearNote(); // Línea temporal para borrar las notas de la antigua versión (BORRAR EN EL FUTURO)
+
+  sh.getRange('C2').setNote(null).setNote(`Última actualización: ${dateNow} por ${userMail}`); // Last Update Note
 
   SpreadsheetApp.flush();
 
-  for (const [txtFileName, txtFileId, txtFileSheet] of list) {
-    let txt_file = DriveApp.getFileById(txtFileId);
-    //Logger.log(`File: ${txtFileName}, Sharing_Before: ${txt_file.getSharingAccess().toString()}`);
-    if(txt_file.getSharingAccess().toString() != 'ANYONE_WITH_LINK') txt_file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-    //Logger.log(`File: ${txtFileName}, Sharing_After: ${txt_file.getSharingAccess().toString()}`);
-    let tsvUrl = `https://drive.google.com/uc?id=${txtFileId}&x=.tsv`;
-    let tsvContent = UrlFetchApp.fetch(tsvUrl, {muteHttpExceptions: true }).getContentText();
-    SpreadsheetApp.flush();
-    let tsvData = Utilities.parseCsv(tsvContent, '\t');
-    SpreadsheetApp.flush();
-    let sheetPaste = ss.getSheetByName(`${txtFileSheet}`) || ss.insertSheet(`${txtFileSheet}`, 200);
-    sh.activate();
-    sheetPaste.setTabColor('00FF00').hideSheet();
-    sheetPaste.clear();
+  const requests = list.map(([txtFileName, txtFileId, txtFileSheet]) => {
+    txt_file = DriveApp.getFileById(txtFileId);
+    txt_sharing = txt_file.getSharingAccess();
+    if (txt_sharing.toString() != 'ANYONE_WITH_LINK') txt_file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
 
-    try {
-      SpreadsheetApp.flush();
-      Logger.log(`DataRows: ${tsvData.length}, DataCols: ${tsvData[0].length}`)
-      sheetPaste.getRange(1, 1, tsvData.length, tsvData[0].length).setValues(tsvData);
-      SpreadsheetApp.flush();
-    } catch (err) {
-      //throw new Error(`El documento [${txtFileName}] no tiene contenido.`);
+    sheetPaste = ss.getSheetByName(txtFileSheet) || ss.insertSheet(`${txtFileSheet}`, 200); sh.activate(); sheetPaste.setTabColor('00FF00');
+    if (keepSheetVisibility != true) sheetPaste.hideSheet();
+    sheetId = sheetPaste.getSheetId();
+    tsvUrl = `https://drive.google.com/uc?id=${txtFileId}&x=.tsv`;
+    tsvContent = UrlFetchApp.fetch(tsvUrl).getContentText();
+
+    if (updateDebugReport) {
+      let tsvData = Utilities.parseCsv(tsvContent, '\t');
+      let obj = { k1_Sheetname: txtFileSheet, k2_dataRows: tsvData.length, k4_dataCols: tsvData[0].length };
+      loggerData.push(obj);
     }
 
-    SpreadsheetApp.flush();
-  };
+    return [
+      { deleteRange: { range: { sheetId }, shiftDimension: "ROWS" } },
+      { pasteData: { data: tsvContent, coordinate: { sheetId }, delimiter: '\t' } }
+    ];
+  });
 
-  sh.getRange('C2').setNote(null).setNote(`Última actualización: ${dateNow} por ${userMail}`); // Last Update Note
+  Sheets.Spreadsheets.batchUpdate({ requests }, ss_id);
+
   deleteEmptyRows(); removeEmptyColumns();
-  sh.activate();
+
+  if (updateDebugReport) {
+    list.map(([txtFileSheet], index) => {
+      sheetPaste = ss.getSheetByName(txtFileSheet).getLastRow();
+      loggerData[index].k3_copiedRows = sheetPaste;
+    });
+    Logger.log(loggerData);
+  }
+
+  if (functionErrors.length > 0) {
+    var ui = SpreadsheetApp.getUi();
+    functionErrors.forEach(element => ui.alert('Advertencia', element, ui.ButtonSet.OK));
+  }
+}
+
+/**
+ * morphCSUpdaterDirect(
+ * Created for faster successive updates
+ */
+function morphCSUpdaterDirect(rowData) {
+
+  const ss = SpreadsheetApp.getActive();
+  let sh = ss.getSheetByName('LINK');
+  let ss_id = ss.getId();
+  let file = DriveApp.getFileById(ss_id);
+  let userMail = Session.getActiveUser().getEmail();
+  let dateNow = Utilities.formatDate(new Date(), 'GMT+1', 'dd/MM/yyyy - HH:mm:ss');
+  const txtFolderName = `ExpTXT`;
+  ScriptApp.getOAuthToken();
+  var functionErrors = [];
+
+  // Variables obtained from user configuration
+  var formData = [
+    rowData.updateDebugReport
+  ];
+
+  var [updateDebugReport] = formData;
+
+  let listValues = sh.getRange("C3:C").getValues();
+  let listLength = listValues.filter(String).length;
+  if (listLength < 1) throw new Error('No hay ningún archivo en la lista de archivos exportados.');
+  Logger.log(`FILENAME: ${file.getName()}, Number of files to import: ${listLength}`);
+  let listRaw = sh.getRange(3,3,listLength,2).getValues();
+  let list = listRaw.map(function(item) {
+    let newString = item[0];
+    let newItem = [newString, item[1]];
+    return newItem;
+ });
+
+  let tsvUrl, tsvContent, sheetPaste, sheetId;
+  var loggerData = [];
+  sh.getRange('C2').setNote(null).setNote(`Última actualización: ${dateNow} por ${userMail}`); // Last Update Note
+
+  const requests = list.map(([txtFileSheet, txtFileId]) => {
+    try {
+      let sheetName = txtFileSheet.slice(0, -4).replace('Sheets ', '').toUpperCase();
+      sheetPaste = ss.getSheetByName(sheetName);
+      sh.activate();
+      sheetId = sheetPaste.getSheetId();
+      tsvUrl = `https://drive.google.com/uc?id=${txtFileId}&x=.tsv`;
+      tsvContent = UrlFetchApp.fetch(tsvUrl).getContentText();
+
+      if (updateDebugReport) {
+        let tsvData = Utilities.parseCsv(tsvContent, '\t');
+        let obj = { k1_Sheetname: sheetName, k2_dataRows: tsvData.length, k4_dataCols: tsvData[0].length };
+        loggerData.push(obj);
+      }
+
+      return [
+        { deleteRange: { range: { sheetId }, shiftDimension: "ROWS" } },
+        { pasteData: { data: tsvContent, coordinate: { sheetId }, delimiter: '\t' } }
+      ];
+
+    } catch (e) {
+      functionErrors.push(`No se ha encontrado el archivo "${txtFileSheet}". Comprueba que exista en la carpeta "${txtFolderName}" o que esté bien escrito el nombre/ID en la lista de archivos exportados de la hoja LINK y luego vuelve a actualizar.`)
+    }
+
+  });
+
+  SpreadsheetApp.flush();
+  Sheets.Spreadsheets.batchUpdate({ requests }, ss_id);
+
+  if (updateDebugReport) {
+    list.map(([txtFileSheet], index) => {
+      let sheetName = txtFileSheet.slice(0, -4).replace('Sheets ', '').toUpperCase();
+      sheetPaste = ss.getSheetByName(sheetName).getLastRow();
+      loggerData[index].k3_copiedRows = sheetPaste;
+    });
+    Logger.log(loggerData);
+  }
+
+  if (functionErrors.length > 0) {
+    var ui = SpreadsheetApp.getUi();
+    functionErrors.forEach(element => ui.alert('Advertencia', element, ui.ButtonSet.OK));
+  }
 }
 
 /**
  * getControlPanel
  * Function to search the Control Panel Document in the Folder Structure
  */
-function getControlPanel(sh, file, btnID) {
-  let filA = [];
+function getControlPanel(file, btnID) {
+  let controlPanelData = [];
+  let parents;
+  var pcMask = 'Panel de control';
 
-try {
-  if (btnID === 'csUpdater') {
-    let parents = file.getParents();
-    let fldrA = [];
-    while (parents.hasNext()) {
-      let f = parents.next();
-      let f_id = f.getId();
-      fldrA.push(f_id);
-      parents = f.getParents();
-    };
+  switch (btnID) {
+    case 'Superficies':
 
-    let pcMask = 'Panel de control';
-    for (let i = 0; i < fldrA.length; i++) {
-      let files = DriveApp.getFolderById(fldrA[i]).getFilesByType(MimeType.GOOGLE_SHEETS);
-      while (files.hasNext()) {
-        let filePC = files.next();
-        if (filePC.getName().toLowerCase().includes(pcMask.toLowerCase())) {
-          filA.push(filePC.getName(), filePC.getId(), filePC.getUrl(), fldrA[i]);
+      parents = file.getParents();
+      while (parents.hasNext() && controlPanelData.length == 0) {
+        let tempFolder = parents.next();
+        let files = DriveApp.getFolderById(tempFolder.getId()).getFilesByType(MimeType.GOOGLE_SHEETS);
+        while (files.hasNext()) {
+          let fileCP = files.next();
+          if (fileCP.getName().toLowerCase().includes(pcMask.toLowerCase())) {
+            controlPanelData.push(fileCP.getName(), fileCP.getId(), fileCP.getUrl(), tempFolder);
+            break;
+          }
         }
+        parents = tempFolder.getParents();
       }
-    }
-  } else if (btnID === 'mediciones') {
+      Logger.log(`CONTROL_PANEL_INFO: ${controlPanelData}`)
+      break;
+    case 'Mediciones':
 
-    Logger.log('id mediciones a tope')
+      parents = file.getParents();
+      while (parents.hasNext() && controlPanelData.length == 0) {
 
-    let parents = file.getParents();
-    let fldrA = [];
-    while (parents.hasNext()) {
-      let f = parents.next();
-      let f_id = f.getId();
-      fldrA.push(f_id);
-      parents = f.getParents();
-    };
+        let tempFolder = parents.next();
+        let tempFolderFolders = tempFolder.getFolders();
 
+        Logger.log(tempFolder.getName());
 
-    let pcMask = 'Panel de control'; let folders;
-    for (let i = 0; i < fldrA.length; i++) {
-      let files = DriveApp.getFolderById(fldrA[i]);
-      Logger.log(files.getName())
-      folders = files.getFolders();
+        while (tempFolderFolders.hasNext()) {
 
-      while (folders.hasNext()) {
-        let folder = folders.next();
-        let findValues1 = ["Proyecto Base", "Arquitectura"];
+          /**/
+          let grandFolder = tempFolderFolders.next();
+          let folderNames = ["Proyecto Base", "Arquitectura"];
 
-        if (findValues1.some(word => folder.getName().includes(word))) {
-          Logger.log('he encontrado la puta carpeta' + folder.getName())
-          let folders2 = folder.getFolders();
-          while (folders2.hasNext()) {
-            let folder2 = folders2.next(); Logger.log(folder2.getName())
-            if (folder2.getName().includes('Doc Escrita')) {
-              Logger.log('he entrado en' + folder2.getName())
-              let folder2id = folder2.getId();
-              let files2 = DriveApp.getFolderById(folder2id).getFilesByType(MimeType.GOOGLE_SHEETS); Logger.log('files2 ' + files2)
-              
-              while (files2.hasNext()) {
-                let filePC = files2.next();
-                Logger.log('filepcname ' + filePC.getName())
-                if (filePC.getName().toLowerCase().includes(pcMask.toLowerCase())) {
-                  Logger.log('panel de control name' + filePC.getName())
-                  filA.push(filePC.getName(), filePC.getId(), filePC.getUrl(), folder2id);
+          Logger.log(grandFolder.getName())
+
+          if (folderNames.some(word => grandFolder.getName().includes(word))) {
+
+            Logger.log('he encontrado la puta carpeta' + grandFolder.getName())
+            
+            let tempFolderFoldersLv2 = grandFolder.getFolders();
+
+            while (tempFolderFoldersLv2.hasNext()) {
+              let parentFolder = tempFolderFoldersLv2.next();
+              if (parentFolder.getName().includes('Doc Escrita')) {
+                Logger.log('he entrado en' + parentFolder.getName())
+                let parentFolderID = parentFolder.getId();
+                let folderFiles = DriveApp.getFolderById(parentFolderID).getFilesByType(MimeType.GOOGLE_SHEETS);
+                
+                while (folderFiles.hasNext()) {
+                  let fileCP = folderFiles.next();
+                  if (fileCP.getName().toLowerCase().includes(pcMask.toLowerCase())) {
+                    Logger.log('panel de control name' + fileCP.getName())
+                    controlPanelData.push(fileCP.getName(), fileCP.getId(), fileCP.getUrl(), parentFolder);
+                    break
+                  }
                 }
               }
             }
           }
         }
+        parents = tempFolder.getParents();
       }
-    }
-
-  } else if (btnID === 'csManual2') {
-    let filePanelUrl = sh.getRange(1, 2).getValue();
-    let filePanelId = getIdFromUrl(filePanelUrl);
-    let filePC = DriveApp.getFileById(filePanelId);
-    filA.push(filePC.getName(), filePanelId, filePanelUrl, filePC.getParents().next().getId());
+      break;
   }
-  return filA;
-} catch(error) {
-  alert(error)
-}
-
-}
-
-/**
- * linkPageTemplateText
- * Add text values to LINK page
- */
-function linkPageTemplateText(sh) {
-  sh.getRange('A1').setValue('URL PANEL DE CONTROL');
-  sh.getRange('B2').setValue('Carpetas referentes');
-  sh.getRange('A3').setValue('CARPETA CUADRO');
-  sh.getRange('A4').setValue('ID CARPETA CUADRO');
-  sh.getRange('A5').setValue('CARPETA PANEL DE CONTROL');
-  sh.getRange('A6').setValue('ID CARPETA PANEL DE CONTROL');
-  sh.getRange('A7').setValue('CARPETA BACKUP');
-  sh.getRange('A8').setValue('ID CARPETA BACKUP');
-  sh.getRange('A9').setValue('DESCARGAR ARCHIVO XLSX');
-  sh.getRange('C1').setValue('=IMPORTRANGE(B1;"Instrucciones!A1")');
-  sh.getRange('D1').setValue('=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1CuMcYrtT6NXwxa9fMEIOTgRfkPySnNwKvA_1dyarCro";"DB-SI!B2")');
-  sh.getRange('C2').setValue('Archivos importados');
-  sh.getRange('D2').setValue('IDs');
+  return controlPanelData;
 }
 
 /**
@@ -285,17 +355,17 @@ function linkPageTemplateText(sh) {
  */
 function linkPageTemplateFormat(sh) {
   // Estilo global
-  sh.getRange(1, 1, 9, 4).setFontSize(14).setFontFamily('Montserrat').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
+  sh.getRange(1, 1, sh.getMaxRows(), 4).setFontSize(14).setFontFamily('Montserrat').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
     .setVerticalAlignment('middle')
     .setFontColor('#78909c');
   // Col A
-  sh.getRange(1, 1, 9, 1).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontWeight('bold');
+  sh.getRange(1, 1, 10, 1).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontWeight('bold');
   // Row 2
   sh.getRange(2, 1, 1, 4).setFontFamily('Inconsolata').setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
     .setFontWeight('bold')
     .setHorizontalAlignment('center');
   // Col B
-  sh.getRange(3, 2, 7, 1).setBackground('#fafafa').setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+  sh.getRange(3, 2, 8, 1).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setBackground('#fafafa');
   // ImportRanges
   sh.getRange(1, 3, 1, 2).setBackground('#e0f7fa').setBorder(true, true, true, true, true, true, '#26c6da', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontColor('#26c6da')
     .setFontWeight('bold')
@@ -305,7 +375,7 @@ function linkPageTemplateFormat(sh) {
     .setFontColor('#00C853')
     .setFontWeight('bold');
   // Folders Bold
-  sh.getRangeList(['B3', 'B5', 'B7', 'B9']).setFontWeight('bold');
+  sh.getRangeList(['B3', 'B5', 'B7', 'B8']).setFontWeight('bold').setFontColor('#0000FF'); sh.getRange('B10').setFontColor('#0000FF');
   // Column/Row Size
   sh.setColumnWidth(1, 340);
   sh.setColumnWidth(2, 380);
@@ -335,57 +405,3 @@ function importRangeToken(ss_id, tokenID) { //
 
   UrlFetchApp.fetch(url, params);
 }
-
-/*
-function manualUpdaterTemplate() {
-  const ss = SpreadsheetApp.getActive();
-  let sh = ss.getSheetByName('LINK') || ss.insertSheet('LINK', 1);
-
-  sh.clear().clearFormats();
-  linkPageTemplateText(sh);
-
-  sh.getRange('C2').setValue('Archivos exportados');
-  sh.getRange('D2').setValue('IDs');
-  sh.getRange('C3').setValue('TXT Sheets Falsos techos.txt');
-  sh.getRange('C4').setValue('TXT Sheets Superficies.txt');
-  sh.getRange('C5').setValue('TXT Sheets Ventanas.txt');
-
-  linkPageTemplateFormat(sh); // Formato de celdas
-
-  // Control Panel 
-  sh.getRangeList(['B1', 'B8']).setBackground('#FFFDE7').setBorder(true, true, true, true, true, true, '#FBC02D', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-    .setFontColor('#FBC02D');
-  sh.getRange('B1').setFontWeight('bold');
-  // Filelist Style
-  sh.getRange(3, 3, 3, 2).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
-  sh.getRange(3, 3, 3, 1).setFontWeight('bold');
-  sh.getRange(3, 4, 3, 1).setBackground('#FFFDE7').setBorder(true, true, true, true, true, true, '#FBC02D', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-    .setFontColor('#FBC02D');
-  // ImportRange Cells
-  sh.getRange('C1').setValue('=IMPORTRANGE(B1;"Instrucciones!A1")');
-  sh.getRange('D1').setValue('=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1CuMcYrtT6NXwxa9fMEIOTgRfkPySnNwKvA_1dyarCro";"DB-SI!B2")');
-
-  deleteEmptyRows(); removeEmptyColumns();
-  sh.activate();
-}
-
- else if (btnID === 'csManual2') { // This code only applies with the Manual Updater
-  
-    let txtFileId_FT = sh.getRange(3, 4).getValue();
-    let txtFile_FT = DriveApp.getFileById(txtFileId_FT);
-    let txtFileId_SP = sh.getRange(4, 4).getValue();
-    let txtFile_SP = DriveApp.getFileById(txtFileId_SP);
-    let txtFileId_VN = sh.getRange(5, 4).getValue();
-    let txtFile_VN = DriveApp.getFileById(txtFileId_VN);
-    let files = [txtFile_FT, txtFile_SP, txtFile_VN];
-
-    txtFile_FT.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-    txtFile_SP.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-    txtFile_VN.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-
-    files.forEach((file) => {
-      list.push([file.getName(), file.getId(), file.getName().slice(0, -4).replace('Sheets ', '').toUpperCase()]);
-    });
-  
-  }
-*/

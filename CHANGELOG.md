@@ -2,6 +2,47 @@
 # Change Log
 Documentación de cambios del proyecto.
 
+## [ 1.8.0 ] - 2023/01/10
+
+### Added
+
+- Añadido botón para crear marcas automáticas en el historial de superficies construidas.
+- Añadida opción en el actualizador de cuadros para mantener la visibilidad de las hojas.
+- Nueva función en el gestor de hojas para mover hojas individualmente.
+- Añadidos iconos de interrogación para ofrecer ayuda contextual junto a las checkbox de opciones.
+- Añadido panel de información sobre cuadros Morph.
+- Nueva herramienta: MODIFICAR FÓRMULAS. Genera automáticamente un registro de las fórmulas modificadas en cuadros.
+- Debug Report: opción para desarrolladores que facilita la detección de errores en cuadros.
+- Nueva herramienta para borrar filas en masa (desde la pestaña Cuadros).
+
+### Changed
+
+- Simplificación de botones en la sección Google Sheets.
+- Cambio de nombre de la sección "Superficies" por "Cuadros".
+- Cambio de diseño en la sección "Cuadros". La casilla "Actualizar hoja LINK" activa los prefijos y ejecuta la función completa (búsqueda de carpetas, panel de control, formato de hoja, etc.) mientras que tenerla desactivada ejecuta un código simple leyendo las IDs directamente de la hoja LINK. De este modo se pueden optimizar los tiempos de ejecución.
+- Se elimina de la vista general la herramienta "Transición de cuadros". Solo podrán acceder a ella los desarrolladores.
+- Las celdas "Hojas conectadas" de la hoja LINK ahora se muestran en las columnas E-F.
+- Cambios de diseño en el gestor de hojas, añadiendo un apartado específico para reordenar hojas.
+- La función "Lista de miembros Morph" ya no aplica formato, solo añade los datos en crudo y a partir de la celda seleccionada.
+- Eliminada la herramienta para modificar la altura de celdas, por redundancia con las posibilidades de Google Sheets.
+- Gran optimización de código para el congelador Morph, reduciendo tiempos de espera.
+
+### Fixed
+
+- Arreglado el link a la hoja conectada en la hoja LINK con la herramienta "Conectar G-Sheets".
+- Optimización del código para actualizar cuadros para solventar el fallo de importación en cuadros grandes.
+- Arreglado el fallo al buscar el panel de control en el cuadro de mediciones.
+- Arreglado bug al usar nota en celda A1 para el listado de archivos.
+- Arreglado bug al usar la función para eliminar filas/columnas vacías.
+- Cambios menores de diseño.
+
+## [ 1.7.1 ] - 2023/01/10
+
+### Fixed
+
+- Eliminado botón innecesario en la sección Google Sheets.
+- Bug en el display de imágenes en Document Studio.
+
 ## [ 1.7.0 ] - 2022/12/18
 
 ### Added

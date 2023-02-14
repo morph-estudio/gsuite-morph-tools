@@ -1,3 +1,13 @@
+<p style="margin-top:15px;" id="test">Cargando...</p>
+
+<script type="text/javascript">
+  function onSuccess(cellCounter2) {
+    document.getElementById('test').innerHTML = cellCounter2;
+  }
+  google.script.run.withSuccessHandler(onSuccess).cellCounter2();
+  document.getElementById('test').innerHTML = "Cargando...";
+</script>
+
 <p>💊 Accede a documentación acerca de las herramientas en la página de <a href="https://sites.google.com/morphestudio.es/morph-pills/gsuite/flujo-de-trabajo-gsuite/gsuite-morph-tools" target="_blank"><b>Morph Pills</b></a>.</p>
 <p>👩‍🔬 Si tienes cualquier duda, consulta al departamento I+D.</p>
 <p><b>asanchez@morphestudio.es</b></p>

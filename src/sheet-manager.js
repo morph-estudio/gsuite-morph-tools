@@ -1,5 +1,5 @@
 /**
- * Gsuite Morph Tools - Sheet Manager 1.7.0
+ * Gsuite Morph Tools - Sheet Manager 1.8.0
  * Developed by alsanchezromero
  *
  * Copyright (c) 2022 Morph Estudio
@@ -87,39 +87,52 @@ function worksheetManagement(sheetNamesToDeleteAsString, rowData) {
  */
 function rearrangeSheets(rowReorderedsend) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  let rowReorderedid = rowReorderedsend.map(function (row) { return row.id });
+  let activeSheet = SpreadsheetApp.getActiveSheet();
   let rowReorderedname = rowReorderedsend.map(function (row) { return row.name });
+  let hiddenList = [];
+  let sheet;
 
-  let sheet; let hiddenList = [];
-
-  rowReorderedname.forEach((sh, index) => {
-    // Logger.log(`Sheet Index: ${index}`);
-    sheet = ss.getSheetByName(sh);
-    sheet.activate();
-    ss.moveActiveSheet(index + 1);
-    if(sheet.isSheetHidden()) { hiddenList.push(sh) }
-  });
+  for(let i = 0; i < rowReorderedname.length; i++) {
+    sheet = ss.getSheetByName(rowReorderedname[i]);
+    if (sheet.isSheetHidden()) { 
+        hiddenList.push(rowReorderedname[i]) 
+    }
+    ss.setActiveSheet(sheet);
+    ss.moveActiveSheet(i + 1);
+  }
 
   SpreadsheetApp.flush();
 
-  Logger.log(`List of Hidden Sheets: ${hiddenList}`);
+  for (let i = 0; i < hiddenList.length; i++) {
+    Utilities.sleep(50);
+    ss.getSheetByName(hiddenList[i]).hideSheet();
+  }
 
-  // This code tries to avoid the bug when you can't hide the active sheet.
-  let myArray = rowReorderedname.filter( function( el ) { return !hiddenList.includes( el ) });
-  ss.getSheetByName(myArray[0]).activate();
+  activeSheet.activate();
+}
 
-  // The code is duplicated because of a GAS bug that doesn't hide the sheets if it's in the last position (sometimes). Maybe we could find another fix here.
-  hiddenList.forEach(sh => {
-    sheet = ss.getSheetByName(sh);
-    SpreadsheetApp.flush();
-    sheet.hideSheet();
-  });
-  hiddenList.forEach(sh => {
-    sheet = ss.getSheetByName(sh);
-    SpreadsheetApp.flush();
-    sheet.hideSheet();
-  });
-
+/**
+ * moveSingleSheet
+ * Faster code to move one single sheet.
+ */
+function moveSingleSheet(sh, shAfter) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let shActive = ss.getActiveSheet();
+  sh = ss.getSheetByName(sh);
+  let isHidden = sh.isSheetHidden(); Logger.log(isHidden)
+  sh.activate();
+  let shIndex = sh.getIndex()
+  shAfter = ss.getSheetByName(shAfter);
+  let shAfterIndex = shAfter.getIndex();
+  shAfterIndex > shIndex ? ss.moveActiveSheet(shAfterIndex) : ss.moveActiveSheet(shAfterIndex + 1); 
+  shActive.activate();
+  SpreadsheetApp.flush(); waiting(500);
+  if (isHidden == true) {
+    sh.hideSheet();
+  }
+  if (isHidden == true) {
+    sh.hideSheet();
+  }
 }
 
 /**
@@ -129,5 +142,6 @@ function rearrangeSheets(rowReorderedsend) {
 function goToSheet(sheetname) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sh = ss.getSheetByName(sheetname);
+  sh.getRange("A1");
   sh.activate();
 }

@@ -1,3 +1,61 @@
+/**
+ * deleteEmptyRows, removeEmptyColumns
+ * Delete the rows and columns up to the last one that contains data
+ */
+function deleteEmptyRows(sh) {
+  sh = sh || SpreadsheetApp.getActiveSheet();
+  let maxRows = sh.getMaxRows();
+  let lastRow = sh.getLastRow();
+  let checker2 = maxRows - (maxRows - lastRow);
+  if (checker2 != maxRows) {
+    sh.deleteRows(lastRow + 1, maxRows - lastRow);
+  }
+}
+
+function deleteExcessiveRows(rowsInput) {
+  let sh = SpreadsheetApp.getActiveSheet();
+  let maxRows = sh.getMaxRows();
+  sh.deleteRows(rowsInput, maxRows - rowsInput);
+}
+
+function removeEmptyColumns(sh) {
+  sh = sh || SpreadsheetApp.getActiveSheet();
+  let maxCol = sh.getMaxColumns();
+  let lastCol = sh.getLastColumn();
+  let checker = maxCol - (maxCol - lastCol);
+  if (checker != maxCol) {
+    sh.deleteColumns(lastCol + 1, maxCol - lastCol);
+  }
+}
+
+/**
+ * deleteAllEmptyRows
+ * Borra cualquier fila donde no haya datos
+ */
+function deleteAllEmptyRows() {
+  let spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = spreadsheet.getActiveSheet();
+  let data = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
+  let row = sheet.getLastRow();
+
+  while (row > 2) {
+    let rec = data.pop();
+    if (rec.join('').length === 0) {
+      sheet.deleteRow(row);
+    }
+    row--;
+  }
+  let maxRows = sheet.getMaxRows();
+  let lastRow = sheet.getLastRow();
+  if (maxRows - lastRow != 0) {
+    sheet.deleteRows(lastRow + 1, maxRows - lastRow);
+  }
+}
+
+/**
+ * increaseFontSize, decreaseFontSize
+ * Modify the text font size proportionally throughout the sheet
+ */
 function increaseFontSize() {
   const range = sh().getDataRange();
   let fontsizes = range.getFontSizes();
@@ -22,221 +80,6 @@ function decreaseFontSize() {
       range.getCell(i + 1,j + 1).setFontSize(fontsizes[i][j] - 2)
     }
   }
-}
-
-function autoResizeAllRows() {
-  const sh = ss().getActiveSheet();
-  const maxRows = sh.getLastRow();
-  sh.autoResizeRows(1, maxRows)
-}
-
-function autoResizeAllCols() {
-  const sh = ss().getActiveSheet();
-  const numCols = sh.getLastColumn();
-
-  for (let j = 1; j < numCols + 1; j++) {
-    sh.autoResizeColumn(j);
-    let colWidth = sh.getColumnWidth(j)
-    sh.setColumnWidth(j, colWidth + 20)
-  }
-}
-
-
-/**
- * listFilesInFolder
- * Crea una lista de archivos dentro de una carpeta de Google Drive
- */
-function setSubindex() {
-
-
-Logger.log(externalDatabase)
-/*
-
-  let sh = ss().getActiveSheet();
-  let cell = sh.getActiveCell();
-  let value = cell.getValue();
-  Logger.log(value)
-
-let value2 = 'asdf';
-value3 = value2.toString()
-let jsonobj = {
-  "squadName": "Super hero squad",
-  "homeTown": "Metro City",
-  "formed": 2016,
-  "secretBase": "Super tower",
-  "active": true,
-  "subindex": [
-    {
-      "0": "₀",
-      "1": "₁",
-      "2": "₂",
-      "3": "₃",
-      "4": "₄",
-      "5": "₅",
-      "6": "₆",
-      "7": "₇",
-      "8": "₈",
-      "9": "₉",
-
-      "a": "₉",
-      "b": "₉",
-    }
-  ]
-}
-
-  for (let i in value) {
-    //value = value.replace(value[i], jsonobj['subindex'][0][value[i].toString()])
-  }
-
- cell.setValue(value2.sub());
-
-
-
-*/
-
-
-/*
-  //let database = SpreadsheetApp.openById('1lcymggGAbACfKuG0ceMDWIIB9zWuxgVtSR9qpgNq4Ng').getSheetByName('UnicodeCharas');
-
-  let database = UrlFetchApp.fetch('https://docs.google.com/spreadsheets/d/1lcymggGAbACfKuG0ceMDWIIB9zWuxgVtSR9qpgNq4Ng/gviz/tq?tqx=out:json&gid=951104656').getContentText();
-  database1 = JSON.parse(database.match(/(?<=.*\().*(?=\);)/s)[0])
-  let database2 = database.match(/(?<=.*\().*(?=\);)/s)[0]
-  Logger.log(database2)
-
-  //let object = database2['rows'][0][2]
-  //Logger.log(`Final value: ${object}`)
-
-
-
-  
-
-  Logger.log(value);
-
-
-
-
-
-
-
-
-
-
-
-let response = jsonobj['subindex'][0][char]
-Logger.log(jsonobj);
-Logger.log(response);
-
-
-
-let database = UrlFetchApp.fetch('https://docs.google.com/spreadsheets/d/1lcymggGAbACfKuG0ceMDWIIB9zWuxgVtSR9qpgNq4Ng/gviz/tq?tqx=out:json&gid=951104656').getContentText();
-database1 = JSON.parse(database.match(/(?<=.*\().*(?=\);)/s)[0])
-let database2 = database.match(/(?<=.*\().*(?=\);)/s)[0]
-Logger.log(database1)
-
-let object = database1['table.rows'][0][2]
-Logger.log(object)
-*/
-
-
-
-
-
-
-
-}
-
-function rowToDict(sheet, rownumber) {
-  var columns = sheet.getRange(1,1,1, sheet.getMaxColumns()).getValues()[0];
-  var data = sheet.getDataRange().getValues()[rownumber-1];
-  var dict_data = {};
-  for (var keys in columns) {
-    var key = columns[keys];
-    dict_data[key] = data[keys];
-  }
-  return dict_data;
-}
-
-
-
-/**
- * listFilesInFolder
- * Crea una lista de archivos dentro de una carpeta de Google Drive
- */
-function listFilesInFolder(rowData) {
-  let ss = SpreadsheetApp.getActive();
-  let sh = ss.getActiveSheet();
-  let maxR = sh.getMaxRows();
-  let maxC = sh.getMaxColumns();
-
-  let a1cell = sh.getActiveCell().getA1Notation();
-  let splitArray = getSplitA1Notation(a1cell);
-
-  sh.getRange(2, 1, 1, 3).setFontWeight('bold');
-
-  let formData = [rowData.listFolderID, rowData.useA1];
-  let [listFolderID, useA1] = formData;
-  let fldr_id;
-  if (useA1) {
-    fldr_URL = sh.getRange(1, 1).getValue();
-    fldr_id = getIdFromUrl(fldr_URL);
-  } else {
-    fldr_id = getIdFromUrl(listFolderID);
-  }
-
-  let fldr = DriveApp.getFolderById(fldr_id);
-  let files = fldr.getFiles();
-  let names = [];
-  //sh.getRange(splitArray[1], 1, maxR, maxC).clearContent();
-  while (files.hasNext()) {
-    f = files.next();
-    f_url = f.getUrl();
-    f_name = f.getName().replace(/\.[^/.]+$/, '');
-    f_mime = f.getMimeType();
-    names.push([f_name,f_url,f_mime]);
-  }
-  let result = [['Filename', 'File URL', 'Type'], ...names.sort()];
-  sh.getRange(splitArray[1], letterToColumn(splitArray[0]), names.length + 1, 3).setValues(result);
-
-  //autoResizeAllRows(); autoResizeAllCols(); sh.setColumnWidth(1, 300); sh.setColumnWidth(2, 300);
-}
-
-function waiting(ms) {
-  Utilities.sleep(ms);
-}
-
-/**
- * colorMe
- * Fondo de celdas con el color Morph
- */
-function colorMe() {
-  let ss = SpreadsheetApp.getActive();
-  let selection = ss.getSelection();
-  let currentCell = selection.getActiveRange();
-  currentCell.setBackgroundColor('#f1cb50');
-}
-
-/**
- * drawPalette
- * Genera la paleta de colores del Cuadro de Superficies
- */
-function drawPalette() {
-  SpreadsheetApp.getActiveSpreadsheet().insertSheet('chart');
-  SpreadsheetApp.getActiveSpreadsheet().getSheetByName('chart').getRange(1, 1, 1, 104).setBackgrounds([
-    [
-
-    "#F2F2F2","#FFF3F3","#EEECE1","#D4C9C6","#CDC8CE","#BDBDBD","#A5A5A5","#7F7F7F", // PALETA GREY / BROWN
-    "#FFF1CB","#FFE9AD","#FFFAB1","#FFFFAE","#FFE699","#FFE499","#FFFF99","#FCF58F","#FFEB84","#FFFB84","#FFD666","#FED166","#F7CB4D","#ECFF49", // PALETA YELLOW
-    "#FFD7AE","#ED956F","#ED7D31","#FF6F31","#F57C00", // PALETA ORANGE
-    "#FFEEF6","#FFE0EF","#E7CFCF","#F9CCC4","#E6BFD2","#FAC5DC","#EEBBD1","#E6B3B3","#F1ADC9","#E2ABC5","#EEA3C6","#F097A3","#E78BB6","#FD7D8F","#F08090","#DD808D","#E67C73","#FF6565","#D16969","#E04C4C", // PALETA RED
-    "#D7D7FF","#FFDDFF","#E2C6FF","#FFC4FF","#E0A7EB","#D797E4","#FF8FFF","#FF62FF", // PALETA PINK
-    "#F0FDFF","#DBE5F1","#E0F7FA","#ECFFF5","#E0FFFC","#DEFFFF","#D7FDFF","#CCF2FF","#C4F7F7","#B9EBFD","#B7D4F0","#C5FFFF","#C4FDF8","#A8DFF3","#A3C3C9","#AFF5EF","#94E6DF","#7FCFEC","#74BFDB","#7BDFD6","#71B9D3","#62D1C7","#5CA4BD","#31AA9F","#3D8DA8","#1B8B81","#1B6F8B", // PALETA BLUE
-    "#EAF8D0","#C7D9B7","#D5E6B6","#E4EBA9","#CCFFCC","#A9DFC5","#CCCF96","#BEE2A6","#B8F1B8","#CDF39C","#CEED8A","#BCDA85","#A7DB85","#CEFF70","#A4C26E","#9DE063","#41CF7F","#8FA369","#63BE7B","#57BB8A","#6AA369","#008000" // PALETA GREEN
-
-    ],
-  ]);
-  let ss = SpreadsheetApp.getActive();
-  let sheet = ss.getSheetByName('chart');
-  ss.deleteSheet(sheet);
 }
 
 /**
@@ -269,84 +112,12 @@ function getDomainUsersList() {
   // Insert data in a spreadsheet
   let ss = SpreadsheetApp.getActiveSpreadsheet();
   let sh = ss.getActiveSheet();
-  sh.getRange(1, 1, users.length, users[0].length).setValues(users);
-  sh.setColumnWidth(1, 250);
-  sh.setColumnWidth(2, 280);
-  sh.getRange('A1:B500').setFontSize(12).setFontFamily('Montserrat');
-  sh.getRange('A1:A500').setFontWeight('bold');
-  sh.activate();
-  deleteEmptyRows();
-  removeEmptyColumns();
-}
-
-/**
- * deleteAllEmptyRows
- * Borra cualquier fila donde no haya datos
- */
-function deleteAllEmptyRows() {
-  let spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  let sheet = spreadsheet.getActiveSheet();
-  let data = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
-  let row = sheet.getLastRow();
-
-  while (row > 2) {
-    let rec = data.pop();
-    if (rec.join('').length === 0) {
-      sheet.deleteRow(row);
-    }
-    row--;
-  }
-  let maxRows = sheet.getMaxRows();
-  let lastRow = sheet.getLastRow();
-  if (maxRows - lastRow != 0) {
-    sheet.deleteRows(lastRow + 1, maxRows - lastRow);
-  }
-}
-
-/**
- * deleteEmptyRows, removeEmptyColumns
- * Borra las filas y columnas hasta la última que contenga datos
- */
-function deleteEmptyRows() {
-  let sh = SpreadsheetApp.getActiveSheet();
-  let maxRows = sh.getMaxRows();
-  let lastRow = sh.getLastRow();
-  let checker2 = maxRows - (maxRows - lastRow);
-  if (checker2 != maxRows) {
-    sh.deleteRows(lastRow + 1, maxRows - lastRow);
-  }
-}
-
-function removeEmptyColumns() {
-  let sh = SpreadsheetApp.getActiveSheet();
-  let maxCol = sh.getMaxColumns();
-  let lastCol = sh.getLastColumn();
-  let checker = maxCol - (maxCol - lastCol);
-  if (checker != maxCol) {
-    sh.deleteColumns(lastCol + 1, maxCol - lastCol);
-  }
-}
-
-/**
- * mergeColumns
- * Combina los datos de las columnas con mismo encabezado
- */
-function mergeColumns() {
-  let transpose = (ar) => ar[0].map((_, c) => ar.map((r) => r[c]));
-  let ss = SpreadsheetApp.getActiveSpreadsheet();
-  let sh = ss.getActiveSheet();
-  let values = sh.getDataRange().getValues();
-  let temp = [
-    ...transpose(values)
-      .reduce(
-        (m, [a, ...b]) => m.set(a, m.has(a) ? [...m.get(a), ...b] : [a, ...b]),
-        new Map(),
-      )
-      .values(),
-  ];
-  let res = transpose(temp);
-  sh.clearContents();
-  sh.getRange(1, 1, res.length, res[0].length).setValues(res);
+  let a1cell = sh.getActiveCell().getA1Notation();
+  let splitArray = getSplitA1Notation(a1cell);
+  sh.getRange(splitArray[1], letterToColumn(splitArray[0]), users.length, users[0].length).setValues(users);
+  //sh.getRange(1, 1, users.length, users[0].length).setValues(users);
+  sh.setColumnWidth(letterToColumn(splitArray[0]), 250);
+  sh.setColumnWidth(letterToColumn(splitArray[0]) + 1, 280);
 }
 
 /**
@@ -365,9 +136,252 @@ function uniqueIdentifier() {
   }
 }
 
+// FUNCTIONS IN FILES AND FOLDERS SECTION
+
+/**
+ * listFilesInFolder
+ * Crea una lista de archivos dentro de una carpeta de Google Drive
+ */
+function listFilesInFolder(rowData) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sh = ss.getActiveSheet();
+
+  let a1cell = sh.getActiveCell().getA1Notation();
+  let splitArray = getSplitA1Notation(a1cell);
+
+  let formData = [rowData.listFolderID, rowData.useA1]; let [listFolderID, useA1] = formData;
+
+  let fldr_id;
+  if (useA1) {
+    fldr_URL = sh.getRange(1, 1).getNote();
+    fldr_id = getIdFromUrl(fldr_URL);
+  } else {
+    fldr_id = getIdFromUrl(listFolderID);
+  }
+
+  Logger.log(`File: ${ss.getName()}, Sheetname: ${sh.getName()}, UseA1: ${useA1} FolderID: ${fldr_id}`)
+
+  let fldr = DriveApp.getFolderById(fldr_id);
+  let files = fldr.getFiles();
+  let names = [];
+  while (files.hasNext()) {
+    f = files.next();
+    f_url = f.getUrl();
+    f_name = f.getName().replace(/\.[^/.]+$/, '');
+    f_mime = shortenMimetype(f.getMimeType());
+    names.push([f_name,f_url,f_mime]);
+  }
+  let result = [['Filename', 'File URL', 'Type'], ...names.sort()];
+  sh.getRange(splitArray[1], letterToColumn(splitArray[0]), names.length + 1, 3).setValues(result);
+}
+
+function shortenMimetype(mimetype) {
+
+  const mimetypes = {
+    "application/vnd.google-apps.script": "GOOGLE_APPS_SCRIPT",
+    "application/vnd.google-apps.drawing": "GOOGLE_DRAWINGS",
+    "application/vnd.google-apps.document": "GOOGLE_DOCS",
+    "application/vnd.google-apps.form": "GOOGLE_FORMS",
+    "application/vnd.google-apps.spreadsheet": "GOOGLE_SHEETS",
+    "application/vnd.google-apps.site": "GOOGLE_SITES",
+    "application/vnd.google-apps.presentation": "GOOGLE_SLIDES",
+    "application/vnd.google-apps.folder": "FOLDER",
+    "application/vnd.google-apps.shortcut": "SHORTCUT",
+    "image/bmp": "BMP",
+    "image/gif": "GIF",
+    "image/jpeg": "JPEG",
+    "image/png": "PNG",
+    "image/svg+xml": "SVG",
+    "application/pdf": "PDF",
+    "text/css": "CSS",
+    "text/csv": "CSV",
+    "text/html": "HTML",
+    "application/javascript": "JAVASCRIPT",
+    "text/plain": "PLAIN_TEXT",
+    "application/rtf": "RTF",
+    "application/vnd.oasis.opendocument.graphics": "OPENDOCUMENT_GRAPHICS",
+    "application/vnd.oasis.opendocument.presentation": "OPENDOCUMENT_PRESENTATION",
+    "application/vnd.oasis.opendocument.spreadsheet": "OPENDOCUMENT_SPREADSHEET",
+    "application/vnd.oasis.opendocument.text": "OPENDOCUMENT_TEXT",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "MICROSOFT_EXCEL",
+    "application/vnd.ms-excel": "MICROSOFT_EXCEL_LEGACY",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation": "MICROSOFT_POWERPOINT",
+    "application/vnd.ms-powerpoint": "MICROSOFT_POWERPOINT_LEGACY",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "MICROSOFT_WORD",
+    "application/msword": "MICROSOFT_WORD_LEGACY",
+    "application/zip": "ZIP",
+    "video/mp4": "VIDEO_MP4"
+  };
+
+  return mimetypes[mimetype] || "UNKNOWN";
+}
+
+/**
+ * insertImagesOfFolder
+ * Insert the images from a folder into the selected cells
+ */
+function insertImagesOfFolder(rowData) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sh = ss.getActiveSheet();
+
+  let formData = [rowData.listFolderID, rowData.useA1, rowData.imageFolderFileID, rowData.imageFolderFileName, rowData.imageFolderImage, rowData.imageFolderArrayFormula];
+  let [folderUrl, useA1, imageFolderFileID, imageFolderFileName, imageFolderImage, imageFolderArrayFormula] = formData;
+
+  let folderID;
+  if (useA1) folderUrl = sh.getRange(1, 1).getNote();
+  folderID = getIdFromUrl(folderUrl);
+
+  let folder = DriveApp.getFolderById(folderID);
+  let contents = folder.getFiles();
+  let file; let downloadList = []; let cnt = 0;
+
+  let selectedCell = sh.getActiveCell().getA1Notation();
+  let a1NotationSplitArray = getSplitA1Notation(selectedCell);
+  let baseURL = 'https://drive.google.com/uc?id='
+
+  while (contents.hasNext()) {
+    file = contents.next();
+    cnt++;
+    Logger.log(file.getMimeType())
+    if ([MimeType.JPEG, MimeType.PNG, MimeType.GIF].includes(file.getMimeType())) {
+      downloadList.push(file)
+      Logger.log('fileperm ' + file.getSharingAccess())
+      if(file.getSharingAccess() != 'ANYONE_WITH_LINK') file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    }
+  };
+
+  downloadList.sort().forEach((el, i) => {
+
+    let listData = [ [] ];
+
+    if (imageFolderFileName) listData[0].push(el.getName());
+    if (imageFolderFileID) listData[0].push(el.getId())
+
+    let count = Number(a1NotationSplitArray[1]) + Number(i);
+
+    if (imageFolderImage) {
+
+      sh.getRange(count, letterToColumn(a1NotationSplitArray[0]), 1, listData[0].length).setValues(listData); // Paste of not-image columns
+      let image = SpreadsheetApp
+                  .newCellImage()
+                  .setSourceUrl(baseURL + el.getId())
+                  .build();
+
+      sh.getRange(count, letterToColumn(a1NotationSplitArray[0]) + listData[0].length, 1, 1).setValue(image);
+
+    } else {
+
+      listData[0].push(baseURL + el.getId()); // Push Public-URL to list
+      sh.getRange(count, letterToColumn(a1NotationSplitArray[0]), 1, listData[0].length).setValues(listData); // Paste of not-image columns
+
+      if (imageFolderArrayFormula) {
+        let formulaRange = sh.getRange(Number(a1NotationSplitArray[1]), letterToColumn(a1NotationSplitArray[0]) + listData[0].length, 1, 1);
+        let shiftedLetter = getShiftedLetter(a1NotationSplitArray[0], listData[0].length - 1);
+        formulaRange.setFormula(`=ARRAYFORMULA(IMAGE($${shiftedLetter}$${Number(a1NotationSplitArray[1])}:$${shiftedLetter}$${Number(a1NotationSplitArray[1]) + downloadList.length - 1}))`);
+      }
+
+    }
+  });
+}
+
+// FUNCTIONS IN INTEROPERABILITY SECTION
+
+/**
+ * sheetConnect
+ * Conecta hojas entre distintos documentos de Google Sheets.
+ */
+function sheetConnect(rowData) {
+
+  let formData = [
+    rowData[`sheetConnectSheetname`],
+    rowData[`sheetConnectTargetURL`],
+    rowData[`sheetConnectLinkList`]
+  ];
+
+  let [sheetConnectSheetname, sheetConnectTargetURL, sheetConnectLinkList] = formData;
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sh = ss.getActiveSheet();
+  let ss_url = ss.getUrl();
+
+  let sourceSheet = ss.getSheetByName(sheetConnectSheetname);
+  let sourceSheetTabColor = sourceSheet.getTabColor();
+  let target = SpreadsheetApp.openById(getIdFromUrl(sheetConnectTargetURL));
+  let targetSheet = sourceSheet.copyTo(target);
+  targetSheet.setName(sheetConnectSheetname).setTabColor(sourceSheetTabColor);
+  targetSheet.clearContents();
+
+  let targetSheetLink;
+
+  if (sheetConnectLinkList == true) {
+    targetSheetLink = target.getSheetByName('LINK');
+    Logger.log(targetSheetLink.getLastRow());
+
+    if (targetSheetLink.getRange('E2').getValue() != `Hojas conectadas`) {
+      targetSheetLink.getRange(2, 5, 1, 2).setValues([[`Hojas conectadas`, `Hojas conectadas: archivo de origen`]]);
+    }
+
+    let sheetLink = '#gid=' + targetSheet.getSheetId();
+    let lastRow = getLastDataRow(sh, "C"); Logger.log(`Lastrow: ${lastRow}`);
+
+    let linkRange_1 = targetSheetLink.getRange(lastRow, 5, 1, 2);
+    let linkRange_2 = targetSheetLink.getRange(lastRow, 5, 1, 1);
+    targetSheetLink.getRange(lastRow, 5, sh.getLastRow(), 2).clearFormat().setFontFamily('Montserrat').setFontSize(14).setFontWeight('normal').setHorizontalAlignment('left').setFontColor('#0000FF');
+
+    targetSheetLink.getRange(1, 5, 2, 2).setBackground(null).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+    targetSheetLink.getRange(1, 4, 1, 1).setBorder(true, true, true, true, true, true, '#26c6da', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+
+    if (targetSheetLink.getRange('E2').getValue() != `Hojas conectadas`) {
+      targetSheetLink.getRange(2, 5, 1, 2).setBackground('#fff').setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+        .setFontFamily('Inconsolata').setFontWeight('bold').setHorizontalAlignment('center');
+    }
+
+    linkRange_1.setValues([[`=hyperlink("${sheetLink}";"${targetSheet.getName()}"& " / ${target.getName()}")`, `=hyperlink("${ss_url}";"${ss.getName()}")`]])
+      .setBackground('#fafafa').setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+    linkRange_2.setBackground('#fff').setFontColor('#78909c')
+
+  }
+  targetSheet.getRange('A1').setFormula(`=IMPORTRANGE("${ss_url}";"${sheetConnectSheetname}!A1:AZZ50000")`)
+}
+
+/**
+ * getCSVFilesData
+ * Import CSV data by sheet and range
+ */
+function getCSVFilesData(rowData, counter) {
+
+  for (let i = 0; i <= counter; i++) {
+
+    let formData = [
+      rowData[`csvURL${i}`],
+      rowData[`csvCELL${i}`],
+      rowData[`selSht${i}`]
+    ];
+
+    let [csvURL, csvCELL, selSht] = formData;
+
+    let sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(selSht);
+
+    let fileURL = csvURL;
+    let fileID = getIdFromUrl(fileURL);
+    let file = DriveApp.getFileById(fileID);
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    let fetchURL = `https://drive.google.com/uc?id=${fileID}&x=.csv`;
+
+    let csvContent = UrlFetchApp.fetch(fetchURL);
+    let csvData = Utilities.parseCsv(csvContent);
+
+    SpreadsheetApp.flush();
+    sh.getRange(sh.getRange(csvCELL).getRowIndex(), sh.getRange(csvCELL).getColumn(), csvData.length, csvData[0].length).setValues(csvData);
+    SpreadsheetApp.flush();
+  }
+}
+
+// FUNCTIONS IN HELP SECTION
+
 /**
  * cellCounter
- * Determina cuán lleno está el documento respecto al total de celdas.
+ * Cell counter for Google Sheets document
  */
 let size;
 function cellCounter() {

@@ -1,13 +1,12 @@
 /**
- * Global Variables + Global Functions
+ * GLOBAL VARIABLES AND FUNCTIONS
  */
 
-const morphDivision = '(I+D)'; const morphDev = '(Devs)'; const gmtVersion = '1.7.2'
-const titleIX = 'G-Suite Morph Tools'; const barTitleIX = `💡 ${titleIX} ${gmtVersion}`;
+const morphDivision = '(I+D)'; const morphDev = '(Devs)'; const gmtVersion = '1.8.3'
+const titleIX = 'Gsuite Morph Tools'; const barTitleIX = `💡 ${titleIX} ${gmtVersion}`;
 const titleSM = 'Gestor de hojas'; const barTitleSM = `📋 ${titleSM} ${morphDivision}`;
 const titleDS = 'Morph Document Studio'; const barTitleDS = `✨ ${titleDS} ${morphDivision}`;
 const titleCL = 'Guía de estilo'; const barTitleCL = `🎨 ${titleCL} ${morphDivision}`;
-
 
 const ss = function() {
   return SpreadsheetApp.getActiveSpreadsheet() }
@@ -17,7 +16,7 @@ const ui = function() {
   return SpreadsheetApp.getUi() }
 
 /**
- * Menu Basic Engine
+ * MAIN MENU ENGINE
  */
 
 function onOpen(e) {
@@ -35,6 +34,10 @@ function onOpen(e) {
 function onInstall(e) {
   onOpen(e);
 }
+
+/**
+ * SIDEBAR FUNCTIONS
+ */
 
 function sidebarIndex() {
   let html = HtmlService.createTemplateFromFile('public/index');
@@ -54,6 +57,7 @@ function sidebarDS() {
 function sidebarSM() {
   let html = HtmlService.createTemplateFromFile('public/sheet-manager');
   html.wsNames = getWorksheetNames();
+  html.wsNamesArray = getWorksheetNamesArray();
   html = html.evaluate().setTitle(barTitleSM); ui().showSidebar(html)
 }
 
@@ -86,4 +90,19 @@ function sidebarCLDevs() {
 function sidebarChangelog() {
   let link = 'https://github.com/morph-estudio/gsuite-morph-tools/blob/main/CHANGELOG.md';
   openExternalUrlFromMenu(link);
+}
+
+/**
+ * DOCUMENT PROPERTIES AND DATA STORING FUNCTIONS
+ */
+
+function getSavedSheetProperties(rowData) {
+  PropertiesService.getDocumentProperties()
+    .setProperties(rowData);
+}
+
+function saveSheetPropertiesWithArray(rowData, array, arrayName) {
+  PropertiesService.getDocumentProperties().setProperties(rowData);
+  let jarray = JSON.stringify(array);
+  PropertiesService.getDocumentProperties().setProperty(arrayName, jarray);
 }

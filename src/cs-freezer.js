@@ -1,186 +1,228 @@
 /**
- * Gsuite Morph Tools - CS Freezer 1.7.0
+ * Gsuite Morph Tools - CS Freezer 1.8.0
  * Developed by alsanchezromero
  *
  * Copyright (c) 2022 Morph Estudio
  */
 
 function morphFreezer(btnID, sheetSelection) {
-  let ss = SpreadsheetApp.getActive();
-  let sh = ss.getSheetByName('LINK');
-  let ss_id = ss.getId();
-  let file = DriveApp.getFileById(ss_id);
-  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-  let parentFolder = file.getParents();
-  let parentFolderID = parentFolder.next().getId();
-  let backupFolderSearch = DriveApp.getFolderById(parentFolderID);
-  let userMail = Session.getActiveUser().getEmail();
-  let dateNow = Utilities.formatDate(new Date(), 'GMT+2', 'dd/MM/yyyy - HH:mm:ss');
-  let freezerDate = Utilities.formatDate(new Date(), 'GMT+2', 'yyyyMMdd');
-  let selectionArray = [];
 
-  if (btnID === 'actPartialFreezer') {
-    sheetSelection.forEach((obj) => {
-      selectionArray.push(ss.getSheetByName(obj));
-    });
+  var startTime = new Date().getTime(); var elapsedTime;
+
+  const ss = SpreadsheetApp.getActive();
+  var sh = ss.getSheetByName('LINK');
+  var ss_id = ss.getId();
+
+  var userMail = Session.getActiveUser().getEmail();
+  var dateNow = Utilities.formatDate(new Date(), 'GMT+2', 'dd/MM/yyyy - HH:mm:ss');
+  var freezerDate = Utilities.formatDate(new Date(), 'GMT+2', 'yyyyMMdd');
+  var destName = `${ss.getName()} - ${freezerDate} - CONGELADO`;
+  var functionErrors = [];
+  
+  var file = DriveApp.getFileById(ss_id);
+  Logger.log(`FILE: ${file.getName()}, FILEURL: ${file.getUrl()}`);
+  var parentFolder = file.getParents();
+  var parentFolderID = parentFolder.next().getId();
+  var backupFolderSearch = DriveApp.getFolderById(parentFolderID);
+
+  // Start freezing process for each button type
+
+  elapsedTime = (new Date().getTime() - startTime) / 1000; Logger.log(`Elapsed time before get backup folder: ${elapsedTime} seconds.`);
+
+  var destination, destinationId, destinationFile, destinationSheets, controlPanelID;
+
+  if (btnID === 'csFreezer') {
+
+  // Automatically get the backup folder
+
+  if (btnID === 'csFreezer') {
+    var backupFolder, backupFolderId, backupFolderName;
+    let searchFor = 'title contains "Congelados"';
+    backupFolder = backupFolderSearch.searchFolders(searchFor);
+    backupFolder = backupFolder.next();
+    backupFolderId = backupFolder.getId();
+    backupFolderName = backupFolder.getName();
   }
 
-  let backupFolderId;
-  if (btnID === 'csFreezer' || btnID === 'csManual3') {
-    backupFolderId = freezerCS(sh, backupFolderSearch, btnID); // Destination Folder (Específico cuadro de superficies)
-  }
+  // Creating destination file
 
-  let tempSheets = createTemporalSheets(ss, btnID, selectionArray) // Copy each sheet in the source Spreadsheet by removing the formulas as the temporal sheets
-
-  // Copy the source Spreadsheet
-
-  let destination = ss.copy(`${ss.getName()} - ${freezerDate} - CONGELADO`);
-  let destinationId = destination.getId();
-  let destinationFile = DriveApp.getFileById(destinationId);
+  elapsedTime = (new Date().getTime() - startTime) / 1000; Logger.log(`Elapsed time before copy: ${elapsedTime} seconds.`);
+  destination = ss.copy(destName);
+  elapsedTime = (new Date().getTime() - startTime) / 1000; Logger.log(`Elapsed time after copy: ${elapsedTime} seconds.`);
+  destinationId = destination.getId();
+  destinationFile = DriveApp.getFileById(destinationId);
   destinationFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  destinationSheets = destination.getSheets();
+  SpreadsheetApp.flush();
 
-  // Delete the temporal sheets in the source Spreadsheet
+  // DBB Variables ImportRange Permission
 
-  tempSheets.forEach((sheet) => {
-    ss.deleteSheet(sheet);
-    SpreadsheetApp.flush();
+  elapsedTime = (new Date().getTime() - startTime) / 1000; Logger.log(`Elapsed time before permission: ${elapsedTime} seconds.`);
+
+  var bddVariablesID = '1CuMcYrtT6NXwxa9fMEIOTgRfkPySnNwKvA_1dyarCro';
+  var controlPanelID = getIdFromUrl(sh.getRange('B1').getValue());
+  var permissionFilesIDs = [bddVariablesID, controlPanelID];
+  var token = ScriptApp.getOAuthToken();
+
+  var promises = permissionFilesIDs.map(function(fileID) {
+    let url = `https://docs.google.com/spreadsheets/d/${destinationId}/externaldata/addimportrangepermissions?donorDocId=${fileID}`;
+    let params = {
+      method: 'post',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      muteHttpExceptions: true,
+    };
+    return UrlFetchApp.fetch(url, params);
   });
+
+  Promise.allSettled(promises)
+    .then(function(results) {
+      var errors = results.filter(result => result.status === 'rejected');
+      if (errors.length > 0) {
+        Logger.log('Se ha producido un error con las peticiones ImportRange: ', errors);
+      } else {
+        Logger.log('Las peticiones ImportRange se han enviado correctamente.');
+      }
+    }); 
+
+  SpreadsheetApp.flush();
+
+  elapsedTime = (new Date().getTime() - startTime) / 1000; Logger.log(`Elapsed time after permission: ${elapsedTime} seconds.`);
 
   // Check Google Forms links and delete them from destination file
 
-  let formUrl = destination.getSheets()[0].getFormUrl();
+  var formUrl = destinationSheets[0].getFormUrl();
+  Logger.log(`HAS FORM?: ${formUrl}`);
   if (formUrl) {
+    Logger.log(`Se ha ejecutado el FormURL`);
     FormApp.openByUrl(formUrl).removeDestination();
     let formID = getIdFromUrl(formUrl);
     DriveApp.getFileById(formID).setTrashed(true);
-    SpreadsheetApp.flush();
   };
 
-  // Delete the original sheets from the copied Spreadsheet and rename the copied sheets
+  // FREEZE!
 
-  deleteAndRenameSheets(destination);
+  elapsedTime = (new Date().getTime() - startTime) / 1000; Logger.log(`Elapsed time before frozen proccess: ${elapsedTime} seconds.`);
 
-  // Delete the main DATA SHEET
+  var visibleSheets, hiddenSheets;
+  var excludedTabColors = ["#00ff00", "#ff0000", "#ffff00"];
 
-  destination.getSheets().forEach((sheet) => {
-    sheetName = sheet.getSheetName();
-    if (sheetName.indexOf('LINK') > -1) {
-      destination.deleteSheet(sheet);
+  visibleSheets = destinationSheets.filter(tempsheet => !tempsheet.isSheetHidden() && !excludedTabColors.includes(tempsheet.getTabColor()));
+  hiddenSheets = destinationSheets.filter(tempsheet => tempsheet.isSheetHidden() || excludedTabColors.includes(tempsheet.getTabColor()));
+
+  var requests = [
+    ...visibleSheets.map((sheet) => {
+      var sheetid = sheet.getSheetId();
+      var lastrow = sheet.getLastRow();
+      var lastcol = sheet.getLastColumn();
+      return {
+        copyPaste: {
+          source: {
+            sheetId: sheetid,
+            startRowIndex: 0,
+            endRowIndex: lastrow,
+            startColumnIndex: 0,
+            endColumnIndex: lastcol
+          },
+          destination: {
+            sheetId: sheetid,
+            startRowIndex: 0,
+            endRowIndex: 1,
+            startColumnIndex: 0,
+            endColumnIndex: 1
+          },
+          pasteType: "PASTE_VALUES",
+          pasteOrientation: "NORMAL"
+        }
+      };
+    }),
+    ...hiddenSheets.map(sheet => {
+      return {
+        deleteSheet: {
+          sheetId: sheet.getSheetId()
+        }
+      };
+    })
+  ];
+
+  Sheets.Spreadsheets.batchUpdate({spreadsheetId: ss_id, requests}, destinationId);
+
+  elapsedTime = (new Date().getTime() - startTime) / 1000; Logger.log(`Elapsed time after frozen proccess: ${elapsedTime} seconds.`);
+
+  } else {
+
+    // Alternative Workflow for Superfreezer and Partial Freezer
+
+    destination = SpreadsheetApp.create(destName);
+    destinationId = destination.getId();
+    destinationFile = DriveApp.getFileById(destinationId);
+    destination = SpreadsheetApp.openById(destination.getId());
+
+    var sheetArray = ss.getSheets();
+    var visibleSheets;
+
+    if (btnID === 'superFreezerButton') {
+      visibleSheets = sheetArray.filter(tempsheet => !tempsheet.isSheetHidden());
+    } else if (btnID === 'actPartialFreezer') {
+      visibleSheets = sheetArray.filter(tempsheet => {
+        return sheetSelection.includes(tempsheet.getName());
+      });
     }
-  });
+
+    let visibleSheetsNames = visibleSheets.map((sheet) => {
+      return sheet.getName();
+    });
+    Logger.log(`Visible Sheet Array: ${visibleSheetsNames}`);
+
+    visibleSheets.map((sheet) => {
+      let src = sheet.getDataRange();
+      let a1Notation = src.getA1Notation();
+      let values = src.getValues();
+      let dstSheet = sheet.copyTo(destination).setName(`${sheet.getSheetName()}`);
+      dstSheet.getRange(a1Notation).setValues(values);
+    });
+
+    destination.deleteSheet(destination.getSheetByName('Hoja 1'));
+  }
 
   // Move file to the destination folder
 
-  if (btnID === 'superFreezerButton' || btnID === 'actPartialFreezer') {
+  if (btnID === 'csFreezer') {
+    if (backupFolderId !== undefined) {
+      DriveApp.getFolderById(backupFolderId).addFile(destinationFile);
+      destinationFile.getParents().next().removeFile(destinationFile);
+    } else {
+      DriveApp.getFolderById(parentFolderID).addFile(destinationFile);
+      destinationFile.getParents().next().removeFile(destinationFile);
+      functionErrors.push(`No se ha encontrado la carpeta 'PXXXXX-A-CS-Congelados' del proyecto, por lo que el archivo se ha guardado en la misma carpeta que el cuadro.`)
+    }
+  } else if (btnID === 'superFreezerButton' || btnID === 'actPartialFreezer') {
     DriveApp.getFolderById(parentFolderID).addFile(destinationFile);
     destinationFile.getParents().next().removeFile(destinationFile);
   };
-  if (btnID === 'csFreezer' || btnID === 'csManual3') {
-    DriveApp.getFolderById(backupFolderId).addFile(destinationFile);
-    destinationFile.getParents().next().removeFile(destinationFile);
-  };
+
+  // EXCEL Conversion and LINK Sheet Data
 
   let url = `https://docs.google.com/feeds/download/spreadsheets/Export?key=${destinationId}&exportFormat=xlsx`;
 
-  if (btnID === 'superFreezerButton' || btnID === 'actPartialFreezer') {
-
+  if (btnID === 'csFreezer') {
+    let backupFolderText = backupFolderId == undefined ? '' : `=hyperlink("https://drive.google.com/corp/drive/folders/${backupFolderId}";"${backupFolderName}")`;
+    sh.getRange('B8').setValue(backupFolderText).setFontWeight('bold').setFontColor('#0000FF').setNote(null).setNote(`Último congelado: ${dateNow} por ${userMail}`); // Last Update Note
+    sh.getRange('B9').setValue(backupFolderId);
+    sh.getRange('B10').setValue(url).setFontColor('#0000FF').setFontWeight('normal'); // Add XLSX download url to sheet
+    sh.activate();
+  } else if (btnID === 'superFreezerButton' || btnID === 'actPartialFreezer') {
     let confirm = Browser.msgBox('Documento Excel', '¿Quieres crear una copia en formato Excel en la misma carpeta?', Browser.Buttons.OK_CANCEL);
     if (confirm == 'ok') {
       exportToXLSS(ss, url, freezerDate, parentFolderID);
     }
   }
-  
-  if (btnID === 'csFreezer' || 'csManual3') {
-    sh.getRange('B9').setValue(url).setFontColor('#0000FF'); // Add XLSX download url to sheet
-    sh.getRange('B7').setNote(null).setNote(`Último congelado: ${dateNow} por ${userMail}`); // Last Update Note
-    sh.activate();
+
+  if (functionErrors.length > 0) {
+    var ui = SpreadsheetApp.getUi();
+    functionErrors.forEach(element => ui.alert('Advertencia', element, ui.ButtonSet.OK));
   }
-
-}
-
-/**
- * freezerCS
- * Opciones específicas del congelador para el Cuadro de Superficies
- */
-function freezerCS(sh, backupFolderSearch, btnID) {
-  let backupFolderId;
-  let backupFolderName;
-
-  if (btnID === 'csFreezer') {
-    let searchFor = 'title contains "Congelados"';
-    let backupFolder = backupFolderSearch.searchFolders(searchFor);
-    let backupFolderDef;
-
-    while (backupFolder.hasNext()) {
-      backupFolderDef = backupFolder.next();
-      backupFolderId = backupFolderDef.getId();
-      backupFolderName = backupFolderDef.getName();
-      backupFolderUrl = backupFolderDef.getUrl();
-    }
-  } else if (btnID === 'csManual3') {
-    backupFolderId = sh.getRange(8, 2).getValue();
-    backupFolderDef = DriveApp.getFolderById(backupFolderId);
-    backupFolderName = backupFolderDef.getName();
-  }
-
-  sh.getRange('B7').setFontWeight('bold').setFontColor('#B7B7B7');
-  sh.getRange('A7').setValue('CARPETA BACKUP');
-  sh.getRange('A8').setValue('ID CARPETA BACKUP');
-  sh.getRange('A9').setValue('DESCARGAR ARCHIVO XLSX');
-  sh.getRange('B7').setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${backupFolderId}";"${backupFolderName}")`).setFontColor('#0000FF');
-  sh.getRange('B8').setValue(backupFolderId);
-
-  return backupFolderId;
-}
-
-/**
- * createTemporalSheets
- * Make temporal copy of sheets with frozen values
- */
-function createTemporalSheets(ss, btnID, selectionArray) {
-  let dstSheet; let src; let sheetsToFreeze; 
-
-  if (btnID === 'actPartialFreezer') { // Freeze only selected sheets in partial freezer
-    sheetsToFreeze = selectionArray;
-  } else {
-    sheetsToFreeze = ss.getSheets();
-  }
-
-  let tempSheets = sheetsToFreeze.filter((sh) => !sh.isSheetHidden()).map((sheet) => {
-    dstSheet = sheet.copyTo(ss).setName(`${sheet.getSheetName()}_temp`);
-    SpreadsheetApp.flush();
-    src = dstSheet.getDataRange();
-    SpreadsheetApp.flush();
-    src.copyTo(src, { contentsOnly: true });
-    SpreadsheetApp.flush();
-    return dstSheet;
-  });
-
-  return tempSheets;
-}
-
-/**
- * deleteAndRenameSheets
- * Crea un archivo XLSS a partir del ID de un archivo de Google Sheets
- */
-function deleteAndRenameSheets(destination) {
-  let sheetName;
-  destination.getSheets().forEach((sheet) => {
-    if (sheet.isSheetHidden()) {
-      destination.deleteSheet(sheet);
-      SpreadsheetApp.flush();
-    }
-    else {
-      sheetName = sheet.getSheetName();
-      if (sheetName.indexOf('_temp') === -1) {
-        destination.deleteSheet(sheet);
-        SpreadsheetApp.flush();
-      }
-      else {
-        sheet.setName(sheetName.replace('_temp', ''));
-      }
-    }
-  });
 }
 
 /**
@@ -204,59 +246,10 @@ function exportToXLSS(ss, url, freezerDate, parentFolderID) {
   }
 }
 
+/**
+ * morphFastFreezer
+ * Función de pruebas para el congelador Morph
+ */
 function morphFastFreezer() {
-  let ss = SpreadsheetApp.getActive();
-  let sh = ss.getSheetByName('LINK');
-  let ss_id = ss.getId();
-  let file = DriveApp.getFileById(ss_id);
-  let fileURL = file.getUrl();
-  let parentFolder = file.getParents();
-  let parentFolderID = parentFolder.next().getId();
-  let parentFolderDef = DriveApp.getFolderById(parentFolderID);
-  let freezerDate = Utilities.formatDate(new Date(), 'GMT+2', 'yyyyMMdd');
-
-  var destination = ss.copy(ss.getName());
-  file.setName(`${ss.getName()} - ${freezerDate} - CONGELADO`);
-
-  let destinationId = destination.getId();
-  let destinationFile = DriveApp.getFileById(destinationId);
-  destinationFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-
-  SpreadsheetApp.flush();
-
-  let tempSheets = ss.getSheets().filter((sht) => !sht.isSheetHidden()).map((sheet) => {
-    let dstSheet = sheet.getDataRange();
-    dstSheet.copyTo(dstSheet, { contentsOnly: true });
-    return dstSheet;
-  });
-
-  tempSheets = ss.getSheets().filter((sht) => sht.isSheetHidden()).map((sheet) => {
-    ss.deleteSheet(sheet);
-  });
-
-  let fileOriginal = DriveApp.getFileById(destinationId);
-
-  SpreadsheetApp.flush();
-
-  let url = `https://docs.google.com/feeds/download/spreadsheets/Export?key=${destinationId}&exportFormat=xlsx`;
-
-  let params = {
-    method: "get",
-    headers: {"Authorization": "Bearer " + ScriptApp.getOAuthToken()},
-    muteHttpExceptions: true,
-  };
-  let blob = UrlFetchApp.fetch(url, params).getBlob();
-  blob.setName(`${ss.getName()}.xlsx`);
-  const ui = SpreadsheetApp.getUi();
-  let confirm = Browser.msgBox('Documento Excel', '¿Quieres crear una copia en formato Excel en la misma carpeta?', Browser.Buttons.OK_CANCEL);
-  if (confirm == 'ok') { DriveApp.getFolderById(parentFolderID).createFile(blob); }
-
-  SpreadsheetApp.flush();
-
-  file.moveTo(parentFolderDef);
-  fileOriginal.moveTo(parentFolderDef);
-  let fileOriginalUrl = fileOriginal.getUrl();
-
-  openExternalUrlFromMenu(fileOriginalUrl);
 
 }

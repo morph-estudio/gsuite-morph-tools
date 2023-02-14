@@ -1,16 +1,21 @@
 <script>
 
-function scrollToPageCenter() {
-  //$(document).scrollTop($(document).height()/2);
-  $("html, body").animate({ scrollTop: $(window).height()/1.25 }, 300, 'linear');
+function scrollToPageCenter2(heightFactor) {
+  $("html, body").animate({ scrollTop: $(window).height() / heightFactor }, 200, 'linear');
 }
 
-function execFunction(fa, sc, rw) {
+$('.centerScroll').click(function() {
+  $('html, body').animate({
+    scrollTop: ($(window).height() / 2) - ($(this).height() * 2.5)
+  }, 200, 'linear');
+});
+
+function execFunction(fa, sc, rw, rw2, rw3) {
   swaload()
   google.script.run
   .withSuccessHandler(e => {swalsuccess(sc)})
   .withFailureHandler(swalerror)
-  [fa](rw);
+  [fa](rw, rw2, rw3);
 }
 
 function execNoSuccess(fa, rw, rw2) {
@@ -43,7 +48,7 @@ function swalsuccess(e) {
 function swalerror(err) {
   Swal.fire({
     title: 'Error!',
-    text: err.message.replace('Exception: ', '') || 'La función no ha podido ejecutarse.',
+    text: err.message.replace('Exception: ', '').replace('Error: ', '') || 'La función no ha podido ejecutarse.',
     icon: 'error',
     confirmButtonColor: '#0D6EFD',
     confirmButtonText: 'Entendido'
@@ -61,8 +66,6 @@ function swalinfo(e) {
 }
 
 function swalConfirm(fa, sc, tx, rw, rw2) {
-  //$("html, body").animate({ scrollTop: $('swalconfirming').offset().top + $('swalconfirming').height() / 2 }, 200, 'linear');
-  scrollToPageCenter();
   Swal.fire({
     text: tx,
     icon: 'info',
@@ -76,17 +79,39 @@ function swalConfirm(fa, sc, tx, rw, rw2) {
     customClass: {
       popup: 'swalconfirming',
     }
-    /*
-    customClass: {
-      //container: 'swal2custom-container',
-      //popup: 'swal2custom-popup',
-    }
-    */
   }).then((result) => {
     if (result.isConfirmed) {
       swaload()
       google.script.run
       .withSuccessHandler(e => {swalsuccess(sc)})
+      .withFailureHandler(swalerror)
+      [fa](rw, rw2);
+    } else if (result.isDenied) {
+      return;
+    }
+  })
+    scrollToPageCenter('swal2-title');
+}
+
+function swalConfirmAdv(fa, sc, tx, rw, rw2) {
+  Swal.fire({
+    text: tx,
+    icon: 'info',
+    allowOutsideClick: false,
+    showLoaderOnConfirm: true,
+    showDenyButton: false,
+    showCancelButton: true,
+    cancelButtonText: `Cancelar`,
+    confirmButtonText: `Continuar`,
+    confirmButtonColor: '#0D6EFD',
+    customClass: {
+      popup: 'swalconfirming',
+    }
+  }).then((result) => {
+    if (result.isConfirmed) {
+      swaload()
+      google.script.run
+      .withSuccessHandler(sc)
       .withFailureHandler(swalerror)
       [fa](rw, rw2);
     } else if (result.isDenied) {
@@ -123,7 +148,7 @@ function swalConfirm(fa, sc, tx, rw, rw2) {
   <swal-html><div class="swal-tt">Por favor, no modifiques ni cierres el documento.</div></swal-html>
   <swal-html><div class="swal2-watermark">MORPH I+D</div></swal-html>
 
-  <swal-image src="https://raw.githubusercontent.com/Codelessly/FlutterLoadingGIFs/master/packages/cupertino_activity_indicator_selective.gif" width="35%" height="auto" />
+  <swal-image src="https://i.ibb.co/yPq3JNz/Eclipse-1-3s-200px.gif" width="60%" />
   <swal-param name="allowEscapeKey" value="false" />
   <swal-param
     name="customClass"

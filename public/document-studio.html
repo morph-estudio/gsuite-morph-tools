@@ -7,7 +7,6 @@
 
   <?!= HtmlService.createHtmlOutputFromFile('public/helpers/header').getContent(); ?>
   <?!= HtmlService.createHtmlOutputFromFile('public/stylesheet').getContent(); ?>
-  <script src="https://www.tutorialspoint.com/jquery/jquery-3.6.0.js"></script>
 
   <script src="https://cdn.tiny.cloud/1/c6gsjn35dtkdhm0zan0ftyao7fe0lr3ye6ocltbbu4bj46em/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
   <script>
@@ -32,7 +31,7 @@
 
 <?!= HtmlService.createHtmlOutputFromFile('public/helpers/navbar').getContent(); ?>
 
-<!--  <div class="background-grey">
+<!--   <div class="background-grey">
 
   <p>Morph Document Studio te permite crear archivos en masa a partir de plantillas con DOCS y SLIDES.</p> 
   <div class="d-flex pt-3 pb-3 mx-auto accordion-body">
@@ -57,12 +56,20 @@
       <div class="accordion-body">
 
         <div class="d-flex pt-1 pb-3 mx-auto">
-          <object data="https://mocarabes.com/wp-content/uploads/morph/google-sheets-icon.svg" class="docsicons"> </object>
+          <img src='https://mocarabes.com/wp-content/uploads/morph/google-sheets-icon.svg' height='auto' width='50' />
           <i class="fa-solid fa-arrow-right fa-compatible"></i>
-          <object data="https://mocarabes.com/wp-content/uploads/morph/google-docs-icon.svg" class="docsicons"> </object>
-          <object data="https://mocarabes.com/wp-content/uploads/morph/google-slides-icon.svg" class="docsicons"> </object>
+          <img src='https://mocarabes.com/wp-content/uploads/morph/google-docs-icon.svg' height='auto' width='50' />
+          <img src='https://mocarabes.com/wp-content/uploads/morph/google-slides-icon.svg' height='auto' width='50' />
           <i class="fa-solid fa-wand-magic-sparkles fa-compatible"></i>
         </div>
+
+        <!--<div class="d-flex pt-1 pb-3 mx-auto">
+          <object type="image/svg+xml" data="https://svgshare.com/i/pbo.svg" class="docsicons"> </object>
+          <i class="fa-solid fa-arrow-right fa-compatible"></i>
+          <object type="image/svg+xml" data="https://mocarabes.com/wp-content/uploads/morph/google-docs-icon.svg" class="docsicons"> </object>
+          <object type="image/svg+xml" data="https://mocarabes.com/wp-content/uploads/morph/google-slides-icon.svg" class="docsicons"> </object>
+          <i class="fa-solid fa-wand-magic-sparkles fa-compatible"></i>
+        </div>-->
 
         <?!= HtmlService.createHtmlOutputFromFile('public/helpers/form-ds-1').getContent(); ?>
 
@@ -109,7 +116,72 @@
     <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
       <div class="accordion-body">
 
-        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/form-ds-4').getContent(); ?>
+        <!-- FINALIZAR -->
+
+        <div>
+          <form novalidate> <!--<form autocomplete="off"> QUITAR -->
+            <div id="userform3">
+
+              <div class="hideWhenBothSwitchOff mb-4">
+                <div id="hideWhenBothSwitchOff" aria-expanded="false" class="collapse">
+                  <label class="form-label mt-2">Más opciones</label>
+                  <p>Ejecutar en todas las filas o solo cuando estén vacías las celdas en <b>[DS] File-links</b> o <b>[DS] Email-links</b>.</p>
+                </div>
+                
+
+                <div id="all-documents-div" aria-expanded="false" class="collapse">
+                  <div class="form-check mt-2 mb-2">
+                    <input class="form-check-input shadow-none" id="all-documents" type="checkbox" >
+                    <label class="form-check-label" for="all-documents">
+                      Generar todos los documentos.
+                    </label>
+                  </div>
+                </div>
+
+                <div id="all-emails-div" aria-expanded="false" class="collapse">
+                  <div class="form-check">
+                    <input class="form-check-input shadow-none" id="all-emails" type="checkbox">
+                    <label class="form-check-label" for="all-emails">
+                      Enviar todos los emails.
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div id="finalButtons">
+                <div class="d-flex">
+                  <button class="btn btn-outline-secondary btn-lg-gmt w-65 shadow-none pb-1" id="saveButton">Guardar</button>
+                  <button class="btn btn-outline-danger btn-lg-gmt w-35 shadow-none ms-1 pt-1 pb-1" id="deleteButton" onclick="swalConfirm('deleteProperties', 'Se ha eliminado la configuración', 'Se eliminará la configuración guardada.')">Borrar</button>
+                </div>
+                  <button class="btn btn-primary btn-xl w-100 shadow-none mt-1" id="mainButton">Ejecutar</button>
+              </div>
+
+              <div class="toast-div">
+                <div id="errorNotFunctions" class="toast fade hide shadow-sm w-100" role="alert" aria-live="assertive" aria-atomic="true">
+                  <div class="toast-header">
+                    <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+                    <strong class="me-auto">Advertencia</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                  </div>
+                  <div class="toast-body">
+                    No se ha activado ninguna de las funciones de Morph Document Studio.
+                  </div>
+                </div>
+
+                <div id="errorNotFields" class="toast fade hide shadow-sm w-100" role="alert" aria-live="assertive" aria-atomic="true">
+                  <div class="toast-header">
+                    <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+                    <strong class="me-auto">Advertencia</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                  </div>
+                  <div class="toast-body">
+                    Revisa todos los campos obligatorios para continuar.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div> <!-- Div End -->
 
       </div>
     </div>
@@ -485,8 +557,6 @@ function validate(fieldsToValidate) {
 
 <?!= HtmlService.createHtmlOutputFromFile('public/helpers/swal').getContent(); ?>
 <?!= HtmlService.createHtmlOutputFromFile('public/helpers/footer').getContent(); ?>
-
-
 
 </body>
 </html>

@@ -83,6 +83,15 @@ h3 {
 hr.side {
   margin: 30px 0px 30px 0px;
 }
+table {
+  table-layout: fixed;
+  max-width: 100%; /* o cualquier otro ancho máximo */
+}
+td {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
 
 @media (max-width: 550px) {
   body {
@@ -130,12 +139,12 @@ hr.side {
   user-select: none;
 }
 .docsicons {
-  display: block;
+  //display: block;
   width: 20%;
-  height: auto;
-  -moz-user-select: none;
-  -webkit-user-select: none;
-  user-select: none;
+  height: 100%;
+  //-moz-user-select: none;
+  //-webkit-user-select: none;
+  //user-select: none;
 }
 .fa-margin { margin-right:7px; }
 .fa-compatible {
@@ -143,6 +152,10 @@ hr.side {
   font-size:24px;
   margin:auto 10px;
   color: #6c7a89;
+}
+.fa-questionstyle {
+  margin-left: 5px;
+  color: #B0BEC5;
 }
 
 // Buttons
@@ -267,13 +280,25 @@ hr.side {
 .btn.btn-primary.colours:hover {
   text-decoration: underline;
 }
+.btn.btn-purple {
+  background-color: #AA00FF;
+  color: #fff;
+}
+.btn.btn-purple:hover {
+  background-color: #bb33ff;
+}
 
-.greybutton1{ background-color: #37474F}
-.greybutton1:hover{ background-color: #455A64}
-.greybutton1:active{ background-color: #37474F}
-.greybutton2{ background-color: #78909C}
-.greybutton2:hover{ background-color: #90A4AE}
-.greybutton2:active{ background-color: #78909C}
+.greybutton1, greybutton1:active{ background-color: #37474F }
+.greybutton1:hover{ background-color: #455A64 }
+.greybutton2, greybutton2:active{ background-color: #78909C }
+.greybutton2:hover{ background-color: #90A4AE }
+.greyborder{ border-color: #E9ECEF !important }
+.brownbutton1{ background-color: #9E9E9E }
+.brownbutton1:hover{ background-color: #BDBDBD }
+.brownbutton1:active{ background-color: #9E9E9E }
+.brownbutton2, brownbutton2:active{ background-color: #757575 }
+.brownbutton2:hover{ background-color: #616161 }
+.brownbutton2:active{ background-color: #757575 }
 .viewSheetButton {
   background: none;
   color: #9E9E9E;
@@ -287,6 +312,27 @@ hr.side {
   padding: none;
   border: none;
   font-weight: bold;
+}
+
+.mainbtn {
+  font-weight: bold;
+}
+
+input[type="checkbox"].btn-check:checked + label.btn-outline-secondary {
+  background-color: #6c757d;
+  color: #fff;
+}
+input[type="checkbox"].btn-check:not(:checked) + label.btn-outline-secondary {
+  background-color: transparent;
+  color: #6c757d;
+}
+input[type="checkbox"].btn-check:hover + label.btn-outline-secondary {
+  background-color: transparent;
+  color: #6c757d;
+}
+input[type="checkbox"].btn-check:hover:checked + label.btn-outline-secondary {
+  background-color: #6c757d;
+  color: #fff;
 }
 
 // Bootstrap Menu
@@ -337,7 +383,7 @@ border: none;
   border:none;
 }
 .accordion-body {
-  padding: 0px 15px 25px 15px;
+  padding: 0px 12px 25px 12px;
   font-size: var(--fontsize-one);
   color: var(--primary-color);
   font-weight: 500;
@@ -630,6 +676,22 @@ input:checked + .slider .off { display: none; }
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Edge, Opera and Firefox */
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

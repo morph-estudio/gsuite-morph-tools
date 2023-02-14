@@ -4,31 +4,41 @@
     <h3 class="menu-h3 mb-3"><i class="fa-solid fa-margin fa-fw fa-laptop-code"></i>Funciones en desarrollo</h3>
   </div>
 
-  <button class="btn btn-primary index shadow-none w-100" onclick="swalConfirm('botBrainSave', 'Se ha acualizado la IA de Morph Robot', 'Por favor, no utilices esta función avanzada si no sabes lo que estás haciendo. Confirma para continuar.')"><i class="fa-solid fa-brain fa-margin fa-fw"></i>Actualizar cerebro de robot</button>
+  <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('deleteProperties')"><i class="fa-solid fa-trash-can fa-margin fa-fw"></i>Delete Document Properties</button>
+
+  <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('macroModificarCuadros')"><i class="fa-solid fa-microchip fa-margin fa-fw"></i>Aplicar macro de cuadros</button>
+  <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('deleteExcessiveRows')"><i class="fa-solid fa-microchip fa-margin fa-fw"></i>Borrar filas excesivas</button>
+
   <button class="btn btn-primary index shadow-none w-100" onclick="swalConfirm('morphFastFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.')"><i class="fa-solid fa-margin fa-snowflake fa-fw"></i>Congelador rápido</button>
   <button class="btn btn-primary index shadow-none w-100" onclick="execFunction('saveSheetAsTSV')"><i class="fa-solid fa-margin fa-file-excel fa-fw"></i>Exportar TSV con fórmulas</button>
+
   <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('postLessons')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Enviar mensajes de Chat</button>
   <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('createTimeTriggerSpecifcDate')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Programar base de mensajes</button>
+  <button class="btn btn-primary index shadow-none w-100" onclick="swalConfirm('botBrainSave', 'Se ha acualizado la IA de Morph Robot', 'Por favor, no utilices esta función avanzada si no sabes lo que estás haciendo. Confirma para continuar.')"><i class="fa-solid fa-brain fa-margin fa-fw"></i>Actualizar cerebro de robot</button>
 
-  <button class="btn btn-primary index shadow-none w-100" id="adaptDeleteButton" onclick="execNoSuccess('deleteProperty', 'adaptedSpreadsheet'), execDirect('sidebarIndex')"><i class="fa-solid fa-unlock fa-margin fa-fw"></i>Desbloquear botón adaptar</button>
+  <button class="btn btn-primary index shadow-none w-100" id="adaptButton" onclick="execFunction('adaptarCuadroAntiguo', 'El cuadro se ha adaptado correctamente.')"><i class="fa-solid fa-margin fa-fw fa-triangle-exclamation"></i>Adaptar cuadro antiguo<span data-bs-toggle="tooltip" data-bs-placement="right" title="Adapta la hoja LINK de los cuadros anteriores a Gsuite Morph Tools">
+  <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:1px"></i>
+</span></button>
   <button class="btn btn-primary index shadow-none w-100" id="adaptDeleteButton" onclick="execNoSuccess('setCuadroAdaptado')"><i class="fa-solid fa-lock fa-margin fa-fw"></i>Bloquear botón adaptar</button>
-  
-  <button class="btn btn-primary index shadow-none w-100 ult" onclick="swalinfo()"><i class="fa-solid fa-gear fa-margin fa-fw fa-spin" style="--fa-animation-duration: 6s;"></i>Destructor de mundos</button>
+  <button class="btn btn-primary index shadow-none w-100" id="adaptDeleteButton" onclick="execNoSuccess('deleteProperty', 'adaptedSpreadsheet'), execDirect('sidebarIndex')"><i class="fa-solid fa-unlock fa-margin fa-fw"></i>Desbloquear botón adaptar</button>
 
   <div class="accordion-body pb-0 mt-4">
     <h3 class="menu-h3 mb-3"><i class="fa-solid fa-margin fa-fw fa-square-caret-down"></i>Menú para developers</h3>
   </div>
+
+  <!--
   <button class="btn btn-primary index shadow-none w-100" onclick="execDirect('sidebarSMDevs')"><i class="fa-solid fa-margin fa-fw fa-file-circle-check"></i>Gestor de hojas</button>
   <button class="btn btn-primary index shadow-none w-100" onclick="execDirect('sidebarDSDevs')"><i class="fa-solid fa-margin fa-fw fa-wand-magic-sparkles"></i>Morph Document Studio</button>
+  -->
   <button class="btn btn-primary index shadow-none w-100 ult" onclick="execDirect('sidebarCLDevs')"><i class="fa-solid fa-margin fa-fw fa-swatchbook"></i>Guía de estilos WIP</button>
+  
 
 </div>
 
-<div id="hisconhidden" style="display: none" class="accordion-body mt-4 pb-3 devhiddensection">
-    <h3 class="menu-h3 mb-3"><i class="fa-solid fa-margin fa-fw fa-window-restore"></i>Histórico de superficies</h3>
-    <p>Debes situarte en la hoja <u>Histórico CONSTRUIDAS</u> antes de crear un punto histórico.</p>
-    <button class="btn btn-success mainbtn btn-xl w-100" id="adaptButton"onclick="swalConfirm('crearPuntoHistorico', 'Se ha creado una marca temporal en el histórico.', 
-    'Asegúrate de estar en la hoja adecuada. Confirma para continuar.')">Crear punto histórico</button>
+<div id="transicionCuadros" style="display: none" class="accordion-body mt-4 pb-3 devhiddensection">
+    <h3 class="mb-3"><i class="fa-solid fa-margin fa-fw fa-triangle-exclamation"></i>Transición de cuadros</h3>
+    <p>Si es un cuadro anterior a <u>Octubre 2022</u> debes adaptarlo antes de actualizar.</p>
+    <button class="btn btn-success mainbtn btn-xl w-100" id="adaptButton" onclick="execFunction('adaptarCuadroAntiguo', 'El cuadro se ha adaptado correctamente.')">Adaptar cuadro antiguo</button>
 </div>
 
 <div id="pdfsechidden" style="display: none" class="accordion-body mt-4 pb-3 devhiddensection">
@@ -95,7 +105,7 @@
     <label class="form-check-label" for="pdfsecFzr">Repetir encabezados en cada hoja</label>
   </div>
 
-    <button class="btn btn-success mainbtn btn-xl w-100 mt-3" id="adaptButton" onclick="secuencialFileClicked()">Crear PDFs</button>
+    <button class="btn btn-primary mainbtn btn-xl w-100 mt-3" id="adaptButton" onclick="secuencialFileClicked()">Crear PDFs</button>
 </div>
 
 <script>
@@ -126,4 +136,9 @@
     swalConfirm('printValidation', 'Se han generado todos los archivos PDF.', 'Asegúrate de tener seleccionada la celda desplegable. Confirma para continuar.', rowData);
   }
 
-</script> 
+  $('#rowsDeleteButton').click(function() {
+    let rowValue = document.getElementById("rowsDeleteInput").value;
+    execNoSuccess('deleteExcessiveRows', rowValue);
+  });
+
+</script>

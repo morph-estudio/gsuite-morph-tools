@@ -1,10 +1,200 @@
-function claus(p) {
-  Logger.log('Holaa')
-}
+
 function fastInit() {
-  Logger.log('Hola')
+  Logger.log('Fast Init makes things faster.')
 }
 
+// CUSTOM FUNCTIONS FOR THE DEVELOPER SECTION
+
+/**
+ * getDatabaseColumn
+ * Devuelve los valores de una columna en documento Sheets externo a través de su título.
+ */
+function getDatabaseColumn(headerName) {
+  let params = {
+    muteHttpExceptions: true,
+  };
+  const parsedDB = JSON.parse(UrlFetchApp.fetch('https://opensheet.elk.sh/1lcymggGAbACfKuG0ceMDWIIB9zWuxgVtSR9qpgNq4Ng/Permissions', params).getContentText());
+  const dbColumn = parsedDB.map(i => i[headerName]);
+  return dbColumn;
+}
+
+/**
+ * getUserRolePermission
+ * Comprueba en la base de datos si el usuario tiene acceso a la información.
+ */
+function getDevPermission(headerName) {
+  const userPermission = getDatabaseColumn(headerName);
+  const userMail = Session.getActiveUser().getEmail();
+  let permission = userPermission !== '' && userPermission.indexOf(userMail) > -1 ? true : false; Logger.log(permission)
+  return permission;
+}
+
+/**
+ * getDevPassword
+ * Comprueba en la base de datos si la contraseña es correcta.
+ */
+function getDevPassword(headerName) {
+  const devPassArray = getDatabaseColumn(headerName);
+  return devPassArray;
+}
+
+// FUNCTIONS IN DEVELOPMENT
+
+/**
+ * formulaLogger
+ * Función para realizar macros rápidas para cualquier necesidad en un documento.
+ */
+function macroModificarCuadros(a) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sh = ss.getActiveSheet();
+
+  let maxColumns = sh.getMaxColumns();
+
+  let firstRange = sh.getRange(4, 1, 1, maxColumns).getFormulas();
+  let modifiedFormulas = [];
+  let row = [];
+  firstRange[0].forEach(function(formula) {
+    row.push("={\"\";" + formula.slice(1) + "}");
+  });
+  modifiedFormulas.push(row);
+  let pasteRange = sh.getRange(3, 1, 1, maxColumns).setFormulas(modifiedFormulas);
+}
+
+/**
+ * formulaLogger
+ * Script that logs changes made to formulas in a Google Spreadsheet and records details like user, date, and file/cell location in a "Formula Changelog" sheet.
+ */
+function formulaLogger(rowData) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sh = ss.getActiveSheet();
+  let sheetName = sh.getName();
+  let formulaSheetName = `Formula Changelog`;
+
+  // Main Variables
+  var formData = [
+    rowData.formulaText,
+    rowData.sendToTemplate
+  ];
+  var [formulaText, sendToTemplate] = formData;
+
+  //Logger.log(`FORMLATEXT: ${formulaText}, SENDTEMPLATE: ${sendToTemplate}`)
+
+  let user = Session.getActiveUser().getEmail();
+  let dateNow = Utilities.formatDate(new Date(), 'GMT+1', 'dd/MM/yyyy - HH:mm');
+
+  let fileName = ss.getName();
+  let fileURL = `${ss.getUrl()}#gid=${sh.getSheetId()}`;
+  let selectedCell = ss.getCurrentCell();
+  let selectedCellNotation = selectedCell.getA1Notation();
+  let newFormula = selectedCell.getFormula();
+
+  let fileType; 
+  let includesArray = ['Superficies', 'Mediciones', 'Exportación'];
+  let foundString = includesArray.find(function(element) {
+    return fileName.includes(element);
+  });
+
+  if (foundString) {
+    fileType = `Cuadro de ${foundString}`;
+  } else {
+    fileType = `Undefined`;
+  }
+  
+  let controlPanelURL = ss.getSheetByName('LINK').getRange('B1').getValue();
+  let controlPanelID = getIdFromUrl(controlPanelURL); Logger.log(`CPURL: ${controlPanelURL}, CPID: ${controlPanelID}`)
+  let controlPanelFile = SpreadsheetApp.openById(controlPanelID);
+  let controlPanelLoggerSheet = controlPanelFile.getSheetByName(formulaSheetName) || controlPanelFile.insertSheet(formulaSheetName, 200).setTabColor('00FF00');
+
+  if (controlPanelLoggerSheet.getDataRange().isBlank()) {
+    controlPanelLoggerSheet.getRange(1, 1, controlPanelLoggerSheet.getMaxRows(), controlPanelLoggerSheet.getMaxColumns()).setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP).setVerticalAlignment("bottom");
+    let rangeList = controlPanelLoggerSheet.getRangeList(["B1:B", "G1:G", "H1:H"]);
+    rangeList.setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
+    let columns = [{column: 1, width: 180},{column: 2, width: 225},{column: 3, width: 160},{column: 4, width: 100},{column: 5, width: 185},{column: 6, width: 150},{column: 7, width: 60},{column: 8, width: 225},{column: 9, width: 225},{column: 10, width: 100}];
+    columns.forEach(function(column) {
+      controlPanelLoggerSheet.setColumnWidth(column.column, column.width);
+    });
+
+    let headerList = ['Filename', 'Sheet Link', 'Type', 'Date', 'User', 'Sheet', 'Cell', 'Old Formula', 'New Formula', 'Send to Nave Nodriza'];
+    let headerRange = controlPanelLoggerSheet.getRange(1, 1, 1, headerList.length);
+    headerRange.setValues([headerList]);
+    deleteEmptyRows(controlPanelLoggerSheet); removeEmptyColumns(controlPanelLoggerSheet); controlPanelLoggerSheet.appendRow([null]);
+    headerRange.setFontWeight('bold');
+  }
+
+  formulaText = "'" + formulaText;
+  newFormula = "'" + newFormula;
+
+  let dataList = [];
+  dataList.push(fileName, fileURL, fileType, dateNow, user, sheetName, selectedCellNotation, formulaText, newFormula, sendToTemplate);
+
+  controlPanelLoggerSheet.getRange(controlPanelLoggerSheet.getLastRow() + 1, 1, 1, dataList.length).setValues([dataList]);
+}
+
+/**
+ * formulaDropper
+ * Returns formula of selected cell in current Google Spreadsheet.
+ */
+function formulaDropper() {
+  let ss = SpreadsheetApp.getActive();
+  var selectedCell = ss.getCurrentCell();
+  var formula = selectedCell.getFormula();
+  Logger.log(formula)
+  return formula;
+}
+
+/**
+ * substringsColorTool
+ * Format text for specific fragments of text in the cells.
+ */
+function substringsColorTool(sctRowData, sctDivCounterArray) {
+
+  Logger.log(sctDivCounterArray)
+
+  for (let i = 0; i < sctDivCounterArray.length; i++) {
+
+    var formData = [
+      sctRowData[`sctSheetSelector-${sctDivCounterArray[i]}`],
+      sctRowData[`sheetRange-${sctDivCounterArray[i]}`],
+      sctRowData[`textSubstring-${sctDivCounterArray[i]}`],
+      sctRowData[`colorpicker-${sctDivCounterArray[i]}`],
+      sctRowData[`stylecheckBold-${sctDivCounterArray[i]}`],
+      sctRowData[`stylecheckItalic-${sctDivCounterArray[i]}`]
+    ];
+
+    var [sheetSelector, sheetRange, textSubstring, colorpicker, stylecheckBold, stylecheckItalic] = formData;
+
+    Logger.log(sheetSelector); Logger.log(colorpicker); Logger.log(stylecheckBold); Logger.log(stylecheckItalic);
+
+    var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetSelector);
+    var numRows = sh.getLastRow(); var numCols = sh.getLastColumn();
+
+    for (var r = 1; r <= numRows; r++) {
+      for (var c = 1; c <= numCols; c++) {
+        var cell = sh.getRange(r, c);
+        var text = cell.getValue().toString();
+
+        if (text.indexOf(textSubstring) > -1) {
+          var substring = textSubstring;
+          
+          var startIndex = text.indexOf(substring);
+          var endIndex = startIndex + substring.length;
+          var textStyle = SpreadsheetApp.newTextStyle().setForegroundColor(colorpicker).setBold(stylecheckBold).setItalic(stylecheckItalic).build();
+          var value = SpreadsheetApp.newRichTextValue()
+              .setText(text)
+              .setTextStyle(startIndex, endIndex, textStyle)
+              .build();
+          cell.setRichTextValue(value);
+        }
+      }
+    }
+
+  }
+}
+
+/**
+ * printValidation
+ * Create a series of PDF files based on the values of a drop-down cell.
+ */
 function printValidation(rowData) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let sh = ss.getActiveSheet();
@@ -110,233 +300,94 @@ function _getAsBlob(url, sheet, secuencialSize, secuencialOrientation, secuencia
   return response.getBlob()
 }
 
-
 /**
- * adjustRowsHeight
- * Ajusta la altura de las filas seleccionadas.
+ * historicoDeSuperficies
+ * Crea un nuevo histórico en el histórico del cuadro de superficies
  */
-function adjustRowsHeight(rowData) {
+function historicoDeSuperficies(sheetRef) {
+
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sh = ss.getActiveSheet();
+  const sheetName = sheetRef == 0 ? `Histórico CONSTRUIDAS` : `Histórico CONSTRUIDAS desglosado`;
+  const sh = ss.getSheetByName(sheetName);
+  const dateNow = Utilities.formatDate(new Date(), 'GMT+2', 'dd/MM/yyyy');
 
-  let formData = [rowData.heightSelectedNumber];
-  let [heightSelectedNumber] = formData;
+  let mainCell = sheetRef == 0 ? `D1` : `E1`;
+  let firstCell = sheetRef == 0 ? `G1` : `H1`;
+  let secondCell = sheetRef == 0 ? `H1` : `I1`;
+  let thirdCell = sheetRef == 0 ? `E1` : `F1`;
+  let groupRange = sheetRef == 0 ? `H:I` : `I:J`;
+  
+  let mainRange = sh.getRange(mainCell);
+  let secondRange = sh.getRange(secondCell);
+  let firstRange = sh.getRange(firstCell);
+  let mainColumnIndex = mainRange.getColumn();
+  let firstColumnIndex = firstRange.getColumn();
 
-  let a = sh.getSelection().getActiveRange().getValues();
-  let ab = sh.getSelection().getActiveRange().getA1Notation();
-  let abs = ab.split(':'); let abst = getSplitA1Notation(abs[0]);
-  sh.setRowHeights(abst[1], a.length, heightSelectedNumber);
-}
+  let originalFormulaRange = sh.getRange(thirdCell);
+  let originalFormula = originalFormulaRange.getFormulas();
 
-/**
- * getSplitA1Notation
- * Separa las letras y números de una notación A1 de Google Sheets.
- */
-function getSplitA1Notation(cell) {
-  let splitArray = cell.split(/([0-9]+)/);
-  return splitArray;
-}
+  let freezeRange;
+  let lastRow = sh.getLastRow();
 
-/**
- * letterToColumn
- * Devuelve el número de columna en función de la letra introducida para una hoja de Google Sheets.
- */
-function letterToColumn(letter) {
-  let column = 0, length = letter.length;
-  for (var i = 0; i < length; i++) {
-    column += (letter.charCodeAt(i) - 64) * Math.pow(26, length - i - 1);
-  }
-  return column;
-}
+  if (firstRange.isBlank()) {
+    freezeRange = sh.getRange(1, mainColumnIndex, lastRow, 1);
+    freezeRange.copyTo(sh.getRange(1, firstColumnIndex), {contentsOnly:true});
+    sh.getRange(firstCell).setValue(dateNow);
+  } else {
 
-/**
- * insertCellImage
- * Inserta las imágenes de una carpeta en
- */
-function insertCellImage(rowData) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sh = ss.getActiveSheet();
+    // Comprobar si han cambiado los valores desde el último histórico
 
-  let formData = [rowData.listFolderID, rowData.useA1, rowData.imageFolderPublicURL, rowData.imageFolderFileID, rowData.imageFolderImage, rowData.imageFolderArrayFormula];
-  let [folderUrl, useA1, imageFolderPublicURL, imageFolderFileID, imageFolderImage, imageFolderArrayFormula] = formData;
-  let folderID;
-
-  if (useA1) {
-      folderUrl = sh.getRange(1, 1).getNote();
-      folderID = getIdFromUrl(folderUrl);
-    } else {
-      folderID = getIdFromUrl(folderUrl);
-  }
-
-  let folder = DriveApp.getFolderById(folderID);
-  let contents = folder.getFiles();
-  let cnt = 0;
-  let file;
-  let downloadList = [];
-
-  let selectedCell = sh.getActiveCell().getA1Notation();
-  let splitArray = getSplitA1Notation(selectedCell);
-  let baseURL = 'https://drive.google.com/uc?id='
-
-  while (contents.hasNext()) {
-      file = contents.next();
-      cnt++;
-      Logger.log(file.getMimeType())
-      if ([MimeType.JPEG, MimeType.PNG, MimeType.GIF].includes(file.getMimeType())) {
-        downloadList.push(file)
-        Logger.log('fileperm ' + file.getSharingAccess())
-        if(file.getSharingAccess() != 'ANYONE_WITH_LINK') file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-        }
-  };
-
-  downloadList.sort().forEach((el, i) => {
-
-    let paste = [
-      []
-    ];
-
-    if (imageFolderPublicURL) paste[0].push(baseURL + el.getId())
-    if (imageFolderFileID) paste[0].push(el.getId())
-
-    Logger.log('pasteado ' + paste); Logger.log(paste.length)
-    let count = Number(splitArray[1]) + Number(i); Logger.log('count ' + count); Logger.log(downloadList.length);
-
-    if (imageFolderPublicURL || imageFolderFileID) {
-      let range = sh.getRange(count, letterToColumn(splitArray[0]), 1, paste[0].length);
-      range.setValues(paste)
-    }
-
-    if (imageFolderImage) {
-      let image = SpreadsheetApp
-                  .newCellImage()
-                  .setSourceUrl(baseURL + el.getId())
-                  .build();
-
-      let range2 = sh.getRange(count, letterToColumn(splitArray[0]) + paste[0].length, 1, 1);
-      range2.setValue(image)
-    } else {
-      if (imageFolderArrayFormula) {
-        let range3 = sh.getRange(Number(splitArray[1]), letterToColumn(splitArray[0]) + paste[0].length, 1, 1);
-        range3.setFormula(`=ARRAYFORMULA(IMAGE($${splitArray[0]}$${Number(splitArray[1])}:$${splitArray[0]}$${Number(splitArray[1]) + downloadList.length - 1}))`);
+    var range1 = sh.getRange(2, mainColumnIndex, lastRow, 1).getValues();
+    var range2 = sh.getRange(2, firstColumnIndex, lastRow, 1).getValues();
+    var isEqual = true;
+    for (var i = 0; i < lastRow; i++) {
+      if (range1[i][0] != range2[i][0]) {
+        isEqual = false;
+        break;
       }
     }
-  });
-}
-
-/**
- * sheetConnect
- * Conecta hojas entre distintos documentos de Google Sheets.
- */
-function sheetConnect(rowData) {
-
-  let formData = [
-    rowData[`sheetConnectSheetname`],
-    rowData[`sheetConnectTargetURL`],
-    rowData[`sheetConnectLinkList`]
-  ];
-
-  let [sheetConnectSheetname, sheetConnectTargetURL, sheetConnectLinkList] = formData;
-
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sh = ss.getActiveSheet();
-  let ss_url = ss.getUrl();
-
-  let sourceSheet = ss.getSheetByName(sheetConnectSheetname);
-  let sourceSheetTabColor = sourceSheet.getTabColor();
-  let target = SpreadsheetApp.openById(getIdFromUrl(sheetConnectTargetURL));
-  let targetSheet = sourceSheet.copyTo(target);
-  targetSheet.setName(sheetConnectSheetname).setTabColor(sourceSheetTabColor);
-  targetSheet.clearContents();
-
-  let linkRange; let targetSheetLink;
-
-  if (sheetConnectLinkList == false) {
-    targetSheetLink = target.getSheetByName('LINK');
-    Logger.log(targetSheetLink.getLastRow());
-
-    if (targetSheetLink.getRange('B10').getValue() != `URL Archivo de origen`) {
-
-      linkRange = targetSheetLink.getRange(targetSheetLink.getLastRow() + 1, 1, 1, 2);
-      
-      linkRange.setValues([[`Hoja conectada / Source File`, `URL Archivo de origen`]])
-        .setBackground('#fff').setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontFamily('Inconsolata').setFontWeight('bold')
-        .setHorizontalAlignment('center');
-
+    if (isEqual) {
+      throw new Error('Los valores de superficies no han cambiado desde el último histórico.')
     }
 
-    let sheetLink = target.getUrl() + '#gid=' + targetSheet.getSheetId(); Logger.log(sheetLink)
+    // Crear el histórico
 
-    linkRange = targetSheetLink.getRange(targetSheetLink.getLastRow() + 1, 1, 1, 2);
-    linkRange2 = targetSheetLink.getRange(targetSheetLink.getLastRow() + 1, 1, 1, 1);
-    
-    linkRange.setValues([[`=hyperlink("${sheetLink}";"${sheetConnectSheetname}"& " / ${ss.getName()}")`, `${ss_url}`]])
-      .setBackground('#fafafa').setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontFamily('Montserrat').setFontWeight('normal')
-      .setHorizontalAlignment('left').setFontColor('#0000FF');
-    linkRange2.setBackground('#fff').setFontColor('#78909c')
+    freezeRange = sh.getRange(1, mainColumnIndex, lastRow, 3);
 
-    let urlRange = targetSheetLink.getRange(targetSheetLink.getLastRow(), 2, 1, 1).getValue();
+    sh.insertColumns(firstColumnIndex, 3);
+    freezeRange.copyTo(sh.getRange(1, firstColumnIndex), {contentsOnly:true});
+    firstRange.setValue(dateNow);
 
-    targetSheet.getRange('A1').setFormula(`=IMPORTRANGE("LINK!B${targetSheetLink.getLastRow()}";"${sheetConnectSheetname}!A1:AZZ50000")`);
+    // Modificación de estilo / formato de texto
 
+    let columns = [{column: firstColumnIndex, width: 100},{column: firstColumnIndex + 1, width: 100},{column: firstColumnIndex + 2, width: 130}];
+    columns.forEach(function(column) {
+      sh.setColumnWidth(column.column, column.width);
+    });
+
+    let freezeRangeFormat = sh.getRange(1, firstColumnIndex - 2, 1, 2);
+    freezeRangeFormat.copyTo(sh.getRange(1, firstColumnIndex + 1), {formatOnly:true});
+    secondRange.setBorder(false, false, false, false, false, false);
+    let frozenRange2 = sh.getRange(2, firstColumnIndex + 1, lastRow - 1, 2);
+    frozenRange2.setBackgroundColor(null).setFontColor('black');
+    sh.getRange(1, firstColumnIndex, lastRow, 1).setBorder(null, true, null, null, null, null, firstRange.getBackground(), SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+
+    sh.getRange(groupRange).shiftRowGroupDepth(1); // Agrupa las nuevas columnas
+
+    // Arreglo de fórmulas, modificar newFormulas si cambian en la plantilla
+
+    sh.getRange(2, mainColumnIndex + 2, lastRow - 1, 1).clearContent(); // Limpia columna original de justificación
+    sh.getRange(2, firstColumnIndex + 1, lastRow - 1, 1).clearContent(); // Limpia nueva columna diferencia de construidas
+
+    let newFormula = sheetRef == 0 ? `={"Diferencia con "&IF(TO_TEXT(J1)<>"";TO_TEXT(J1);"última fecha");ARRAYFORMULA(IF(B2:B<>"";IF(TO_TEXT(J2:J)<>"";G2:G-J2:J;0);))}` : `={"Diferencia con "&IF(TO_TEXT(K1)<>"";TO_TEXT(K1);"última fecha");ARRAYFORMULA(IF(B2:B<>"";IF(TO_TEXT(K2:K)<>"";H2:H-K2:K;0);))}`;
+    originalFormulaRange.setFormula(originalFormula); 
+    secondRange.setFormula(newFormula); 
   }
-
-  targetSheet.getRange('A1').setFormula(`=IMPORTRANGE("${ss_url}";"${sheetConnectSheetname}!A1:AZZ50000")`)
 }
-
-/**
- * crearPuntoHistorico
- * Crea un nuevo histórico en el histórico del cuadro de superficies.
- */
-function crearPuntoHistorico() {
-
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sh = ss.getActiveSheet();
-  let dateNow = Utilities.formatDate(new Date(), 'GMT+2', 'dd/MM/yyyy');
-
-  let firstCell = 'G1';
-  let columnIndex;
-  columnIndex = sh.getRange(firstCell).getColumn();
-  let lastColumn = sh.getLastColumn(); Logger.log(lastColumn)
-  let checkRange = sh.getRange(1, lastColumn).getValue();
-
-  if (checkRange == "N/A") {
-    //sh.insertColumnAfter(6); sh.setColumnWidth(7, 100);
-    
-    let copyRange = sh.getRange(1, 4, sh.getLastRow(), 1);
-    copyRange.copyTo(sh.getRange(1, columnIndex), {contentsOnly:true}); /**/
-    sh.getRange(firstCell).setValue(dateNow);
-    return;
-  }
-  
-  let copyRange = sh.getRange(1, 4, sh.getLastRow(), 3);
-  sh.insertColumns(columnIndex, 3);
-  sh.setColumnWidth(columnIndex, 100); sh.setColumnWidth(columnIndex + 1, 110); sh.setColumnWidth(columnIndex + 2, 150);
-  sh.getRange('H:I').shiftRowGroupDepth(1);
-
-  copyRange.copyTo(sh.getRange(1, columnIndex), {contentsOnly:true});
-  let dateHeader = sh.getRange(firstCell);
-  dateHeader.setValue(dateNow);
-
-  let copyRange2 = sh.getRange(1, columnIndex, sh.getLastRow(), 1);
-  let sheetID = sh.getSheetId();
-  copyRange2.copyFormatToRange(sheetID, columnIndex, columnIndex, 1, sh.getLastRow())
-  //copyRange2.copyTo(sh.getRange(1, columnIndex), {formatOnly:true});
-  let copyRange3 = sh.getRange(1, columnIndex - 2, sh.getLastRow(), 2);
-  copyRange3.copyTo(sh.getRange(1, columnIndex + 1), {formatOnly:true});
-
-  let boldColor = dateHeader.getBackground();
-  copyRange2.setBorder(null, true, null, null, null, null, boldColor, SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
-  copyRange2.setBorder(null, null, null, true, null, null, boldColor, SpreadsheetApp.BorderStyle.SOLID);
-
-  sh.getRange(1, columnIndex + 1).setFormula('="diferencia con "&TO_TEXT($J$1)');
-  sh.getRange(2, columnIndex + 1).setValue("").setFormula('=ARRAYFORMULA(IF(B2:B<>"";G2:G-J2:J;))');
-  sh.getRange(3, columnIndex + 1, sh.getLastRow() - 2, 1).clearContent();
-}
-
 
 /**
  * adaptarCuadroAntiguo
- * Script para adaptar cuadros de superficies antiguos a la nueva estructura automática.
+ * Script to adapt old surface tables to the new automatic structure.
  */
 function adaptarCuadroAntiguo() {
   let ss = SpreadsheetApp.getActive();
@@ -353,7 +404,6 @@ function adaptarCuadroAntiguo() {
     ss.deleteSheet(sh_act);
     sh_link.setName('LINK').setTabColor('FFFF00');
   }
-
 
   let oldSheets = ['TXT LIMPIO','TXT FT','TXT VN'];
   let newSheets = ['TXT SUPERFICIES','TXT FALSOS TECHOS','TXT VENTANAS'];
@@ -397,170 +447,8 @@ function setCuadroAdaptado() {
 }
 
 /**
- * getSheetnames
- * Devuelve una lista con el nombre de las hojas del documento Sheets.
- */
-function getSheetnames(ss) { 
-  var out = [];
-  var sheets = ss.getSheets();
-  for (var i = 0 ; i < sheets.length ; i++) out.push( sheets[i].getName() )
-  return out;
-}
-
-/**
- * getDatabaseColumn
- * Devuelve los valores de una columna en documento Sheets externo a través de su título.
- */
-function getDatabaseColumn(headerName) {
-  let params = {
-    muteHttpExceptions: true,
-  };
-  const parsedDB = JSON.parse(UrlFetchApp.fetch('https://opensheet.elk.sh/1lcymggGAbACfKuG0ceMDWIIB9zWuxgVtSR9qpgNq4Ng/Permissions', params).getContentText());
-  const dbColumn = parsedDB.map(i => i[headerName]);
-  return dbColumn;
-}
-
-/**
- * getUserRolePermission
- * Comprueba en la base de datos si el usuario tiene acceso a la información.
- */
-function getDevPermission(headerName) {
-  const userPermission = getDatabaseColumn(headerName);
-  const userMail = Session.getActiveUser().getEmail();
-  let permission = userPermission !== '' && userPermission.indexOf(userMail) > -1 ? true : false; Logger.log(permission)
-  return permission;
-}
-
-/**
- * getDevPassword
- * Comprueba en la base de datos si la contraseña es correcta.
- */
-function getDevPassword(headerName) {
-  const devPassArray = getDatabaseColumn(headerName);
-  return devPassArray;
-}
-
-/*
-
-function jsonColumnArray_Deprecated(database, keyName) {
-  let permission = []
-  for (let i = 0; i < database.length; i++) {
-    permission.push(database[i][keyName])
-  }
-  permission = permission.filter(function (el) {
-    return el != null;
-  });
-
-  return permission;
-}
-
-function getPermission_Deprecated(database, keyName) {
-  let databaseParsed = JSON.parse(UrlFetchApp.fetch('https://docs.google.com/spreadsheets/d/1lcymggGAbACfKuG0ceMDWIIB9zWuxgVtSR9qpgNq4Ng/gviz/tq?tqx=out:json&gid=0')
-    .getContentText().match(/(?<=.*\().*(?=\);)/s)[0]);
-  let columnNeeded = databaseParsed.table.cols.findIndex(obj => obj.label === headerName);
-  let tableLength = Object.keys(databaseParsed.table.rows).length; Logger.log(tableLength);
-  let permission; let userPermission = [];
-
-  for (let i = 0; i < tableLength; i++) {
-    userPermission.push(databaseParsed.table.rows[i].c[columnNeeded].v)
-  }
-
-  const userMail = Session.getActiveUser().getEmail();
-  if (userPermission !== '' && userPermission.indexOf(userMail) > -1) { permission = true; } else { permission = false; }
-  // ui().alert(permission)
-  Logger.log(permission)
-
-  return permission;
-
-*/
-
-/**
- * botBrainSave
- * Guarda las hojas de un documento de Sheets en formato CSV y las sube a un bucket de Cloud Storage.
- * Funciones dependientes: uploadFivaroGCS(), getService(params), authCallback(request)
- */
- function botBrainSave() {
-  const sheets = ss().getSheets();
-  var fileName;
-
-  sheets.forEach((sheet) => { 
-    fileName = sheet.getName() + ".csv";
-    var url = null; var blob;
-    url = `https://docs.google.com/spreadsheets/d/${ss().getId()}/gviz/tq?tqx=out:csv&gid=${sheet.getSheetId()}`;
-    if (url) {
-      blob = UrlFetchApp.fetch(url, {
-        headers: { authorization: `Bearer ${ScriptApp.getOAuthToken()}` },
-      }).getBlob();
-    }
-
-    // var file = folder.createFile(blob).setName(fileName);
-
-    var params = {
-      CLIENT_ID: '443000249830-g093ottepd29j2s13j8ki8ts5lfdou24.apps.googleusercontent.com',
-      CLIENT_SECRET: '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',
-      BUCKET_NAME: 'morph-bot-brain',
-      FILE_PATH: `knowledge-base/${fileName}`,
-      DRIVE_FILE: blob,
-    };
-    uploadFivaroGCS(params);
-  });
-}
-
-function uploadFivaroGCS(params) {
-  var service = getService(params);
-  if (!service.hasAccess()) {
-    // Logger.log('Please authorize %s', service.getAuthorizationUrl());
-    openExternalUrlFromMenu(service.getAuthorizationUrl());
-    return;
-  }
-
-  var blob = params.DRIVE_FILE;
-  var bytes = blob.getBytes();
-
-  var url = 'https://www.googleapis.com/upload/storage/v1/b/BUCKET/o?uploadType=media&name=FILE'
-    .replace('BUCKET', params.BUCKET_NAME)
-    .replace('FILE', encodeURIComponent(params.FILE_PATH)); Logger.log('fileurl: ' + url)
-
-  var response = UrlFetchApp.fetch(url, {
-    method: 'POST',
-    contentLength: bytes.length,
-    contentType: blob.getContentType(),
-    payload: bytes,
-    headers: {
-      Authorization: `Bearer ${service.getAccessToken()}`,
-    },
-  });
-
-  var result = JSON.parse(response.getContentText());
-  Logger.log(JSON.stringify(result, null, 2));
-}
-
-function getService(params) {
-  return OAuth2.createService('ctrlq')
-    .setAuthorizationBaseUrl('https://accounts.google.com/o/oauth2/auth')
-    .setTokenUrl('https://accounts.google.com/o/oauth2/token')
-    .setClientId(params.CLIENT_ID)
-    .setClientSecret(params.CLIENT_SECRET)
-    .setCallbackFunction('authCallback')
-    .setPropertyStore(PropertiesService.getUserProperties())
-    .setScope('https://www.googleapis.com/auth/devstorage.read_write')
-    .setParam('access_type', 'offline')
-    .setParam('approval_prompt', 'force')
-    .setParam('login_hint', Session.getActiveUser().getEmail());
-}
-
-function authCallback(request) {
-  var service = getService();
-  var authorized = service.handleCallback(request);
-  if (authorized) {
-    return HtmlService.createHtmlOutput('Connected to Google Cloud Storage');
-  }
-  return HtmlService.createHtmlOutput('Access Denied');
-}
-
-/**
  * fExportXML
- * Función en desarrollo.
+ * Función en desarrollo
  */
 function fExportXML() {
   const values = sh().getDataRange().getValues();
@@ -651,4 +539,338 @@ function convertRangeTotsvFile(tsvFileName, sheet) {
   catch(err) {
     Browser.msgBox(err);
   }
+}
+
+// AUTOFOLDERTREE AND PROJECT FOLDER INIT
+
+/**
+ * Gsuite Morph Tools - Morph autoFolderTree 1.3
+ * Developed by alsanchezromero
+ *
+ * Copyright (c) 2022 Morph Estudio
+ */
+
+/* eslint-disable guard-for-in */
+/* eslint-disable no-restricted-syntax */
+
+function autoFolderTree() {
+  const ss = SpreadsheetApp.getActive();
+  let sh = ss.getActiveSheet();
+  let userMail = Session.getActiveUser().getEmail();
+  let dateNow = Utilities.formatDate(new Date(), 'GMT+2', 'dd/MM/yyyy - HH:mm:ss');
+  let niveles = [1, 2, 3, 4, 5, 6, 7];
+
+  let result = ui().alert(
+    '¿Quieres crear una copia de la hoja?',
+    'Las fórmulas de la plantilla actual se sustituirán por las nuevas carpetas creadas. Si no haces una copia perderás la plantilla personalizada.',
+    ui().ButtonSet.YES_NO,
+  );
+
+  if (result == ui().Button.YES) {
+    let sheetName = sh.getSheetName();
+    let copiedSheetIndex = sh.getIndex() + 1;
+    sh.setName(`${sheetName} - Final`);
+    sh.copyTo(ss).setName(sheetName).activate();
+    ss.moveActiveSheet(copiedSheetIndex);
+    sh.activate();
+  }
+
+  for (n in niveles) {
+    if (n == 0) Logger.log('holaaaa');
+    let levelInput = niveles[n];
+    let Level = levelInput * 2 + 1;
+    let numRows = sh.getLastRow(); // Number of rows to process
+    let dataRange = sh.getRange(2, Number(Level) - 1, numRows, Number(Level)); // startRow, startCol, endRow, endCol
+    let data = dataRange.getValues();
+    let parentFolderID = new Array();
+    let theParentFolder;
+
+    for (let i in data) {
+      parentFolderID[i] = data [i][0];
+      if (data [i][0] == '') {
+        parentFolderID[i] = parentFolderID[i - 1];
+      }
+    }
+
+    for (let i in data) {
+      
+      if (data [i][1] !== '') {
+        if (n == 0) {
+          theParentFolder = DriveApp.getFolderById(getIdFromUrl(parentFolderID[i]));
+          Logger.log('cosasidtheparent ' + theParentFolder)
+        } else {
+          theParentFolder = DriveApp.getFolderById(parentFolderID[i]);
+        }
+        let folderName = data[i][1];
+        let theChildFolder = theParentFolder.createFolder(folderName);
+        let newFolderID = sh.getRange(Number(i) + 2, Number(Level) + 1);
+        let folderIdValue = theChildFolder.getId();
+        newFolderID.setValue(folderIdValue);
+        let addLink = sh.getRange(Number(i) + 2, Number(Level));
+        let value = addLink.getDisplayValue();
+        addLink.setValue(`=hyperlink("https://drive.google.com/corp/drive/folders/${folderIdValue}";"${value}")`);
+        SpreadsheetApp.flush();
+      }
+    }
+    sh.getRange('B2').clearNote().setNote(`Estructura creada el ${dateNow} por ${userMail}`);
+    SpreadsheetApp.flush();
+  }
+}
+
+function autoFolderTreeTpl() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sh = ss.getActiveSheet();
+
+  sh.clear().clearFormats();
+
+  // Copy Data from TSV
+
+  let externalFolderId = '1BwVkhZsDQh-FO3Jgj4pwPu-p4WFG9wr-';
+  let fileName = 'autoFolderTree.txt';
+  let fileId;
+  let filesFound = searchFile(fileName, externalFolderId);
+  for (let file of filesFound) {
+    fileId = file.getId();
+  }
+  let tsvUrl = `https://drive.google.com/uc?id=${fileId}&x=.tsv`;
+  let tsvContent = UrlFetchApp.fetch(tsvUrl, {}).getContentText();
+  let tsvData = Utilities.parseCsv(tsvContent, '\t');
+  sh.getRange(1, 1, tsvData.length, tsvData[0].length).setValues(tsvData);
+
+  // Global Style
+  sh.getRange(1, 1, sh.getMaxRows(), sh.getMaxColumns()).setFontSize(12).setFontFamily('Inter').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
+    .setVerticalAlignment('middle');
+  // Levels of Structure
+  sh.getRange(1, 3, 1, 13).setBackground('#546E7A').setFontColor('#fff');
+  sh.getRange('B1').setBackground('#FFAB00').setBorder(true, true, true, true, true, true, '#FFAB00', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+    .setFontColor('#fff');
+  sh.getRange('B2').setBackground('#FFFDE7').setBorder(true, true, true, true, true, true, '#FFAB00', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+    .setFontColor('#FFAB00').setNote(null).setNote(`Introduce en esta celda la dirección URL de la carpeta inicial de la estructura.`);
+  // Style of Morph Project Template
+  sh.getRange(1, 18, 1, 6).setBackground('#FFAB00').setBorder(true, true, true, true, true, true, '#FFAB00', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+    .setFontColor('#fff');
+  sh.getRange(2, 18, 1, 6).setBackground('#FFFDE7').setBorder(true, true, true, true, true, true, '#FFAB00', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+    .setFontColor('#FFAB00').setHorizontalAlignment('center');
+
+  let cell = sh.getRange('T2');
+  let rule = SpreadsheetApp.newDataValidation().requireValueInList(['AEI', 'E', 'I', 'IINT', 'I+D']).build();
+  cell.setDataValidation(rule);
+  
+  sh.getRange(1, 1, 1, sh.getMaxColumns()).setFontWeight('bold').setFontSize(14).setHorizontalAlignment('center');
+
+  // Column Style
+  sh.setFrozenRows(1);
+  sh.hideColumns(4); sh.hideColumns(6); sh.hideColumns(8); sh.hideColumns(10);
+  sh.hideColumns(12); sh.hideColumns(14); sh.hideColumns(16);
+  sh.setColumnWidth(1, 25);
+  sh.setColumnWidth(2, 250);
+  sh.setColumnWidth(3, 230);
+  sh.setColumnWidth(5, 230);
+  sh.setColumnWidth(7, 230);
+  sh.setColumnWidth(9, 230);
+  sh.setColumnWidth(11, 230);
+  sh.setColumnWidth(13, 230);
+  sh.setColumnWidth(15, 230);
+  sh.setColumnWidth(17, 40);
+  sh.setColumnWidth(21, 150);
+  sh.setColumnWidth(22, 200);
+  sh.setColumnWidth(23, 200);
+
+  removeEmptyColumns();
+  deleteEmptyRows();
+  SpreadsheetApp.flush();
+}
+
+// MORPH CHATBOT DEVELOPMENT
+
+/**
+ * botBrainSave
+ * Guarda las hojas de un documento de Sheets en formato CSV y las sube a un bucket de Cloud Storage
+ * Funciones dependientes: uploadFivaroGCS(), getService(params), authCallback(request)
+ */
+ function botBrainSave() {
+  const sheets = ss().getSheets();
+  var fileName;
+
+  sheets.forEach((sheet) => { 
+    fileName = sheet.getName() + ".csv";
+    var url = null; var blob;
+    url = `https://docs.google.com/spreadsheets/d/${ss().getId()}/gviz/tq?tqx=out:csv&gid=${sheet.getSheetId()}`;
+    if (url) {
+      blob = UrlFetchApp.fetch(url, {
+        headers: { authorization: `Bearer ${ScriptApp.getOAuthToken()}` },
+      }).getBlob();
+    }
+
+    // var file = folder.createFile(blob).setName(fileName);
+
+    var params = {
+      CLIENT_ID: '443000249830-g093ottepd29j2s13j8ki8ts5lfdou24.apps.googleusercontent.com',
+      CLIENT_SECRET: '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',
+      BUCKET_NAME: 'morph-bot-brain',
+      FILE_PATH: `knowledge-base/${fileName}`,
+      DRIVE_FILE: blob,
+    };
+    uploadFivaroGCS(params);
+  });
+}
+
+function uploadFivaroGCS(params) {
+  var service = getService(params);
+  if (!service.hasAccess()) {
+    // Logger.log('Please authorize %s', service.getAuthorizationUrl());
+    openExternalUrlFromMenu(service.getAuthorizationUrl());
+    return;
+  }
+
+  var blob = params.DRIVE_FILE;
+  var bytes = blob.getBytes();
+
+  var url = 'https://www.googleapis.com/upload/storage/v1/b/BUCKET/o?uploadType=media&name=FILE'
+    .replace('BUCKET', params.BUCKET_NAME)
+    .replace('FILE', encodeURIComponent(params.FILE_PATH)); Logger.log('fileurl: ' + url)
+
+  var response = UrlFetchApp.fetch(url, {
+    method: 'POST',
+    contentLength: bytes.length,
+    contentType: blob.getContentType(),
+    payload: bytes,
+    headers: {
+      Authorization: `Bearer ${service.getAccessToken()}`,
+    },
+  });
+
+  var result = JSON.parse(response.getContentText());
+  Logger.log(JSON.stringify(result, null, 2));
+}
+
+function getService(params) {
+  return OAuth2.createService('ctrlq')
+    .setAuthorizationBaseUrl('https://accounts.google.com/o/oauth2/auth')
+    .setTokenUrl('https://accounts.google.com/o/oauth2/token')
+    .setClientId(params.CLIENT_ID)
+    .setClientSecret(params.CLIENT_SECRET)
+    .setCallbackFunction('authCallback')
+    .setPropertyStore(PropertiesService.getUserProperties())
+    .setScope('https://www.googleapis.com/auth/devstorage.read_write')
+    .setParam('access_type', 'offline')
+    .setParam('approval_prompt', 'force')
+    .setParam('login_hint', Session.getActiveUser().getEmail());
+}
+
+function authCallback(request) {
+  var service = getService();
+  var authorized = service.handleCallback(request);
+  if (authorized) {
+    return HtmlService.createHtmlOutput('Connected to Google Cloud Storage');
+  }
+  return HtmlService.createHtmlOutput('Access Denied');
+}
+
+// DEPRECATED FUNCTIONS
+
+/**
+ * colorMe
+ * Fondo de celdas con el color Morph
+ */
+function colorMe() {
+  let ss = SpreadsheetApp.getActive();
+  let selection = ss.getSelection();
+  let currentCell = selection.getActiveRange();
+  currentCell.setBackgroundColor('#f1cb50');
+}
+
+/**
+ * drawPalette
+ * Genera la paleta de colores del Cuadro de Superficies
+ */
+function drawPalette() {
+  SpreadsheetApp.getActiveSpreadsheet().insertSheet('chart');
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName('chart').getRange(1, 1, 1, 104).setBackgrounds([
+    [
+
+    "#F2F2F2","#FFF3F3","#EEECE1","#D4C9C6","#CDC8CE","#BDBDBD","#A5A5A5","#7F7F7F", // PALETA GREY / BROWN
+    "#FFF1CB","#FFE9AD","#FFFAB1","#FFFFAE","#FFE699","#FFE499","#FFFF99","#FCF58F","#FFEB84","#FFFB84","#FFD666","#FED166","#F7CB4D","#ECFF49", // PALETA YELLOW
+    "#FFD7AE","#ED956F","#ED7D31","#FF6F31","#F57C00", // PALETA ORANGE
+    "#FFEEF6","#FFE0EF","#E7CFCF","#F9CCC4","#E6BFD2","#FAC5DC","#EEBBD1","#E6B3B3","#F1ADC9","#E2ABC5","#EEA3C6","#F097A3","#E78BB6","#FD7D8F","#F08090","#DD808D","#E67C73","#FF6565","#D16969","#E04C4C", // PALETA RED
+    "#D7D7FF","#FFDDFF","#E2C6FF","#FFC4FF","#E0A7EB","#D797E4","#FF8FFF","#FF62FF", // PALETA PINK
+    "#F0FDFF","#DBE5F1","#E0F7FA","#ECFFF5","#E0FFFC","#DEFFFF","#D7FDFF","#CCF2FF","#C4F7F7","#B9EBFD","#B7D4F0","#C5FFFF","#C4FDF8","#A8DFF3","#A3C3C9","#AFF5EF","#94E6DF","#7FCFEC","#74BFDB","#7BDFD6","#71B9D3","#62D1C7","#5CA4BD","#31AA9F","#3D8DA8","#1B8B81","#1B6F8B", // PALETA BLUE
+    "#EAF8D0","#C7D9B7","#D5E6B6","#E4EBA9","#CCFFCC","#A9DFC5","#CCCF96","#BEE2A6","#B8F1B8","#CDF39C","#CEED8A","#BCDA85","#A7DB85","#CEFF70","#A4C26E","#9DE063","#41CF7F","#8FA369","#63BE7B","#57BB8A","#6AA369","#008000" // PALETA GREEN
+
+    ],
+  ]);
+  let ss = SpreadsheetApp.getActive();
+  let sheet = ss.getSheetByName('chart');
+  ss.deleteSheet(sheet);
+}
+
+/**
+ * adjustRowsHeight
+ * Ajusta la altura de las filas seleccionadas.
+ */
+function adjustRowsHeight(rowData) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sh = ss.getActiveSheet();
+
+  let formData = [rowData.heightSelectedNumber];
+  let [heightSelectedNumber] = formData;
+
+  let a = sh.getSelection().getActiveRange().getValues();
+  let ab = sh.getSelection().getActiveRange().getA1Notation();
+  let abs = ab.split(':'); let abst = getSplitA1Notation(abs[0]);
+  sh.setRowHeights(abst[1], a.length, heightSelectedNumber);
+}
+
+/**
+ * autoResizeAllRows, autoResizeAllCols
+ * Automatically adjust the size of rows and columns
+ */
+function autoResizeAllRows() {
+  const sh = ss().getActiveSheet();
+  const maxRows = sh.getLastRow();
+  sh.autoResizeRows(1, maxRows)
+}
+
+function autoResizeAllCols() {
+  const sh = ss().getActiveSheet();
+  const numCols = sh.getLastColumn();
+
+  for (let j = 1; j < numCols + 1; j++) {
+    sh.autoResizeColumn(j);
+    let colWidth = sh.getColumnWidth(j)
+    sh.setColumnWidth(j, colWidth + 20)
+  }
+}
+
+/**
+ * mergeColumns
+ * Combina los datos de las columnas con mismo encabezado
+ */
+function mergeColumns() {
+  let transpose = (ar) => ar[0].map((_, c) => ar.map((r) => r[c]));
+  let ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getActiveSheet();
+  let values = sh.getDataRange().getValues();
+  let temp = [
+    ...transpose(values)
+      .reduce(
+        (m, [a, ...b]) => m.set(a, m.has(a) ? [...m.get(a), ...b] : [a, ...b]),
+        new Map(),
+      )
+      .values(),
+  ];
+  let res = transpose(temp);
+  sh.clearContents();
+  sh.getRange(1, 1, res.length, res[0].length).setValues(res);
+}
+
+function rowToDict(sheet, rownumber) { // Ni idea de para qué era esta función
+  var columns = sheet.getRange(1,1,1, sheet.getMaxColumns()).getValues()[0];
+  var data = sheet.getDataRange().getValues()[rownumber-1];
+  var dict_data = {};
+  for (var keys in columns) {
+    var key = columns[keys];
+    dict_data[key] = data[keys];
+  }
+  return dict_data;
 }

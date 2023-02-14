@@ -1,0 +1,228 @@
+<div>
+
+  <p>
+    <b>Actualmente esta herramienta está disponible solo para desarrolladores.</b><br>
+  </p>
+  <p>
+    Aplica estilos a fragmentos de texto en un rango de celdas.
+  </p>
+
+  <div id="sctInput" class="rounded mb-2">
+    <div id="sctRow-0">
+    <div class="input-group flex-nowrap update mb-1">
+      <select class="form-select shadow-none" id="sctSheetSelector-0"></select>
+      <span class="input-group-text" title="Elige la hoja a la izquierda y el rango de inserción a la derecha."><i class="fa-solid fa-table-cells-large"></i></span>
+      <input type="text" class="form-control shadow-none" id="sheetRange-0" placeholder="A1:B15">
+    </div>
+    <div class="input-group flex-nowrap update mb-3">
+      <span class="input-group-text" title="Escribe aquí el framento de texto al que aplicar el estilo."><i class="fa-solid fa-quote-right"></i></span>
+      <input type="text" class="form-control shadow-none" id="textSubstring-0" placeholder="text">
+      <input type="color" class="greyborder border-0" style="height:auto" id="colorpicker-0" value="#E0E0E0">
+    
+      <input type="checkbox" class="btn-check shadow-none" id="stylecheckBold-0" autocomplete="off">
+      <label class="btn btn-outline-secondary shadow-none" for="stylecheckBold-0"><i class="fa-solid fa-bold"></i></label>
+      <input type="checkbox" class="btn-check shadow-none" id="stylecheckItalic-0" autocomplete="off">
+      <label class="btn btn-outline-secondary shadow-none" for="stylecheckItalic-0"><i class="fa-solid fa-italic"></i></label>
+      <button class="btn btn-secondary disabled" id="" type="button" onClick="sctDeleteRowOnClick(this.id)"><i class="fa-regular fa-face-smile fa-fw"></i></button>
+    </div>
+      
+    </div>
+  </div>
+
+  <div class="d-flex mt-2 mb-1">
+    <button class="btn btn-success btn-lg-gmt w-50 shadow-none me-1" id="sctMoreFields" value="Añadir estilo">Añadir</button>
+    <button class="btn btn-outline-secondary btn-lg-gmt w-50 shadow-none ms-1" id="sctSaveOptions">Guardar</button>
+  </div>
+
+  <button class="btn btn-primary gmt w-100 shadow-none" id="sctMainButton">Aplicar estilos</button>
+
+</div>
+
+<script>
+
+var sctCounter = 0;
+
+$('#sctMoreFields').click(function () {
+  ++sctCounter;
+
+  var substringsColorToolNewRow =
+    `<div id="sctRow-${sctCounter}">` +
+      `<div class="input-group flex-nowrap update mb-1">` +
+        `<select class="form-select shadow-none" id="sctSheetSelector-${sctCounter}"></select>` +
+        `<span class="input-group-text" title="Elige la hoja a la izquierda y el rango de inserción a la derecha."><i class="fa-solid fa-table-cells-large"></i></span>` +
+        `<input type="text" class="form-control shadow-none" id="sheetRange-${sctCounter}" placeholder="A1:B15">` +
+      `</div>` +
+      `<div class="input-group flex-nowrap update mb-3">` +
+        `<span class="input-group-text"><i class="fa-solid fa-quote-right"></i></span>` +
+        `<input type="text" class="form-control shadow-none" id="textSubstring-${sctCounter}" placeholder="">` +
+        `<input type="color" class="greyborder" style="height:auto" id="colorpicker-${sctCounter}" value="#E0E0E0">` +
+        `<input type="checkbox" class="btn-check shadow-none" id="stylecheckBold-${sctCounter}" autocomplete="off">` +
+        `<label class="btn btn-outline-secondary shadow-none" for="stylecheckBold-${sctCounter}"><i class="fa-solid fa-bold"></i></label>` +
+        `<input type="checkbox" class="btn-check shadow-none" id="stylecheckItalic-${sctCounter}" autocomplete="off">` +
+        `<label class="btn btn-outline-secondary shadow-none" for="stylecheckItalic-${sctCounter}"><i class="fa-solid fa-italic"></i></label>` +
+        `<button class="btn btn-danger" id="sctDeleteRow-${sctCounter}" type="button" onClick="sctDeleteRowOnClick(this.id)">` +
+        `<i class="fa-solid fa-trash fa-fw"></i></button>` +
+      `</div>` +
+    `</div>`;
+
+  $('#sctInput').append(substringsColorToolNewRow);
+  $('#sctInput').children().last().hide().fadeIn(500);
+  sctGetDropdownSheetnames2(wsNames, sctCounter);
+  //window.alert(sctCounter)
+});
+
+function sctDeleteRowOnClick(clickedID) {
+  var sctRowID = clickedID.slice(13); // Change Slice Function according to ID Prefix Length
+  $('body').on('click', `#sctDeleteRow-${sctRowID}`, function () {
+      $(this).parents(`#sctRow-${sctRowID}`).remove();
+  })
+}
+
+function sctGetDropdownSheetnames(wsNames) {
+  let addedField = document.getElementById(`sctSheetSelector-0`);
+  addDropdownElem(wsNames, addedField)
+}
+
+function addDropdownElem(wsNames, field) {
+  wsNames.forEach(function(r){
+    let option = document.createElement('option');
+    option.textContent = r;
+    field.appendChild(option);
+  });
+}
+
+function sctGetDropdownSheetnames2(wsNames, i) {
+  let addedField = document.getElementById(`sctSheetSelector-${i}`);
+  addDropdownElem(wsNames, addedField)
+}
+
+</script>
+
+<script>
+
+var sctRowData = {}
+
+function substringsColorToolForm(sctDivCounterArray) {
+ 
+  //window.alert(sctDivCounterArray.length);
+  //sctRowData[`sctCounterArray`] = sctDivCounterArray;
+  //sctDivCounterArray = [0, 1]
+
+  //var sctRowData = {};
+  
+  for (var i = 0; i < sctDivCounterArray.length; i++) {
+    //window.alert(`loop: ${sctDivCounterArray[i]}`)
+    sheetSelector = document.getElementById(`sctSheetSelector-${sctDivCounterArray[i]}`).value;
+    sheetRange = document.getElementById(`sheetRange-${sctDivCounterArray[i]}`).value;
+    textSubstring = document.getElementById(`textSubstring-${sctDivCounterArray[i]}`).value;
+    colorpicker = document.getElementById(`colorpicker-${sctDivCounterArray[i]}`).value;
+    stylecheckBold = document.getElementById(`stylecheckBold-${sctDivCounterArray[i]}`).checked;
+    stylecheckItalic = document.getElementById(`stylecheckItalic-${sctDivCounterArray[i]}`).checked;
+
+    sctRowData[`sctSheetSelector-${sctDivCounterArray[i]}`] = sheetSelector;
+    sctRowData[`sheetRange-${sctDivCounterArray[i]}`] = sheetRange;
+    sctRowData[`textSubstring-${sctDivCounterArray[i]}`] = textSubstring;
+    sctRowData[`colorpicker-${sctDivCounterArray[i]}`] = colorpicker;
+    sctRowData[`stylecheckBold-${sctDivCounterArray[i]}`] = stylecheckBold;
+    sctRowData[`stylecheckItalic-${sctDivCounterArray[i]}`] = stylecheckItalic;
+
+    //window.alert(`rowdataloop: ${JSON.stringify(sctRowData)}`)
+  }
+  //window.alert(`DivCounterArray Length: ${sctDivCounterArray.length}`)
+  //sctRowData[`substringsColorToolNewRow`] = substringsColorToolNewRow;
+  //window.alert(JSON.stringify(sctRowData));
+
+  return sctRowData;
+}
+
+function sctMainButtonFunction() {
+  let sctDivCounterArray = sctDivCounterFunction();
+  let sctRowData = substringsColorToolForm(sctDivCounterArray);
+  swalConfirm('substringsColorTool', 'Se han aplicado todos los estilos.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', sctRowData, sctDivCounterArray);
+}
+
+function sctSaveButtonFunction() {
+
+  var sctDivCounterArray = sctDivCounterFunction();
+  //window.alert('holas ' + sctDivCounterArray)
+  var sctRowData = substringsColorToolForm(sctDivCounterArray);
+  //window.alert('hola2' + sctCounter)
+  //window.alert(sctDivCounterArray);
+  //window.alert(JSON.stringify(sctRowData));
+  execFunction('saveSheetPropertiesWithArray', 'Se ha guardado la configuración.', sctRowData, sctDivCounterArray, 'sctCounterArray');
+}
+
+function sctDivCounterFunction() {
+  let array = [];
+  $("div[id^='sctRow-']").each(function() {
+    array.push($(this).attr('id').split("-")[1]);
+  });
+  return array;
+}
+
+function sctGetSavedData() {
+
+  //window.alert(sctCounter)
+
+  google.script.run.withSuccessHandler(function(dataExtracted) {
+
+    //window.alert(typeof JSON.parse(dataExtracted[`sctCounterArray`]))
+
+    if (typeof JSON.parse(dataExtracted[`sctCounterArray`]) !== 'undefined') {
+      var sctDivCounterArray = JSON.parse(dataExtracted[`sctCounterArray`]);
+      sctCounter = Math.max(...sctDivCounterArray);
+    } else {
+      sctCounter = 0;
+    };
+
+    //window.alert(JSON.stringify(dataExtracted))
+
+    //substringsColorToolNewRow = dataExtracted[`substringsColorToolNewRow`];
+
+    for (let i = 0; i < sctDivCounterArray.length; i++) {
+      if (sctDivCounterArray[i] != 0) {
+        var substringsColorToolNewRow =
+          `<div id="sctRow-${sctDivCounterArray[i]}">` +
+            `<div class="input-group flex-nowrap update mb-1">` +
+              `<select class="form-select shadow-none" id="sctSheetSelector-${sctDivCounterArray[i]}"></select>` +
+              `<span class="input-group-text" title="Elige la hoja a la izquierda y el rango de inserción a la derecha."><i class="fa-solid fa-table-cells-large"></i></span>` +
+              `<input type="text" class="form-control shadow-none" id="sheetRange-${sctDivCounterArray[i]}" placeholder="A1:B15">` +
+            `</div>` +
+            `<div class="input-group flex-nowrap update mb-3">` +
+              `<span class="input-group-text"><i class="fa-solid fa-quote-right"></i></span>` +
+              `<input type="text" class="form-control shadow-none" id="textSubstring-${sctDivCounterArray[i]}" placeholder="">` +
+              `<input type="color" class="greyborder" style="height:auto" id="colorpicker-${sctDivCounterArray[i]}" value="#E0E0E0">` +
+              `<input type="checkbox" class="btn-check shadow-none" id="stylecheckBold-${sctDivCounterArray[i]}" autocomplete="off">` +
+              `<label class="btn btn-outline-secondary shadow-none" for="stylecheckBold-${sctDivCounterArray[i]}"><i class="fa-solid fa-bold"></i></label>` +
+              `<input type="checkbox" class="btn-check shadow-none" id="stylecheckItalic-${sctDivCounterArray[i]}" autocomplete="off">` +
+              `<label class="btn btn-outline-secondary shadow-none" for="stylecheckItalic-${sctDivCounterArray[i]}"><i class="fa-solid fa-italic"></i></label>` +
+              `<button class="btn btn-danger" id="sctDeleteRow-${sctDivCounterArray[i]}" type="button" onClick="sctDeleteRowOnClick(this.id)">` +
+              `<i class="fa-solid fa-trash fa-fw"></i></button>` +
+            `</div>` +
+          `</div>`;
+
+        $('#sctInput').append(substringsColorToolNewRow);
+        sctGetDropdownSheetnames2(wsNames, i);
+      }
+    }
+
+    //window.alert('boldtest' + dataExtracted[`stylecheckBold-0}`]);
+
+    for (let i = 0; i < sctDivCounterArray.length; i++) {
+      if (typeof dataExtracted[`sctSheetSelector-${sctDivCounterArray[i]}`] !== 'undefined') document.getElementById(`sctSheetSelector-${sctDivCounterArray[i]}`).value = dataExtracted[`sctSheetSelector-${sctDivCounterArray[i]}`];
+      if (typeof dataExtracted[`sheetRange-${sctDivCounterArray[i]}`] !== 'undefined') document.getElementById(`sheetRange-${sctDivCounterArray[i]}`).value = dataExtracted[`sheetRange-${sctDivCounterArray[i]}`];
+      if (typeof dataExtracted[`textSubstring-${sctDivCounterArray[i]}`] !== 'undefined') document.getElementById(`textSubstring-${sctDivCounterArray[i]}`).value = dataExtracted[`textSubstring-${sctDivCounterArray[i]}`];
+      if (typeof dataExtracted[`colorpicker-${sctDivCounterArray[i]}`] !== 'undefined') document.getElementById(`colorpicker-${sctDivCounterArray[i]}`).value = dataExtracted[`colorpicker-${sctDivCounterArray[i]}`];
+      if (typeof dataExtracted[`stylecheckBold-${sctDivCounterArray[i]}`] !== 'undefined') document.getElementById(`stylecheckBold-${sctDivCounterArray[i]}`).checked = dataExtracted[`stylecheckBold-${sctDivCounterArray[i]}`] === 'true';;
+      if (typeof dataExtracted[`stylecheckItalic-${sctDivCounterArray[i]}`] !== 'undefined') document.getElementById(`stylecheckItalic-${sctDivCounterArray[i]}`).checked = dataExtracted[`stylecheckItalic-${sctDivCounterArray[i]}`] === 'true';;
+    }
+  }).getDocProperties();
+
+/**/
+
+}
+
+document.getElementById("sctMainButton").addEventListener("click", sctMainButtonFunction);
+document.getElementById("sctSaveOptions").addEventListener("click", sctSaveButtonFunction);
+
+</script>

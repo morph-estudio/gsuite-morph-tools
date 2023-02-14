@@ -14,39 +14,29 @@
 
 <?!= HtmlService.createHtmlOutputFromFile('public/helpers/navbar').getContent(); ?>
 
-<!-- <?!= HtmlService.createHtmlOutputFromFile('public/helpers/csv').getContent(); ?> -->
-
-
 
 <div class="accordion" id="accordionExample">
   <div class="accordion-item">
-    <h2 class="accordion-header" id="headingOne">
-      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+    <h2 class="accordion-header" id="headingSheets">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSheets" aria-expanded="true" aria-controls="collapseSheets">
         Google Sheets
       </button>
     </h2>
-    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+    <div id="collapseSheets" class="accordion-collapse collapse show" aria-labelledby="headingSheets" data-bs-parent="#accordionExample">
       <div class="accordion-body pb-0 mt-2">
 
         <div class="mt-1 pb-0">
           <p>En esta app tienes las funciones implementadas por el equipo I+D para Google Suite.</p>
         </div>
 
-        <button id="superFreezerButton" class="btn btn-primary gmt blue btn-lg-gmt w-100 mt-1 mb-3"  onclick="swalConfirm('morphFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">Supercongelador</button>
+        <button id="superFreezerButton" class="btn btn-primary gmt blue btn-lg-gmt w-100 mt-1 mb-3 shadow-none centerScroll"  onclick="swalConfirm('morphFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">Supercongelador</button>
 
-        <!-- <button class="btn btn-primary btn-lg-gmt mt-1 mb-3"  onclick="swalConfirm('exportXML', 'El archivo se ha convertido correctamente.', 'Congelar', 'Una vez ejecutado no se puede detener. Confirma para continuar.')">EXPORTAR XML</button> -->
-      
       </div>
+
       <div id="button-container" class="accordion-body px-0 pb-0">
-        <button class="btn btn-primary index w-100 shadow-none" title="Crea una lista de usuarios del Google Workspace de Morph" onclick="swalConfirm('getDomainUsersList', 'Se ha creado una lista de usuarios.', 'Asegúrate de estar en una hoja en blanco antes de continuar.')"><i class="fa-solid fa-margin fa-users fa-fw"></i>Lista de miembros Morph</button>
-        <div class="btn-group d-flex" role="group">
-          <button class="btn btn-primary index shadow-none half w-50" onclick="execNoSuccess('drawPalette')"><i class="fa-solid fa-margin fa-palette fa-fw"></i>Paleta Morph</button>
-          <button class="btn btn-primary index shadow-none w-50" onclick="execDirect('colorMe')"><i class="fa-solid fa-margin fa-fill-drip fa-fw"></i>Color Morph</button>
-        </div>
+
         <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('deleteEmptyRows')"><i class="fa-solid fa-margin fa-table-list fa-fw"></i>Eliminar filas vacías</button>
         <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('removeEmptyColumns')"><i class="fa-solid fa-margin fa-table-columns fa-fw"></i>Eliminar columnas vacías</button>
-        <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('mergeColumns')"><i class="fa-solid fa-margin fa-circle-h fa-fw"></i>Unificar columnas con el mismo encabezado</button>
-        <button class="btn btn-primary index shadow-none w-100" title="Genera un identificador por cada celda seleccionada" onclick="execNoSuccess('uniqueIdentifier')"><i class="fa-solid fa-barcode fa-margin fa-fw"></i>Identificadores automáticos</button>
         <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('exportSheet')"><i class="fa-solid fa-database fa-margin fa-fw"></i>Exportar hoja a formato JSON</button>
 
         <div class="btn-group d-flex" role="group">
@@ -54,75 +44,132 @@
           <button class="btn btn-primary index shadow-none w-50" title="Disminuye proporcionalmente el tamaño de letra en la hoja" onclick="execNoSuccess('decreaseFontSize')"><i class="fa-solid fa-margin fa-fw fa-arrows-down-to-line"></i>Font Size -</button>
         </div>
 
-        <!--<div class="btn-group d-flex" role="group">
-          <button class="btn btn-primary index shadow-none half w-50" title="Ajusta las filas al texto existente" onclick="execNoSuccess('autoResizeAllRows')"><i class="fa-solid fa-margin fa-fw fa-sliders"></i>Fit Filas</button>
-          <button class="btn btn-primary index shadow-none w-50" title="Ajusta las columnas al texto existente" onclick="execNoSuccess('autoResizeAllCols')"><i class="fa-solid fa-margin fa-fw fa-sliders"></i>Fit Colms</button>
-          <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('postLessons')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Enviar mensajes de Chat</button>
-        </div>-->
+        <button class="btn btn-primary index shadow-none w-100" title="Genera un identificador por cada celda seleccionada" onclick="execNoSuccess('uniqueIdentifier')"><i class="fa-solid fa-barcode fa-margin fa-fw"></i>Identificadores automáticos</button>
+        <button class="btn btn-primary index w-100 shadow-none" title="Crea una lista de usuarios del Google Workspace de Morph" onclick="swalConfirm('getDomainUsersList', 'Se ha creado una lista de usuarios.', 'Asegúrate de tener seleccionada la celda donde comenzará el listado antes de continuar.')"><i class="fa-solid fa-margin fa-users fa-fw"></i>Lista de miembros Morph</button>
+
+        <!--
+        <button class="btn btn-primary btn-lg-gmt mt-1 mb-3"  onclick="swalConfirm('exportXML', 'El archivo se ha convertido correctamente.', 'Congelar', 'Una vez ejecutado no se puede detener. Confirma para continuar.')">EXPORTAR XML</button>
+        <div class="btn-group d-flex" role="group">
+        <button class="btn btn-primary index shadow-none half w-50" onclick="execNoSuccess('drawPalette')"><i class="fa-solid fa-margin fa-palette fa-fw"></i>Paleta Morph</button>
+        <button class="btn btn-primary index shadow-none w-50" onclick="execDirect('colorMe')"><i class="fa-solid fa-margin fa-fill-drip fa-fw"></i>Color Morph</button>
+        </div>
+        <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('mergeColumns')"><i class="fa-solid fa-margin fa-circle-h fa-fw"></i>Unificar columnas con el mismo encabezado</button>
+        <button class="btn btn-primary index shadow-none half w-50" title="Ajusta las filas al texto existente" onclick="execNoSuccess('autoResizeAllRows')"><i class="fa-solid fa-margin fa-fw fa-sliders"></i>Fit Filas</button>
+        <button class="btn btn-primary index shadow-none w-50" title="Ajusta las columnas al texto existente" onclick="execNoSuccess('autoResizeAllCols')"><i class="fa-solid fa-margin fa-fw fa-sliders"></i>Fit Colms</button>
+        <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('postLessons')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Enviar mensajes de Chat</button>
+        -->
 
       </div>
     </div>
   </div>
 
   <div class="accordion-item">
-    <h2 class="accordion-header" id="headingTwo">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-        Superficies
+    <h2 class="accordion-header" id="headingCuadros">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCuadros" aria-expanded="false" aria-controls="collapseCuadros">
+        Cuadros
       </button>
     </h2>
-    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+    <div id="collapseCuadros" class="accordion-collapse collapse" aria-labelledby="headingCuadros" data-bs-parent="#accordionExample">
       <div class="accordion-body mt-2">
 
-        <div class="">
-          <p>Diseñado para funcionar en las copias de la <b>NAVE NODRIZA</b> del cuadro de superficies.</p>
+        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/helpCuadros').getContent(); ?>
 
-          <div class="input-group flex-nowrap update rounded-pill mb-3">
-            <span class="input-group-text">Prefijo</span>
-            <input type="text" class="form-control shadow-none" id="updatePrefixID" placeholder="Por defecto: TXT">
+        <div style="margin-bottom: 25px">
+
+          <div class="form-check form-switch">
+            <input class="form-check-input shadow-none" type="checkbox" role="switch" id="update-linkpage">
+            <label class="form-check-label" style="position:relative;top:2px" for="update-linkpage">Actualizar hoja LINK </label>
+            <span data-bs-toggle="tooltip" data-bs-placement="right" title="Marcar esta casilla en la primera actualización del cuadro o cuando haya nuevos archivos .txt de exportación. Se buscarán de nuevo los archivos y carpetas y se formateará la hoja LINK.">
+            <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:1px"></i>
+            </span>
           </div>
 
-          <div class="form-check form-switch mt-0">
-            <input class="form-check-input" type="checkbox" role="switch" id="prefix-all-switch" onclick="document.getElementById('updatePrefixID').disabled = this.checked">
-            <label class="form-check-label" style="position:relative;top:2px" for="prefix-all-switch" title="Añade todos los archivos de la carpeta independientemente de su prefijo.">Añadir todos los archivos</label>
+        <div class="mt-3 updateLinkPageCollapse collapse">
+
+          <div class="input-group flex-nowrap update rounded-pill mb-2">
+            <span class="input-group-text prefixUpdateClassColor">Prefijo<span data-bs-toggle="tooltip" data-bs-placement="right" title="Por defecto se importarán los archivos con prefijo TXT (por ejemplo, TXT Sheets Ventanas), pero si usas un paquete de archivos con otro identificativo escribe aquí el prefijo."><i class="fa-regular fa-circle-question fa-questionstyle" style="color:#c0cbd1"></i></span></span> 
+            <input type="text" class="form-control shadow-none prefixUpdateClass" id="updatePrefixID" placeholder="Por defecto: TXT">
           </div>
 
-          <div class="form-check form-switch mb-3 mt-0">
-            <input class="form-check-input" type="checkbox" role="switch" id="update-linkpage">
-            <label class="form-check-label" style="position:relative;top:2px" for="update-linkpage" title="Busca de nuevo el panel de control, carpetas referentes y formatea el texto.">Actualizar hoja LINK</label>
-          </div>         
+          <div class="form-check form-switch">
+            <input class="form-check-input shadow-none prefixUpdateClass" type="checkbox" role="switch" id="prefix-all-switch" onclick="document.getElementById('updatePrefixID').disabled = this.checked">
+            <label class="form-check-label" style="position:relative;top:2px" for="prefix-all-switch">Ignorar prefijos</label> <span data-bs-toggle="tooltip" data-bs-placement="right" title="Añade todos los archivos de la carpeta 'ExpTXT' sin importar el prefijo.">
+            <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:2px"></i>
+          </div>
 
-          <button id="csUpdater" class="btn btn-warning gmt sup w-100 shadow-none mb-1">Actualizar cuadro de superficies</button>
-          <button id="csFreezer" class="btn btn-primary gmt inf blue w-100 shadow-none" onclick="swalConfirm('morphFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">Congelar cuadro de superficies</button>
+          <div class="form-check form-switch">
+            <input class="form-check-input shadow-none prefixUpdateClass" type="checkbox" role="switch" id="update-keepVisibility">
+            <label class="form-check-label" style="position:relative;top:2px" for="update-keepVisibility">Mantener visibilidad</label>
+            <span data-bs-toggle="tooltip" data-bs-placement="right" title="Por defecto las hojas importadas se ocultan, marca esta opción para mantenerlas visibles.">
+            <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:2px"></i>
+          </div>
+
         </div>
 
-        <div class="mt-4">
-          <h3 class="mb-3"><i class="fa-solid fa-margin fa-fw fa-triangle-exclamation"></i>Transición de cuadros</h3>
-          <p>Si es un cuadro anterior a <u>Octubre 2022</u> debes adaptarlo antes de actualizar.</p>
-          <button class="btn btn-success mainbtn btn-xl w-100" id="adaptButton" onclick="execFunction('adaptarCuadroAntiguo', 'El cuadro se ha adaptado correctamente.')">Adaptar cuadro antiguo</button>
-          <!--<button class="btn btn-primary mainbtn btn-lg-gmt w-100 mt-4" id="adaptDeleteButton" onclick="execNoSuccess('deleteProperty', 'adaptedSpreadsheet')">Adaptar cuadro antiguo</button>-->
+          <div id="devmenuhidden" style="display: none;" class="devhiddensection">
+            <div class="form-check form-switch">
+              <input class="form-check-input shadow-none" type="checkbox" role="switch" id="update-debugReport">
+              <label class="form-check-label" style="position:relative;top:2px" for="update-debugReport">Debug Report</label>
+              <span data-bs-toggle="tooltip" data-bs-placement="right" title="Opción para desarrolladores: incluye datos adicionales al logger que pueden ayudar a resolver problemas.">
+              <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:2px"></i>
+            </div>
+          </div>
+
         </div>
 
-        <div class="mt-4">
-          <h3 class="mb-3"><i class="fa-solid fa-margin fa-fw fa-tent-arrow-left-right"></i>Mediciones automáticas</h3>
-          <p>El selector de prefijos también funciona en esta herramienta.</p>
-          <button id="mediciones" class="btn btn-warning mainbtn btn-xl w-100 shadow-none">Actualizar cuadro de mediciones</button>
+        <div style="margin-bottom: 30px">
+          <h3 class="mb-3"><i class="fa-solid fa-margin fa-fw fa-layer-group"></i>Cuadro de superficies</h3>
+          <p>Diseñado para funcionar en las copias de la <b>NAVE NODRIZA</b> de los <u>cuadros MORPH</u>.</p>
+
+          <button id="csUpdater" class="btn btn-warning gmt sup w-100 shadow-none mt-1 mb-1 centerScroll">Actualizar cuadro de superficies</button>
+          <button id="csFreezer" class="btn btn-primary gmt inf blue w-100 shadow-none centerScroll" onclick="swalConfirm('morphFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">Congelar cuadro de superficies</button>
         </div>
 
-        <!--<hr class="side">
+        <div style="margin-bottom: 30px">
+          <h3 class="mb-3"><i class="fa-solid fa-margin fa-fw fa-ruler"></i>Cuadro de mediciones</h3>
+          <button id="mediciones" class="btn btn-warning gmt btn-xl w-100 shadow-none centerScroll">Actualizar cuadro de mediciones</button>
+        </div>
 
-        <div class="">
-          <h3 class="mb-3"><i class="fa-solid fa-margin fa-fw fa-window-restore"></i>Histórico de superficies</h3>
-          <p>Debes situarte en la hoja <u>Histórico CONSTRUIDAS</u> antes de crear un punto histórico.</p>
-          <button class="btn btn-success mainbtn btn-xl w-100" id="adaptButton" onclick="swalConfirm('crearPuntoHistorico', 'Se ha creado una marca temporal en el histórico.', 'Asegúrate de estar en la hoja adecuada. Confirma para continuar.')">Crear punto histórico</button>
-        </div>-->
+        <h3 class="menu-h3 mb-3"><i class="fa-solid fa-circle-dot fa-margin fa-fw"></i>Más botonazos</h3>
 
+        <button class="btn btn-purple gmt btn-xl w-100 shadow-none centerScroll" id="historicoSupButton">Crear punto en el histórico de superficies</button>
+      
+        <div class="form-check form-switch mt-3">
+          <input class="form-check-input shadow-none" type="checkbox" role="switch" id="historicoSupAddPlus">
+          <label class="form-check-label" style="position:relative;top:2px" for="historicoSupAddPlus">Añadir al HISTÓRICO desglosado
+          <span data-bs-toggle="tooltip" data-bs-placement="right" title="Crear también un punto histórico en la hoja Histórico CONSTRUIDAS desglosado.">
+          <i class="fa-regular fa-circle-question fa-questionstyle" style=""></i></label>
+        </div>
 
+        <div id="borrarFilasExcesivas" style="margin-top: 30px">
+          <h3 class="mb-3"><i class="fa-solid fa-delete-left fa-margin fa-fw"></i>Quitar filas excesivas</h3>
+          <div class="input-group flex-nowrap update rounded-pill mb-2">
+            <span class="input-group-text prefixUpdateClassColor">Fila máxima<span data-bs-toggle="tooltip" data-bs-placement="right" title="Escribe el número de filas máximas que quieres en la hoja actual."><i class="fa-regular fa-circle-question fa-questionstyle" style="color:#c0cbd1"></i></span></span> 
+            <input type="text" class="form-control shadow-none" id="rowsDeleteInput" placeholder="p.ej: 100">
+          </div>
+          <button class="btn btn-primary btn-lg-gmt w-100 shadow-none centerScroll " id="rowsDeleteButton">Borrar filas</button>
+        </div>
 
+        <div id="devmenuhidden" style="display: none;" class="devhiddensection">
+          <div style="margin-top: 30px">
+            <h3 class="mb-3"><i class="fa-solid fa-diagram-next fa-margin fa-fw"></i>Modificar fórmulas</h3>
 
+            <div class="form-check form-switch mb-2">
+              <input class="form-check-input shadow-none" type="checkbox" role="switch" id="sendFormulaToTemplate">
+              <label class="form-check-label" style="position:relative;top:2px" for="sendFormulaToTemplate">Enviar a Nave Nodriza</label> <span data-bs-toggle="tooltip" data-bs-placement="right" title="Marca la casilla para que un admin evalúe si el cambio debe integrarse en la plantilla. Mantenlo desmarcado si es un cambio de fórmula para un proyecto local.">
+              <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:2px"></i>
+            </div>
+            
+            <div class="form-group">
+              <div class="input-group mb-1">
+                <textarea class="form-control shadow-none me-1" id="formulaLogFormulaText" rows="2" placeholder="Copia o inyecta aquí la fórmula antigua."></textarea>
+                <button type="button" id="formulaDropperButton" class="btn btn-secondary shadow-none" style="width:16%"><i class="fa-solid fa-eye-dropper"></i></button>
+              </div>
 
-
-
-
+            <button class="btn btn-primary gmt w-100 shadow-none centerScroll" id="formulaLogButton">Registrar nueva fórmula</button>
+            </div>
+          </div>
+        </div>
 
 
 
@@ -131,103 +178,95 @@
   </div>
 
   <div class="accordion-item">
-    <h2 class="accordion-header" id="headingThree">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+    <h2 class="accordion-header" id="headingFiles">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFiles" aria-expanded="false" aria-controls="collapseFiles">
         Archivos y carpetas
       </button>
     </h2>
-    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+    <div id="collapseFiles" class="accordion-collapse collapse" aria-labelledby="headingFiles" data-bs-parent="#accordionExample">
       <div class="accordion-body mt-2 pb-2">
 
-         <!--<div class="mb-4">
-          <h3>Estructura de carpetas</h3>
-          <p>Hay que seguir la estructura de niveles de la <b>plantilla</b>.</p>
-        
-          <button class="btn btn-primary gmt sup grey w-100 shadow-none mb-1" onclick="execFunction('autoFolderTreeTpl', 'Se ha generado una plantilla para la estructura de carpetas.')">Crear plantilla</button>
-          <button class="btn btn-primary gmt inf pink w-100 shadow-none" onclick="swalConfirm('autoFolderTree', 'Se ha generado la estructura de carpetas.', 'Una vez ejecutado no se puede detener. Confirma para continuar.')">Generar estructura de carpetas</button>
-        </div>-->
-
-        <div class="">
-          <h3>Listado de archivos</h3>
-          <p>Genera una lista con nombres y links de archivos en una carpeta.</p>
-          <?!= HtmlService.createHtmlOutputFromFile('public/helpers/form-folderlist').getContent(); ?>
-        </div>
+        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/folderlist').getContent(); ?>
 
       </div>
     </div>
   </div>
 
   <div class="accordion-item">
-    <h2 class="accordion-header" id="headingInterop">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInterop" aria-expanded="false" aria-controls="collapseInterop">
+    <h2 class="accordion-header" id="headingInteroperabilidad">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInteroperabilidad" aria-expanded="false" aria-controls="collapseInteroperabilidad">
         Interoperabilidad
       </button>
     </h2>
-    <div id="collapseInterop" class="accordion-collapse collapse" aria-labelledby="headingInterop" data-bs-parent="#accordionExample">
+    <div id="collapseInteroperabilidad" class="accordion-collapse collapse" aria-labelledby="headingInteroperabilidad" data-bs-parent="#accordionExample">
       <div class="accordion-body mt-2 pb-3">
 
-        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/sheet-connect').getContent(); ?>
-        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/csv').getContent(); ?>
+        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/interoperabilidad').getContent(); ?>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="accordion-item devhiddensection" style="display: none;">
+    <h2 class="accordion-header" id="headingEstCom">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEstCom" aria-expanded="false" aria-controls="collapseEstCom">
+        Estilos complejos
+      </button>
+    </h2>
+    <div id="collapseEstCom" class="accordion-collapse collapse" aria-labelledby="headingEstCom" data-bs-parent="#accordionExample">
+      <div class="accordion-body mt-2 pb-3">
+
+        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/estilosComplejos').getContent(); ?>
 
       </div>
     </div>
   </div>
 
   <div class="accordion-item">
-    <h2 class="accordion-header" id="headingFour">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+    <h2 class="accordion-header" id="headingDevelopment">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDevelopment" aria-expanded="false" aria-controls="collapseDevelopment">
         Desarrollo
       </button>
     </h2>
-    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
+    <div id="collapseDevelopment" class="accordion-collapse collapse" aria-labelledby="headingDevelopment" data-bs-parent="#accordionExample">
 
       <div id="password_div">
-        
-          <div class="card bg-light border-0 border-top rounded-0 mt-2" >
-            <div class="card-body">
-      
-              <label for="hidden_password" class="form-label"><i class="fa-solid fa-key fa-margin fa-fw"></i>Introduce una clave:</label>
-              <div class="input-group flex-nowrap update rounded-pill">
-                <!--<span class="input-group-text"><i class="fas fa-lock"></i></span>-->
-                <input name="password" type="password" value="" class="input form-control shadow-none" id="hidden_password" required="true" onkeydown = "if (event.keyCode == 13) document.getElementById('hideSectionButton').click()"/>
-                <span class="input-group-text" onclick="password_show_hide();">
-                  <i class="fas fa-eye fa-fw" id="show_eye"></i>
-                  <i class="fas fa-eye-slash d-none fa-fw" id="hide_eye"></i>
-                </span>
-              </div>
-              <div id="invalid-developer" class="text-danger mt-2 collapse">asdf</div>
-              <button class="btn btn-secondary btn-lg-gmt w-100 mt-2" id="hideSectionButton">Desbloquear</button>
-
+        <div class="card bg-light border-0 border-top rounded-0 mt-2" >
+          <div class="card-body">
+            <label for="hidden_password" class="form-label"><i class="fa-solid fa-key fa-margin fa-fw"></i>Introduce una clave:</label>
+            <div class="input-group flex-nowrap update rounded-pill">
+              <input name="password" type="password" value="" class="input form-control shadow-none" id="hidden_password" required="true" onkeydown = "if (event.keyCode == 13) document.getElementById('hideSectionButton').click()"/>
+              <span class="input-group-text" onclick="password_show_hide();">
+                <i class="fas fa-eye fa-fw" id="show_eye"></i>
+                <i class="fas fa-eye-slash d-none fa-fw" id="hide_eye"></i>
+              </span>
             </div>
+            <div id="invalid-developer" class="text-danger mt-2 collapse">asdf</div>
+            <button class="btn btn-secondary btn-lg-gmt w-100 mt-2" id="hideSectionButton">Desbloquear</button>
           </div>
-        
+        </div>
       </div>
-
 
       <?!= HtmlService.createHtmlOutputFromFile('public/helpers/developer').getContent(); ?>
-      <?!= HtmlService.createHtmlOutputFromFile('public/helpers/mupdate').getContent(); ?>
-      
-
-      
-      </div>
 
     </div>
+  </div>
 
 
   <div class="accordion-item last">
-    <h2 class="accordion-header" id="headingFive">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+    <h2 class="accordion-header" id="headingHelp">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHelp" aria-expanded="false" aria-controls="collapseHelp">
         Ayuda
       </button>
     </h2>
-    <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionExample">
+    <div id="collapseHelp" class="accordion-collapse collapse" aria-labelledby="headingHelp" data-bs-parent="#accordionExample">
       <div class="accordion-body mt-2">
 
         <div class="progress">
-          <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width:<?= cellCounter() ?>%"><span class="justify-content-center d-flex position-absolute w-100"><?= cellCounter() ?>%</span></div>
-          </div>
+          <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width:<?= cellCounter() ?>%">
+          <span class="justify-content-center d-flex position-absolute w-100"><?= cellCounter() ?>%</span></div>
+        </div>
 
-        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/counter').getContent(); ?>
         <?!= HtmlService.createHtmlOutputFromFile('public/helpers/help').getContent(); ?>
 
       </div>
@@ -236,199 +275,275 @@
 
 </div>
 
+<!-- SCRIPT AREA DIVISION -->
+
 <script>
-  var wsNames = JSON.parse("<?=JSON.stringify(wsNames)?>");
+
+function afterSidebarLoads(){
+  setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 300);
+}
+
 </script>
 
-<script>
+<script> // Funciones relacionadas con el área de desarrollo y validación de contraseñas
 
-  function afterSidebarLoads(){
-    setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 300);
-  }
+function check_password () {
+  btnLoading('#hideSectionButton', 'Validando...');
+  var field = document.getElementById('hidden_password');
+  var password = field.value;
 
-</script>
-
-<script>
-
-  function check_password () {
-    btnLoading('#hideSectionButton', 'Validando...');
-    var field = document.getElementById('hidden_password');
-    var password = field.value;
-
-    if (password == '') {
-      $('#invalid-developer').html('<small>El campo no puede estar vacío.</small>').addClass("show");
-      field.classList.add("is-invalid"); setTimeout(function(){validatePassword(field); $('#invalid-developer').removeClass("show").addClass("collapse") }, 3500);
-      btnReset("#hideSectionButton");
-    } else {
-      google.script.run.withSuccessHandler(function(data){
-      if (data.includes(password)) {
-        let x = document.getElementsByClassName("devhiddensection");
-        for (let i = 0; i < x.length; i++) {
-            x[i].style.display = 'block';
-        }
-      } else {
-        switch (password) {
-          case 'icsv':
-            document.getElementById('icsv').style.display = 'block';
-            break;
-          case 'pdfsec':
-            document.getElementById('pdfsechidden').style.display = 'block';
-            break;
-          case 'hiscon':
-            document.getElementById('hisconhidden').style.display = 'block';
-            break;
-          case 'desbutadaptar':
-            execNoSuccess('deleteProperty', 'adaptedSpreadsheet');
-            execDirect('sidebarIndex');
-            break;
-          default:
-          $('#invalid-developer').html('<small>La clave es incorrecta.</small>').addClass("show");
-          field.classList.add("is-invalid"); setTimeout(function(){validatePassword(field);  $('#invalid-developer').removeClass("show").addClass("collapse") }, 3500);
-        }
-      }
-      btnReset("#hideSectionButton");
-      $('#hidden_password').val('');
-
-      }).getDevPassword('DevAreaKeys');
-    }
-  }
-
-  function validatePassword(field) {
-    field.classList.remove("is-invalid");
-  }
-
-  function check_userRole(field) {
-    let protection = JSON.parse("<?=JSON.stringify(protection)?>");
-    if (protection === true) {
-
+  if (password == '') {
+    $('#invalid-developer').html('<small>El campo no puede estar vacío.</small>').addClass("show");
+    field.classList.add("is-invalid"); setTimeout(function(){validatePassword(field); $('#invalid-developer').removeClass("show").addClass("collapse") }, 3500);
+    btnReset("#hideSectionButton");
+  } else {
+    google.script.run.withSuccessHandler(function(data){
+    if (data.includes(password)) {
       let x = document.getElementsByClassName("devhiddensection");
-      let i;
-      for (i = 0; i < x.length; i++) {
+      for (let i = 0; i < x.length; i++) {
           x[i].style.display = 'block';
       }
-
     } else {
-
-      let x = document.getElementsByClassName("devhiddensection");
-      let i;
-      for (i = 0; i < x.length; i++) {
-          x[i].style.display = 'none';
+      switch (password) {
+        case 'pdfsec':
+          document.getElementById('pdfsechidden').style.display = 'block';
+          break;
+        case 'adaptarcuadro':
+          document.getElementById('transicionCuadros').style.display = 'block';
+          break;
+        default:
+        $('#invalid-developer').html('<small>La clave es incorrecta.</small>').addClass("show");
+        field.classList.add("is-invalid"); setTimeout(function(){validatePassword(field);  $('#invalid-developer').removeClass("show").addClass("collapse") }, 3500);
       }
     }
+    btnReset("#hideSectionButton");
+    $('#hidden_password').val('');
+
+    }).getDevPassword('DevAreaKeys');
   }
+}
 
-  function validatePassword(field) {
-    field.classList.remove("is-invalid");
+function validatePassword(field) {
+  field.classList.remove("is-invalid");
+}
+
+function check_userRole(field) {
+  let protection = JSON.parse("<?=JSON.stringify(protection)?>");
+  if (protection === true) {
+
+    let x = document.getElementsByClassName("devhiddensection");
+    let i;
+    for (i = 0; i < x.length; i++) {
+        x[i].style.display = 'block';
+    }
+
+  } else {
+
+    let x = document.getElementsByClassName("devhiddensection");
+    let i;
+    for (i = 0; i < x.length; i++) {
+        x[i].style.display = 'none';
+    }
   }
+}
 
-  function updateButtonClicked() {
-    let updatePrefix = document.getElementById('updatePrefixID').value;
-    let prefixAll = document.getElementById("prefix-all-switch").checked;
-    let updateLinkPage = document.getElementById("update-linkpage").checked; 
-    let btnID = 'csUpdater';
+function validatePassword(field) {
+  field.classList.remove("is-invalid");
+}
 
-    var rowData = {
-          updatePrefix,
-          prefixAll,
-          updateLinkPage
-        };
+// Función para el botón de ocultar/mostrar contraseña
 
+function password_show_hide() {
+  var x = document.getElementById("hidden_password");
+  var show_eye = document.getElementById("show_eye");
+  var hide_eye = document.getElementById("hide_eye");
+  hide_eye.classList.remove("d-none");
+  if (x.type === "password") {
+    x.type = "text";
+    show_eye.style.display = "none";
+    hide_eye.style.display = "block";
+  } else {
+    x.type = "password";
+    show_eye.style.display = "block";
+    hide_eye.style.display = "none";
+  }
+}
+
+</script> 
+
+<script>
+
+// Funciones relacionadas con los botones
+
+function updateButtonClicked() {
+  let updateLinkPage = document.getElementById("update-linkpage").checked;
+  let keepSheetVisibility = document.getElementById("update-keepVisibility").checked;
+  let updatePrefix = document.getElementById('updatePrefixID').value;
+  let prefixAll = document.getElementById("prefix-all-switch").checked;
+  let updateDebugReport = document.getElementById("update-debugReport").checked;
+  let btnID = 'Superficies';
+  var rowData = {
+        updatePrefix,
+        prefixAll,
+        updateLinkPage,
+        keepSheetVisibility,
+        updateDebugReport
+      }
+  if (updateLinkPage) {
+    swalConfirm('morphCSUpdater', 'El cuadro se ha actualizado correctamente.', 'Se actualizará la hoja LINK en el proceso de actualización. Confirma para continuar.', btnID, rowData);
+  } else {
+    swalConfirm('morphCSUpdaterDirect', 'El cuadro se ha actualizado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', rowData);
+  }
+}
+
+function medicionesButtonClicked() {
+  let updateLinkPage = document.getElementById("update-linkpage").checked;
+  let keepSheetVisibility = document.getElementById("update-keepVisibility").checked;
+  let updatePrefix = document.getElementById('updatePrefixID').value;
+  let prefixAll = document.getElementById("prefix-all-switch").checked;
+  let updateDebugReport = document.getElementById("update-debugReport").checked;
+  let btnID = 'Mediciones';
+  var rowData = {
+        updatePrefix,
+        prefixAll,
+        updateLinkPage,
+        keepSheetVisibility,
+        updateDebugReport
+      }
+  if (updateLinkPage) {
     swalConfirm('morphCSUpdater', 'El cuadro se ha actualizado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', btnID, rowData);
+  } else {
+    swalConfirm('morphCSUpdaterDirect(', 'El cuadro se ha actualizado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', rowData);
   }
+}
 
-  function medicionesButtonClicked() {
-    let updatePrefix = document.getElementById('updatePrefixID').value;
-    let prefixAll = document.getElementById("prefix-all-switch").checked;
-    let btnID = 'mediciones';
+function historicoButtonClicked() {
+  let addToDesglosado = document.getElementById("historicoSupAddPlus").checked;
 
-    var rowData = {
-          updatePrefix: updatePrefix,
-          prefixAll: prefixAll,
-        };
-
-    swalConfirm('morphCSUpdater', 'El cuadro se ha actualizado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', btnID, rowData);
+  if (addToDesglosado) {
+    swalConfirmAdv('historicoDeSuperficies', e => {google.script.run.withSuccessHandler(swalsuccess('Se ha creado un punto temporal en el histórico.')).historicoDeSuperficies(1)}, 'Se creará un nuevo punto en la hoja Histórico CONSTRUIDAS.', 0);
+  } else {
+    swalConfirm('historicoDeSuperficies', 'Se ha creado un punto temporal en el histórico.', 'Se creará un nuevo punto en la hoja Histórico CONSTRUIDAS.', 0);
   }
+}
+
+function formulaLogButtonClicked() {
+  let formulaText = document.getElementById("formulaLogFormulaText").value;
+  let sendToTemplate = document.getElementById("sendFormulaToTemplate").checked;
+  var rowData = {
+        formulaText,
+        sendToTemplate
+      }
+  swalConfirm('formulaLogger', 'La fórmula ha quedado registrada.', 'Asegúrate de seleccionar la celda modificada antes de continuar.', rowData);
+}
+
+$('#formulaDropperButton').click(function() {
+  swaload();
+  google.script.run.withSuccessHandler(function(data){
+    document.getElementById('formulaLogFormulaText').innerText = data;
+    Swal.close();
+  }).formulaDropper();
+});
 
 </script>
 
 <script>
 
-  function password_show_hide() {
-    var x = document.getElementById("hidden_password");
-    var show_eye = document.getElementById("show_eye");
-    var hide_eye = document.getElementById("hide_eye");
-    hide_eye.classList.remove("d-none");
-    if (x.type === "password") {
-      x.type = "text";
-      show_eye.style.display = "none";
-      hide_eye.style.display = "block";
+// JQuery para el control HTML
+
+$(document).ready(function() {
+  $('.prefixUpdateClass').attr("disabled", true);
+  $('.prefixUpdateClassColor').css('color', '#B0BEC5');
+});
+
+$('#update-linkpage').change(function() {
+    if ($(this).prop('checked')) {
+      $(".updateLinkPageCollapse").collapse('show');
+      $('.prefixUpdateClassColor').css('color', '#37474F');
+      $('.prefixUpdateClass').attr("disabled", false);
+      
     } else {
-      x.type = "password";
-      show_eye.style.display = "block";
-      hide_eye.style.display = "none";
+      $(".updateLinkPageCollapse").collapse('hide');
+      $('.prefixUpdateClass').attr("disabled", true);
+      $('.prefixUpdateClassColor').css('color', '#B0BEC5');
     }
-  }
+});
 
-</script>
-
-<script>
-
-  function adaptButtonDisable() {
-    $('#adaptButton').prop('disabled', true);
-    $('#adaptButton').html('Ya se ha adaptado');
-  }
-
-  function getSavedProperties() {
-    let data = JSON.parse("<?=JSON.stringify(isAdapted)?>");
-    let dataExtracted = data;
-    if (data == 'true') {
-      adaptButtonDisable()
-    }
-  }
-  function checkReturn(arg) {
-    if(arg === 'true') { return true; } else { return false; }
-  }
-
-</script>
-
-<script> // Script to order buttons alphabetically (and add ult_class to last child)
-
-  'use strict';
-  const buttonContainer = document.getElementById('button-container');
-  const sortedButtons = [... buttonContainer.children].sort((buttonA, buttonB) => {
-    const name1 = buttonA.innerText.toLowerCase();
-    const name2 = buttonB.innerText.toLowerCase();
-    if(name1 === name2){
-      return 0;
-    } else if(name1 < name2){
-      return -1;
+$('#prefix-all-switch').change(function() {
+    if ($(this).prop('checked')) {
+      $('.prefixUpdateClassColor').css('color', '#B0BEC5');
     } else {
-      return 0;
+      $('.prefixUpdateClassColor').css('color', '#37474F');
     }
-  });
-  sortedButtons.forEach(button => buttonContainer.append(button));
+});
 
-  $("#button-container").children().last().addClass("ult");
-
+function adaptButtonDisable() {
+  $('#adaptButton').prop('disabled', true);
+  $('#adaptButton').html('<i class="fa-solid fa-margin fa-fw fa-triangle-exclamation"></i>Este cuadro ya se ha adaptado');
+}
 
 </script>
 
 <script>
 
-  document.getElementById('hideSectionButton').addEventListener("click", check_password);
-  document.getElementById('csUpdater').addEventListener("click", updateButtonClicked);
-  document.getElementById('mediciones').addEventListener("click", medicionesButtonClicked);
-  document.addEventListener('DOMContentLoaded', () => {
-    check_userRole();
-    afterSidebarLoads();
-    getSavedProperties();
-    getSavedCSVImport();
+// Script to order buttons alphabetically (and add ult_class to last child)
 
-  });
+'use strict';
+const buttonContainer = document.getElementById('button-container');
+const sortedButtons = [... buttonContainer.children].sort((buttonA, buttonB) => {
+  const name1 = buttonA.innerText.toLowerCase();
+  const name2 = buttonB.innerText.toLowerCase();
+  if(name1 === name2){
+    return 0;
+  } else if(name1 < name2){
+    return -1;
+  } else {
+    return 0;
+  }
+});
+sortedButtons.forEach(button => buttonContainer.append(button));
+
+$("#button-container").children().last().addClass("ult");
 
 </script>
 
+<script>
 
+var wsNames = JSON.parse("<?=JSON.stringify(wsNames)?>");
+
+function getSavedProperties() {
+  let data = JSON.parse("<?=JSON.stringify(isAdapted)?>");
+  let dataExtracted = data;
+  if (data == 'true') {
+    adaptButtonDisable()
+  }
+}
+function checkReturn(arg) {
+  if(arg === 'true') { return true; } else { return false; }
+}
+
+</script>
+
+<script>
+
+// Eventos de elementos
+
+document.getElementById('hideSectionButton').addEventListener("click", check_password);
+document.getElementById('csUpdater').addEventListener("click", updateButtonClicked);
+document.getElementById('mediciones').addEventListener("click", medicionesButtonClicked);
+document.getElementById('formulaLogButton').addEventListener("click", formulaLogButtonClicked);
+document.getElementById('historicoSupButton').addEventListener("click", historicoButtonClicked);
+
+document.addEventListener('DOMContentLoaded', () => {
+  check_userRole();
+  afterSidebarLoads();
+  getSavedProperties();
+  getSavedCSVImport();
+  sctGetDropdownSheetnames(wsNames);
+  sctGetSavedData();
+});
+
+</script>
 
 <?!= HtmlService.createHtmlOutputFromFile('public/helpers/swal').getContent(); ?>
 <?!= HtmlService.createHtmlOutputFromFile('public/helpers/footer').getContent(); ?>

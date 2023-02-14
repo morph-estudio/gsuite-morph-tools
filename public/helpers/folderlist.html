@@ -1,0 +1,191 @@
+<h3 class="mb-3"><i class="fa-regular fa-folder-open fa-margin fa-fw"></i>Listado de archivos</h3>
+<p>Genera una lista con nombres y links de archivos en una carpeta.</p>
+
+<form novalidate autocomplete="off">
+
+  <div id="userform3">
+    <div class="mb-2">
+
+      <label for="list-files" class="form-label">URL/ID de la carpeta</label>
+      <input type="text" class="form-control shadow-none" id="list-files" placeholder="ej: https://drive.google.com/drive/folders/1DHirb56iLf-T_n6Idq2MP8f8Ok765JuZ?usp=sharing" aria-describedby="template-id-2-help" required>
+      <div class="invalid-feedback">
+      Introduce una URL/ID correcta.
+      </div>
+      <div id="destination-folder-help" class="form-text">Selecciona la celda donde empezará el listado antes de ejecutar.</div>
+
+      <div class="form-check form-switch mt-3">
+        <input class="form-check-input shadow-none" type="checkbox" onchange="document.getElementById('list-files').disabled = this.checked" role="switch" id="use-a1" >
+        <label class="form-check-label" for="use-a1">Usar nota en celda A1 para URL de carpeta<span data-bs-toggle="tooltip" data-bs-placement="right" title="Inserta una nota en la celda A1 de la hoja con la URL de la carpeta de destino si no quieres introducirla aquí cada vez."><i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:1px"></i></span></label> 
+      </div>
+      
+
+      <div class="form-check form-switch mt-3">
+        <input class="form-check-input shadow-none" type="checkbox" role="switch" id="list-image-folder" >
+        <label class="form-check-label" for="list-image-folder">Insertar carpeta de imágenes<span data-bs-toggle="tooltip" data-bs-placement="right" title="Inserta las imágenes de una carpeta. Primero elige si insertarlas en las celdas o a través de su URL Pública con un Arrayformula y luego añade las columnas que quieras."><i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:1px"></i></span></label>
+      </div>
+
+      <div class="mt-2 mb-3 ms-4">
+
+        <div class="form-check form-check-inline">
+          <input class="form-check-input shadow-none arrayelements" type="checkbox" id="imagefolder-image" disabled>
+          <label class="form-check-label" style="position:relative;top:2px" for="imagefolder-image">Imágenes en celdas</label>
+        </div>
+
+        <div class="form-check form-check-inline">
+          <input class="form-check-input shadow-none" type="checkbox" id="imagefolder-arrayformula" disabled>
+          <label class="form-check-label" style="position:relative;top:2px" for="imagefolder-arrayformula">Usar ArrayFormula</label>
+        </div>
+
+        <div class="mt-2">
+          <p style="color:#9EA4AA;margin-bottom:5px;">Añadir columnas:</p>
+
+          <div class="form-check form-check-inline">
+            <input class="form-check-input shadow-none arrayelements" type="checkbox" id="imagefolder-filename" disabled>
+            <label class="form-check-label" style="position:relative;top:2px" for="imagefolder-filename">Filename</label>
+          </div>
+
+          <div class="form-check form-check-inline">
+            <input class="form-check-input shadow-none" type="checkbox" id="imagefolder-fileid" disabled>
+            <label class="form-check-label" style="position:relative;top:2px" for="imagefolder-fileid">ID</label>
+          </div>
+        </div>
+
+      </div>
+
+        <button class="btn btn-primary gmt shadow-none w-100 centerScroll" id="listButton">Listar archivos</button>
+
+    </div>
+  </div>
+</form>
+
+<!--
+<div class="mt-2 mb-2">
+  <label for="heightNumber" class="form-label mt-3">Altura de filas</label>
+  <div class="input-group flex-nowrap update ">
+    <span class="input-group-text"><i class="fa-solid fa-arrow-up-1-9"></i></span>
+    <input type="text" class="form-control shadow-none" id="heightNumber" placeholder="ej: 100">
+    <button class="btn btn-primary shadow-none" type="button" id="increase-rows-height">Go!</button>
+  </div>
+  <div class="form-text">Introduce la altura <b>en píxeles</b> mientras tienes seleccionado el rango de filas.</div>
+</div>
+-->
+
+<!--
+<div class="mb-4">
+  <h3>Estructura de carpetas</h3>
+  <p>Hay que seguir la estructura de niveles de la <b>plantilla</b>.</p>
+
+  <button class="btn btn-primary gmt sup grey w-100 shadow-none mb-1" onclick="execFunction('autoFolderTreeTpl', 'Se ha generado una plantilla para la estructura de carpetas.')">Crear plantilla</button>
+  <button class="btn btn-primary gmt inf pink w-100 shadow-none" onclick="swalConfirm('autoFolderTree', 'Se ha generado la estructura de carpetas.', 'Una vez ejecutado no se puede detener. Confirma para continuar.')">Generar estructura de carpetas</button>
+</div>
+-->
+
+<script>
+
+var checkSelector = $('#imagefolder-image, #imagefolder-public-url, #imagefolder-fileid, #imagefolder-arrayformula, #imagefolder-filename');
+
+$('#list-image-folder').change(function () {
+    if ($(this).prop('checked')) {
+
+        checkSelector.attr("disabled", false);
+        $('#imagefolder-image').prop('checked', true);
+        $('#imagefolder-arrayformula').prop('checked', false);
+
+    } else {
+        //$('#imagefolder-image').attr('checked', false);
+        checkSelector.attr("disabled", true);
+        checkSelector.prop('checked', false);
+    }
+});
+
+$('#imagefolder-image').change(function () {
+    if ($(this).prop('checked')) {
+        $('#imagefolder-arrayformula').prop('checked', false);
+    } else {
+        $('#imagefolder-arrayformula').prop('checked', true);
+    }
+});
+
+$('#imagefolder-arrayformula').change(function () {
+    if ($(this).prop('checked')) {
+      $('#imagefolder-image').prop('checked', false);
+    } else {
+      $('#imagefolder-image').prop('checked', true);
+    }
+});
+
+</script>
+
+<script>
+
+function afterButtonClicked(){
+
+  if(validate()){
+
+    let listFolderID = document.getElementById("list-files");
+    let useA1 = document.getElementById("use-a1").checked;
+    let listImageFolder = document.getElementById("list-image-folder").checked;
+    let imageFolderFileID = document.getElementById("imagefolder-fileid").checked;
+    let imageFolderFileName = document.getElementById("imagefolder-filename").checked;
+    let imageFolderImage = document.getElementById("imagefolder-image").checked;
+    let imageFolderArrayFormula = document.getElementById("imagefolder-arrayformula").checked;
+    let rowData = {
+      listFolderID: listFolderID.value,
+      useA1,
+      imageFolderFileID,
+      imageFolderFileName,
+      imageFolderImage,
+      imageFolderArrayFormula
+    };
+      swaload();
+      if (listImageFolder) {
+        execNoSuccess('insertImagesOfFolder', rowData);
+        // google.script.run.withSuccessHandler(e => {swalsuccess('Las imágenes se han listado correctamente.'), afterSubmit(e)}).withFailureHandler(swalerror).insertImagesOfFolder(rowData);
+      } else {
+        execNoSuccess('listFilesInFolder', rowData);
+        // google.script.run.withSuccessHandler(e => {swalsuccess('Los archivos se han listado correctamente.'), afterSubmit(e)}).withFailureHandler(swalerror).listFilesInFolder(rowData);
+      }
+  }
+}
+
+function clearFields(fields){
+  fields.forEach(function(field){
+    var el = document.getElementById(field);
+    el.value = "";
+  });
+}
+
+function validate(){
+  var fieldsToValidate = document.querySelectorAll("#userform3 input");
+
+  Array.prototype.forEach.call(fieldsToValidate, function(el){
+    if (el.checkValidity()){
+      el.classList.remove("is-invalid");
+    } else{
+      el.classList.add("is-invalid");
+    }
+  });
+
+  return Array.prototype.every.call(fieldsToValidate,function(el){
+  return el.checkValidity();
+  });
+}
+
+/*
+function increaseRowsHeight(){
+  var heightSelectedNumber = document.getElementById("heightNumber").value;
+  var rowData = {
+    heightSelectedNumber
+  }
+  execNoSuccess('adjustRowsHeight', rowData);
+}
+
+function afterSubmit(e){
+  clearFields(["list-files"]);
+}
+*/
+
+document.getElementById("listButton").addEventListener("click",afterButtonClicked);
+document.getElementById("increase-rows-height").addEventListener("click",increaseRowsHeight);
+  
+</script>

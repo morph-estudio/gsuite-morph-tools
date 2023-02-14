@@ -1,6 +1,14 @@
 /* eslint-disable no-only-tests/no-only-tests */
 
 /**
+ * waiting
+ * Pausa el script por milisegundos, lo que en ocasiones permite evitar bloqueos
+ */
+function waiting(ms) {
+  Utilities.sleep(ms);
+}
+
+/**
  * isValidHttpUrl
  * Chequea si una URL es válida
  */
@@ -159,4 +167,71 @@ function keepNewestFilesOfEachNameInAFolder(folder) {
       }
     });
   });
+}
+
+/**
+ * getLastDataRow
+ * Get last row in a single column
+ */
+function getLastDataRow(sh, column) {
+  var lastRow = sh.getLastRow();
+  var range = sh.getRange(column + lastRow);
+  if (range.getValue() !== "") {
+    return lastRow;
+  } else {
+    return range.getNextDataCell(SpreadsheetApp.Direction.UP).getRow();
+  }              
+}
+
+/**
+ * getSplitA1Notation
+ * Separa las letras y números de una notación A1 de Google Sheets.
+ */
+function getSplitA1Notation(cell) {
+  let splitArray = cell.split(/([0-9]+)/);
+  return splitArray;
+}
+
+/**
+ * letterToColumn
+ * Return the column number based on the letter input for a Google Sheets sheet.
+ */
+function letterToColumn(letter) {
+  let column = 0, length = letter.length;
+  for (var i = 0; i < length; i++) {
+    column += (letter.charCodeAt(i) - 64) * Math.pow(26, length - i - 1);
+  }
+  return column;
+}
+
+/**
+ * getShiftedLetter
+ * Return the letter of a column shifted a number of times.
+ */
+function getShiftedLetter(letter, shiftNumber) {
+  var charCode = letter.charCodeAt(0);
+  var newCharCode = charCode + shiftNumber;
+  return String.fromCharCode(newCharCode);
+}
+
+/**
+ * getSheetnames
+ * Devuelve una lista con el nombre de las hojas del documento Sheets.
+ */
+function getSheetnames(ss) { 
+  var out = [];
+  var sheets = ss.getSheets();
+  for (var i = 0 ; i < sheets.length ; i++) out.push( sheets[i].getName() )
+  return out;
+}
+
+/**
+ * deleteAllSheetNotes
+ * Delete all cell notes in the selected sheet
+ */
+function deleteAllSheetNotes(sh) {
+  let notes = sh.getNotes();
+  for (var i = 0; i < notes.length; i++) {
+    sh.getRange(notes[i].getRow(), notes[i].getColumn()).clearNote();
+  }
 }
