@@ -9,9 +9,10 @@
   --primary-padding: 15px;
   --primary-fontfamily: 'Inter', sans-serif;
   --fontsize-small: 12px;
-  --fontsize-one: 15px;
-  --fontsize-two: 16px;
-  --fontsize-three: 18px;
+  --fontsize-15: 15px;
+  --fontsize-16: 16px;
+  --fontsize-18: 18px;
+  --fontsize-20: 20px;
   --help-lineheight: 18px;
   --primary-lineheight: 1.3em;
   --fontweight-thin: 400;
@@ -40,7 +41,7 @@ html {
   font-family: 'Inter', sans-serif !important;
 }
 body {
-  //background-image: linear-gradient(#edf1f2, #fff);
+  // background-image: linear-gradient(#edf1f2, #fff);
   font-family: var(--primary-fontfamily);
   color: var(--primary-color);
   text-rendering: optimizeLegibility !important;
@@ -53,13 +54,13 @@ body {
   padding-right: var(--primary-padding);
 }
 p {
-  font-size: var(--fontsize-one);
+  font-size: var(--fontsize-15);
   font-weight: var(--fontweight-regular);
   line-height: var(--primary-lineheight);
   position: relative;
   margin-top: 5px;
 }
-.font-xl { font-size: var(--fontsize-two) }
+.font-xl { font-size: var(--fontsize-16) }
 a {
   color: var(--link-color);
   text-decoration:none;
@@ -134,6 +135,8 @@ td {
   width: 85%;
   height: auto;
   padding: 8px 0px 8px 8px;
+}
+img {
   -moz-user-select: none;
   -webkit-user-select: none;
   user-select: none;
@@ -157,14 +160,33 @@ td {
   margin-left: 5px;
   color: #B0BEC5;
 }
+.fa-questionstyle.roboto {
+  margin-left: 0px;
+}
+.fa-sizing {
+  font-size: 75%;
+  vertical-align: middle;
+}
+
+
 
 // Buttons
 
 .btn-xl {
-  font-size: var(--fontsize-three);
+  font-size: var(--fontsize-18);
   font-weight: var(--fontweight-bold);
   line-height: 1.4em;
   padding: 10px 10px;
+}
+.btn-formula-dropper {
+  background-color: #f8f9fa !important;
+  border-color: #ccc !important;
+  color: #6c757d !important;
+}
+.btn-formula-dropper:hover {
+  background-color: #e2e3e5 !important;
+  border-color: #b4b4b4 !important;
+  color: #212529 !important;
 }
 .btn-refresh {
   height: 32px;
@@ -186,7 +208,7 @@ td {
   border-radius: 0px;
   padding: 10px 9px 10px 15px;
   margin-top: 0px;
-  font-size: var(--fontsize-one);
+  font-size: var(--fontsize-15);
   color: var(--primary-color);
   font-weight: var(--fontweight-bold);
   text-align: left;
@@ -198,21 +220,43 @@ td {
   color: var(--secondary-color);
   border-bottom: 1px solid var(--primary-color);
 }
+
+.btn.btn-primary.index.i2 {
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid #D2D2D2;
+  border-radius: 0px;
+  padding: 10px 9px 10px 15px;
+  margin-top: 0px;
+  font-size: var(--fontsize-15);
+  color: var(--primary-color);
+  font-weight: var(--fontweight-bold);
+  text-align: left;
+  line-height: 1.4em;
+  transition: all .3s;
+}
+.btn.btn-primary.index.i2:hover {
+  background-color: #F7F7F7;
+  border-bottom: 1px solid #D2D2D2;
+}
+
+
 .btn.btn-primary.index.ult{ border-bottom: none !important; }
+
+.btn.btn-primary.index.i2.ult2{ border-bottom: none !important; border-radius: 0px 0px 5px 5px }
+
 .btn.btn-primary.index.half{ border-right: 1px dotted var(--primary-color); }
 .btn.gmt {
   border: none;
   padding: 12px 15px;
-  font-size: var(--fontsize-three);
+  font-size: var(--fontsize-18);
   text-align: center;
   line-height: var(--primary-lineheight);
   font-weight: 500;
   transition: all .15s linear;
   -moz-transition: all .15s linear;
 }
-.btn.gmt.sup {
-  border-radius: 10px 10px 0 0;
-}
+
 .form-control.update {
   background-color: #FFF8E1;
   color: #FB8C00;
@@ -225,9 +269,69 @@ td {
   color: #fdba66;
   font-weight: bold;
 }
-.btn.gmt.sup:hover { padding: 15px 15px; }
-.btn.gmt.inf { border-radius: 0 0 10px 10px }
-.btn.gmt.inf:hover { padding: 15px 15px; }
+textarea[data-placeholder="placeholderFormula"]::placeholder {
+  font-size: 13px;
+  font-family: "Roboto Mono", monospace;
+}
+.montserrat {
+  font-family: Montserrat, sans-serif;
+}
+
+
+.cache-btn {
+  background-color: transparent; /* color de fondo del botón */
+  border: none; /* eliminar borde */
+  color: white; /* color de texto */
+  text-align: center; /* centrar texto */
+  text-decoration: none; /* eliminar subrayado */
+  display: inline-block; /* mostrar como bloque */
+  font-size: 16px; /* tamaño de fuente */
+  cursor: pointer; /* cambiar cursor al pasar el ratón sobre él */
+  padding: 0px;
+}
+.cache-btn:hover {
+  background-color: transparent; /* color de fondo del botón */
+}
+
+.cache-btn img {
+  width: 54px; /* ancho de la imagen */
+  height: 54px; /* altura de la imagen */
+  animation: spin 8s linear infinite; /* animación de rotación */
+  transform-origin: center center;
+  -webkit-transform-origin: 50% 50%;
+  -moz-transform-origin: 50% 50%;
+  -o-transform-origin: 50% 50%;
+  transform-origin: 50% 50%;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+
+
+
+.btn.gmt.sup {
+  padding: 18px 18px;
+  border-radius: 10px 10px 0 0;
+}
+.btn.gmt.sup:hover {
+  padding: 23px 23px;
+}
+.btn.gmt.inf {
+  padding: 18px 18px;
+  border-radius: 0 0 10px 10px;
+}
+.btn.gmt.inf:hover {
+  padding: 23px 23px;
+}
+
 .btn.gmt.yellow {
   background-color: var(--color-yellow-button);
   color: #263238;
@@ -251,13 +355,81 @@ td {
 .btn.btn-outline-primary {
   font-weight:600;
 }
+
+// Botones del gestor de fórmulas
+.btn.gmt.coral {
+  background-color: #FF7F50;
+  border-color: #FF7F50;
+  color: #fff;
+}
+.btn.gmt.coral:hover {
+  background-color: #FF6347;
+  border-color: #FF6347;
+  color: #fff;
+}
+.btn.gmt.steel {
+  background-color: #B0C4DE;
+  border-color: #B0C4DE;
+  color: #fff;
+}
+.btn.gmt.steel:hover {
+  background-color: #8696a9;
+  border-color: #8696a9;
+  color: #fff;
+}
+
+// Botones de optimización
+.btn.optGreen {
+  color: #3bb273;
+  border-color: #3bb273;
+}
+.btn.optGreen:hover {
+  color: #fff;
+  background-color: #3bb273;
+  border-color: #3bb273;
+}
+.btn.optYellow {
+  color: #ffbe2e;
+  border-color: #ffbe2e;
+}
+.btn.optYellow:hover {
+  color: #fff;
+  background-color: #ffbe2e;
+  border-color: #ffbe2e;
+}
+.btn.optRed {
+  color: #ba324f;
+  border-color: #ba324f;
+}
+.btn.optRed:hover {
+  color: #fff;
+  background-color: #ba324f;
+  border-color: #ba324f;
+}
+
+.btn-round {
+  height: 30px; /* Cambia esto al valor de altura que desees */
+  width: 30px; /* Cambia esto al valor de ancho que desees */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-round i {
+  font-size: 14px; /* Cambia esto al tamaño de fuente que desees */
+}
+
+
+
+
+
 .btn.btn-primary.index.navMenu {
   border: none;
   border-top: 1px solid #917a30;
   color: #302910;
   padding: 12px 8px 10px 20px;
   background-color: var(--morph-color);
-  font-size: var(--fontsize-three);
+  font-size: var(--fontsize-18);
   shadow: none;
 }
 .btn.btn-primary.index.navMenu:hover {
@@ -270,7 +442,7 @@ td {
   border: none;
   border-radius: 0px;
   padding: 10px 9px 10px 15px;
-  font-size: var(--fontsize-two);
+  font-size: var(--fontsize-16);
   color: var(--secondary-color);
   font-weight: var(--fontweight-bold);
   text-align: left;
@@ -384,7 +556,7 @@ border: none;
 }
 .accordion-body {
   padding: 0px 12px 25px 12px;
-  font-size: var(--fontsize-one);
+  font-size: var(--fontsize-15);
   color: var(--primary-color);
   font-weight: 500;
   line-height: 18px;
@@ -397,13 +569,23 @@ border: none;
 .w-65 { width: 65%; }
 .w-35 { width: 35%; }
 .form-label{
-  font-size: var(--fontsize-two);
+  font-size: var(--fontsize-16);
   font-weight: 600;
 }
 .form-check-label {
   position:relative;
   top: 1px;
-  font-size: var(--fontsize-two);
+  font-size: var(--fontsize-16);
+}
+.robotoSwitch {
+  min-width: 30px;
+}
+.robotoLabel {
+  position: relative;
+  top: 1px;
+  left: 3px;
+  font-size: 13px;
+  font-family: 'Roboto Mono', monospace;
 }
 .form-control::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
   color: var(--placeholder-color);
@@ -429,7 +611,7 @@ border: none;
   background: none;
 }
 .nav-tog-i-cus {
-  font-size: var(--fontsize-one); 
+  font-size: var(--fontsize-15); 
   position: relative;
   bottom: 1px;
 }
@@ -443,7 +625,7 @@ border: none;
   margin-top: 15px;
 }
 .me-auto { // Toast Header Title
-  font-size: var(--fontsize-two); 
+  font-size: var(--fontsize-16); 
 }
 .slow-spin {
   -webkit-animation: fa-spin 6s infinite linear;

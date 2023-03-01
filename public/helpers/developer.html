@@ -1,7 +1,7 @@
-<div id="devmenuhidden" style="display: none;" class="devhiddensection mt-4">
+<div style="display: none;" class="devAreaPermission mt-4">
 
   <div class="accordion-body pb-0">
-    <h3 class="menu-h3 mb-3"><i class="fa-solid fa-margin fa-fw fa-laptop-code"></i>Funciones en desarrollo</h3>
+    <h3 class="menu-h3 mb-3"><i class="fa-solid fa-laptop-code fa-margin fa-fw fa-sizing"></i>Funciones en desarrollo</h3>
   </div>
 
   <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('deleteProperties')"><i class="fa-solid fa-trash-can fa-margin fa-fw"></i>Delete Document Properties</button>
@@ -23,7 +23,7 @@
   <button class="btn btn-primary index shadow-none w-100" id="adaptDeleteButton" onclick="execNoSuccess('deleteProperty', 'adaptedSpreadsheet'), execDirect('sidebarIndex')"><i class="fa-solid fa-unlock fa-margin fa-fw"></i>Desbloquear botón adaptar</button>
 
   <div class="accordion-body pb-0 mt-4">
-    <h3 class="menu-h3 mb-3"><i class="fa-solid fa-margin fa-fw fa-square-caret-down"></i>Menú para developers</h3>
+    <h3 class="menu-h3 mb-3"><i class="fa-solid fa-square-caret-down fa-margin fa-fw fa-sizing"></i>Menú para developers</h3>
   </div>
 
   <!--
@@ -35,15 +35,15 @@
 
 </div>
 
-<div id="transicionCuadros" style="display: none" class="accordion-body mt-4 pb-3 devhiddensection">
-    <h3 class="mb-3"><i class="fa-solid fa-margin fa-fw fa-triangle-exclamation"></i>Transición de cuadros</h3>
+<div id="transicionCuadros" style="display: none" class="accordion-body mt-4 pb-3 devAreaPermission">
+    <h3 class="mb-3"><i class="fa-solid fa-triangle-exclamation fa-margin fa-fw fa-sizing"></i>Transición de cuadros</h3>
     <p>Si es un cuadro anterior a <u>Octubre 2022</u> debes adaptarlo antes de actualizar.</p>
     <button class="btn btn-success mainbtn btn-xl w-100" id="adaptButton" onclick="execFunction('adaptarCuadroAntiguo', 'El cuadro se ha adaptado correctamente.')">Adaptar cuadro antiguo</button>
 </div>
 
-<div id="pdfsechidden" style="display: none" class="accordion-body mt-4 pb-3 devhiddensection">
+<div id="pdfsechidden" style="display: none" class="accordion-body mt-4 pb-3 devAreaPermission">
 
-  <h3 class="menu-h3 mb-3"><i class="fa-regular fa-margin fa-fw  fa-file-pdf"></i>Crear PDF Secuencial</h3>
+  <h3 class="menu-h3 mb-3"><i class="fa-regular fa-file-pdf fa-margin fa-fw fa-sizing"></i>Crear PDF Secuencial</h3>
   <p>Selecciona la <u>celda desplegable</u> antes de darle al botón.</p>
 
   <label for="pdfsecFilename" class="form-label"></i>Nombre del archivo</label>
@@ -136,9 +136,6 @@
     swalConfirm('printValidation', 'Se han generado todos los archivos PDF.', 'Asegúrate de tener seleccionada la celda desplegable. Confirma para continuar.', rowData);
   }
 
-  $('#rowsDeleteButton').click(function() {
-    let rowValue = document.getElementById("rowsDeleteInput").value;
-    execNoSuccess('deleteExcessiveRows', rowValue);
-  });
+
 
 </script>

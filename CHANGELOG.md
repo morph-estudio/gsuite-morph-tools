@@ -2,7 +2,29 @@
 # Change Log
 Documentación de cambios del proyecto.
 
-## [ 1.8.0 ] - 2023/01/10
+## [ 1.8.2 ] - 2023/03/01
+
+### Added
+
+- Botón para reformatear la hoja LINK.
+- Botón para limpiar la caché del documento en el apartado "Optimizar documento".
+
+### Changed
+
+- Cambio de la imagen del logo principal, letras en texto en lugar de en imagen.
+- Cambio general de organización y diseño en la sección "Cuadros".
+
+### Fixed
+
+- Bug con los datos "backup" de la hoja LINK a la hora de actualizar a la última versión.
+
+## [ 1.8.1 ] - 2023/01/22
+
+### Fixed
+
+- Bugs generales en el manejo de cuadros debido a los cambios en la última actualización.
+
+## [ 1.8.0 ] - 2023/01/18
 
 ### Added
 
@@ -36,7 +58,7 @@ Documentación de cambios del proyecto.
 - Arreglado bug al usar la función para eliminar filas/columnas vacías.
 - Cambios menores de diseño.
 
-## [ 1.7.1 ] - 2023/01/10
+## [ 1.7.1 ] - 2022/12/27
 
 ### Fixed
 

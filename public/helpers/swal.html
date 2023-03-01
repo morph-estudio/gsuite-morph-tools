@@ -1,12 +1,14 @@
 <script>
 
-function scrollToPageCenter2(heightFactor) {
-  $("html, body").animate({ scrollTop: $(window).height() / heightFactor }, 200, 'linear');
+function scrollToPageCenter() {
+  $('html, body').animate({
+    scrollTop: ($('body').height() / 2) - ($(window).height() / 2)
+  }, 200, 'linear');
 }
 
 $('.centerScroll').click(function() {
   $('html, body').animate({
-    scrollTop: ($(window).height() / 2) - ($(this).height() * 2.5)
+    scrollTop: ($('body').height() / 2) - ($(window).height() / 2)
   }, 200, 'linear');
 });
 
@@ -90,7 +92,7 @@ function swalConfirm(fa, sc, tx, rw, rw2) {
       return;
     }
   })
-    scrollToPageCenter('swal2-title');
+
 }
 
 function swalConfirmAdv(fa, sc, tx, rw, rw2) {

@@ -1,0 +1,217 @@
+<div class="mb-4 text-center">
+  <img src='https://cdn-icons-png.flaticon.com/512/2457/2457902.png' height='auto' width='75' class="mx-auto" style="margin-bottom:15px" />
+  <h3 class="montserrat">Manejo de cuadros</h3>
+</div>
+
+<div class="card mt-2 mb-1">
+  <div class="card-header font-weight-bold" style="font-weight:bold">
+    Cuadro de superficies y mediciones
+  </div>
+  <div class="card-body">
+
+    <!--
+    <h3 class="mb-3"><i class="fa-solid fa-margin fa-fw fa-layer-group fa-sizing"></i>Cuadro de superficies</h3>
+    <h3 class="mb-3"><i class="fa-solid fa-margin fa-fw fa-ruler fa-sizing"></i>Cuadro de mediciones</h3>
+    <p>Usar en las copias de la <b>NAVE NODRIZA</b> de los <u>cuadros MORPH</u>.</p>
+    <h3 class="menu-h3"><i class="fa-solid fa-circle-dot fa-margin fa-fw fa-sizing"></i>Más botoncillos</h3>
+    -->
+
+    <div class="mb-3">
+
+      <div class="form-check form-switch">
+        <input class="form-check-input shadow-none" type="checkbox" role="switch" id="update-linkpage">
+        <label class="form-check-label" style="position:relative;top:2px" for="update-linkpage">Actualizar hoja LINK </label>
+        <span data-bs-toggle="tooltip" data-bs-placement="right" title="Marcar esta casilla en la primera actualización del cuadro o cuando haya nuevos archivos .txt de exportación. Se buscarán de nuevo los archivos y carpetas y se formateará la hoja LINK">
+        <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:1px"></i>
+        </span>
+      </div>
+
+      <div class="mt-3 updateLinkPageCollapse collapse">
+
+        <div class="input-group flex-nowrap update rounded-pill mb-2">
+          <span class="input-group-text prefixUpdateClassColor">Prefijo<span data-bs-toggle="tooltip" data-bs-placement="right" title="Por defecto se importarán los archivos con prefijo TXT (por ejemplo, TXT Sheets Ventanas), pero si usas un paquete de archivos con otro identificativo escribe aquí el prefijo"><i class="fa-regular fa-circle-question fa-questionstyle" style="color:#c0cbd1"></i></span></span> 
+          <input type="text" class="form-control shadow-none prefixUpdateClass" id="updatePrefixID" placeholder="TXT">
+        </div>
+
+        <div class="form-check form-switch">
+          <input class="form-check-input shadow-none prefixUpdateClass" type="checkbox" role="switch" id="prefix-all-switch" onclick="document.getElementById('updatePrefixID').disabled = this.checked">
+          <label class="form-check-label" style="position:relative;top:2px" for="prefix-all-switch">Ignorar prefijos</label> <span data-bs-toggle="tooltip" data-bs-placement="right" title="Añade todos los archivos de la carpeta 'ExpTXT' sin importar el prefijo.">
+          <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:2px"></i>
+        </div>
+
+        <div class="form-check form-switch">
+          <input class="form-check-input shadow-none prefixUpdateClass" type="checkbox" role="switch" id="update-keepVisibility">
+          <label class="form-check-label" style="position:relative;top:2px" for="update-keepVisibility">Mantener visibilidad</label>
+          <span data-bs-toggle="tooltip" data-bs-placement="right" title="Por defecto las hojas importadas se ocultan, marca esta opción para mantenerlas visibles">
+          <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:2px"></i>
+        </div>
+
+      </div>
+
+      <div id="devmenuhidden" style="display: none;" class="devAreaPermission">
+        <div class="form-check form-switch">
+          <input class="form-check-input shadow-none" type="checkbox" role="switch" id="update-debugReport">
+          <label class="form-check-label" style="position:relative;top:2px" for="update-debugReport">Debug Report</label>
+          <span data-bs-toggle="tooltip" data-bs-placement="right" title="Opción para desarrolladores: incluye datos adicionales al logger que pueden ayudar a resolver problemas">
+          <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:2px"></i>
+        </div>
+      </div>
+
+    </div>
+
+    <div>
+      <button id="csUpdater" class="btn btn-primary gmt sup yellow w-100 shadow-none mt-1 mb-1 centerScroll" style="font-size:20px">Actualizar</button>
+      <button id="csFreezer" class="btn btn-primary gmt inf blue w-100 shadow-none centerScroll" style="font-size:20px" onclick="swalConfirm('morphFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">Congelar</button>
+    </div>
+
+  </div>
+</div>
+
+<div class="card mt-2 mb-1">
+  <div class="card-header font-weight-bold" style="font-weight:bold">
+    Histórico de superficies<span data-bs-toggle="tooltip" data-bs-placement="right" title="Todos los cuadros de superficies cuentan con una hoja HISTÓRICO Construidas donde registrar los cambios en el desarrollo del proyecto">
+    <i class="fa-regular fa-circle-question fa-questionstyle" style=""></i></span>
+  </div>
+  <div class="card-body">
+
+    <div>
+      <button class="btn btn-purple gmt btn-xl w-100 shadow-none centerScroll" id="historicoSupButton">Crear punto en el histórico de superficies</button>
+
+      <div class="form-check form-switch d-flex align-items-center mt-2">
+        <div><input class="form-check-input robotoSwitch shadow-none" type="checkbox" role="switch" id="historicoSupAddPlus"></div>
+        <label class="form-check-label robotoLabel" for="historicoSupAddPlus">Añadir al HISTÓRICO desglosado<span data-bs-toggle="tooltip" data-bs-placement="right" title="Crear también un punto histórico en la hoja Histórico CONSTRUIDAS desglosado">
+        <i class="fa-regular fa-circle-question fa-questionstyle roboto"></i></span></label>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="card mt-2 mb-1">
+  <div class="card-header font-weight-bold" style="font-weight:bold">
+    Otras funciones<span data-bs-toggle="tooltip" data-bs-placement="right" title="Todos los cuadros de superficies cuentan con una hoja HISTÓRICO Construidas donde registrar los cambios en el desarrollo del proyecto">
+    <i class="fa-regular fa-circle-question fa-questionstyle" style=""></i></span>
+  </div>
+  <div class="card-body p-0">
+
+    <button class="btn btn-primary index i2 ult2 shadow-none w-100 centerScroll" onclick="swalConfirm('formatLinkSheetOld', 'Se hoja LINK se ha reformateado.', 'Este proceso solo actualizará el formato base a la última versión disponible y no borrará datos relevantes.')"><i class="fa-solid fa-border-none fa-margin fa-fw"></i>Reformatear hoja LINK</button>
+<!--
+    <button class="btn btn-primary index i2 shadow-none w-100 centerScroll" onclick="swalConfirm('formatLinkSheet', 'Se ha generado la hoja LINK.', 'Este proceso solo actualizará el formato base a la última versión, sin tocar los datos de la hoja LINK. Confirma para continuar.')"><i class="fa-solid fa-border-none fa-margin fa-fw"></i>Reformatear hoja LINK (WIP)</button>
+    <button class="btn btn-primary index i2 ult2 shadow-none w-100 centerScroll" onclick="execNoSuccess('getConectedSheetList')"><i class="fa-solid fa-network-wired fa-margin fa-fw"></i>Generar hojas conectadas</button>
+-->
+  </div>
+</div>
+
+
+<div id="borrarFilasExcesivas" style="margin-top:40px">
+
+  <div class="mb-4 text-center">
+    <img src='https://cdn-icons-png.flaticon.com/512/4110/4110253.png' height='auto' width='75' class="mx-auto" style="margin-bottom:15px" />
+    <h3 class="montserrat">Optimizar documento</h3>
+  </div>
+
+  <div class="card">
+    <div class="card-header" style="font-weight:bold">
+      Eliminar filas innecesarias<span data-bs-toggle="tooltip" data-bs-placement="right" title="Elimina las filas sobrantes de la hoja actual hasta llegar a la fila que establezcas como fila máxima">
+  <i class="fa-regular fa-circle-question fa-questionstyle" style=""></i></span>
+    </div>
+    <div class="card-body">
+
+      <div class="input-group flex-nowrap update rounded-pill">
+        <span class="input-group-text prefixUpdateClassColor">Fila máxima<span data-bs-toggle="tooltip" data-bs-placement="right" title="Escribe el número de fila máxima que quieres en la hoja actual"><i class="fa-regular fa-circle-question fa-questionstyle" style="color:#c0cbd1"></i></span></span> 
+        <input type="text" class="form-control shadow-none" id="rowsDeleteInput" placeholder="ej: 100">
+      </div>
+      <button class="btn btn-primary btn-lg-gmt w-100 shadow-none centerScroll mt-1" id="rowsDeleteButton">Borrar filas</button>
+
+    </div>
+  </div>
+
+  <div class="card mt-2 mb-1">
+    <div class="card-header" style="font-weight:bold">
+      Optimización automática<span data-bs-toggle="tooltip" data-bs-placement="right" title="Elimina las filas sobrantes de TODAS LAS HOJAS del documento hasta llegar a la fila máxima 1500/3000/6000, según el botón que elijas">
+  <i class="fa-regular fa-circle-question fa-questionstyle" style=""></i></span>
+    </div>
+    <div class="card-body">
+
+      <div class="d-flex">
+        <button class="btn btn-outline optGreen btn-lg-gmt w-50 shadow-none optSpr" id="optSpr1500">+1500</button>
+        <button class="btn btn-outline optYellow btn-lg-gmt w-50 shadow-none ms-1 optSpr" id="optSpr3000">+3000</button>
+        <button class="btn btn-outline optRed btn-lg-gmt w-50 shadow-none ms-1 optSpr" id="optSpr6000">+6000</button>
+      </div>
+
+      <div class="container mt-3">
+        <div class="row">
+          <div class="col text-center">
+            <button type="button" class="cache-btn centerScroll" data-toggle="tooltip" data-placement="bottom" title="Borrar caché del documento" onclick="swalConfirm('purgeDocumentCache', 'La caché se ha purgado correctamente.', 'Se borrará la memoria caché del documento. Confirma antes de continuar.')">
+              <img src="https://cdn-icons-png.flaticon.com/512/4459/4459985.png" alt="Icono de borrar caché">
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div id="formulaInterop" style="display: none; margin-top:40px" class="formulaModPermission">
+
+  <div class="mb-4 text-center">
+    <img src='https://cdn-icons-png.flaticon.com/512/3190/3190768.png' height='auto' width='75' class="mx-auto" style="margin-bottom:15px" />
+    <h3 class="montserrat">Gestión de fórmulas</h3>
+  </div>
+
+  <div class="card">
+    <div class="card-header" style="font-weight:bold">
+      Morph Formula Database<span data-bs-toggle="tooltip" data-bs-placement="right" title="Importa todas las fórmulas de la base de datos asociadas a este archivo">
+  <i class="fa-regular fa-circle-question fa-questionstyle" style=""></i></span>
+    </div>
+    <div class="card-body">
+
+      <div class="form-check form-switch mb-3 d-flex align-items-center">
+        <div><input class="form-check-input robotoSwitch shadow-none" type="checkbox" role="switch" id="formulaInteropActualSheet"></div>
+        <label class="form-check-label robotoLabel" for="formulaInteropActualSheet">Aplicar únicamente a la hoja actual<span data-bs-toggle="tooltip" data-bs-placement="right" title="Por defecto se importa/exporta todas las hojas del documento, pero puedes marcar esta casilla para hacerlo solo con la hoja actual">
+        <i class="fa-regular fa-circle-question fa-questionstyle roboto"></i></span></label>
+      </div>
+
+
+      <select class="form-select shadow-none mb-2" id="formulaInteropSelectFileType">
+        <option value="plantilla" selected>Documento de plantilla o relacionados</option>
+        <option value="proyecto">El documento tiene código de proyecto</option>
+        <option value="otros">Es otro tipo de documento</option>
+      </select>
+
+      <button id="formulaImportButton" class="btn btn-primary gmt sup coral w-100 shadow-none mb-1 centerScroll">Importar fórmulas de la base de datos</button>
+      <button id="formulaExportButton" class="btn btn-primary gmt inf steel w-100 shadow-none centerScroll">Exportar fórmulas a la base de datos</button>
+
+    </div>
+  </div>
+
+  <div class="card mt-2 mb-1">
+    <div class="card-header font-weight-bold" style="font-weight:bold">
+      Registro local de fórmula<span data-bs-toggle="tooltip" data-bs-placement="right" title="Registra el cambio de la fórmula seleccionada en el Panel de Control de proyecto">
+      <i class="fa-regular fa-circle-question fa-questionstyle" style=""></i></span>
+    </div>
+    <div class="card-body">
+
+      <div class="form-check form-switch mb-3 d-flex align-items-center">
+        <div><input class="form-check-input robotoSwitch shadow-none" type="checkbox" role="switch" id="sendFormulaToTemplate"></div>
+        <label class="form-check-label robotoLabel" for="sendFormulaToTemplate">Revisar en plantilla<span data-bs-toggle="tooltip" data-bs-placement="right" title="Marca esta casilla para que un administrador evalúe si el cambio debe integrarse en la plantilla o nave nodriza">
+        <i class="fa-regular fa-circle-question fa-questionstyle roboto"></i></span></label>
+      </div>
+      
+      <div class="form-group">
+        <div class="input-group mb-1">
+          <textarea class="form-control shadow-none me-1" id="formulaLogFormulaText" rows="2" placeholder="Copia o inyecta aquí la fórmula antigua." data-placeholder="placeholderFormula"></textarea>
+          <button type="button" id="formulaDropperButton" class="btn shadow-none btn-formula-dropper centerScroll" style="width:16%; display: flex; justify-content: center; align-items: center;">
+            <i class="fa-solid fa-eye-dropper"></i>
+          </button>
+        </div>
+
+      <button class="btn btn-primary w-100 shadow-none centerScroll" id="formulaLogButton">Registrar nueva fórmula</button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

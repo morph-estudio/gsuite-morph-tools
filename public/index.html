@@ -25,9 +25,9 @@
     <div id="collapseSheets" class="accordion-collapse collapse show" aria-labelledby="headingSheets" data-bs-parent="#accordionExample">
       <div class="accordion-body pb-0 mt-2">
 
-        <div class="mt-1 pb-0">
+        <!-- <div class="mt-1 pb-0">
           <p>En esta app tienes las funciones implementadas por el equipo I+D para Google Suite.</p>
-        </div>
+        </div> -->
 
         <button id="superFreezerButton" class="btn btn-primary gmt blue btn-lg-gmt w-100 mt-1 mb-3 shadow-none centerScroll"  onclick="swalConfirm('morphFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">Supercongelador</button>
 
@@ -73,105 +73,7 @@
       <div class="accordion-body mt-2">
 
         <?!= HtmlService.createHtmlOutputFromFile('public/helpers/helpCuadros').getContent(); ?>
-
-        <div style="margin-bottom: 25px">
-
-          <div class="form-check form-switch">
-            <input class="form-check-input shadow-none" type="checkbox" role="switch" id="update-linkpage">
-            <label class="form-check-label" style="position:relative;top:2px" for="update-linkpage">Actualizar hoja LINK </label>
-            <span data-bs-toggle="tooltip" data-bs-placement="right" title="Marcar esta casilla en la primera actualización del cuadro o cuando haya nuevos archivos .txt de exportación. Se buscarán de nuevo los archivos y carpetas y se formateará la hoja LINK.">
-            <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:1px"></i>
-            </span>
-          </div>
-
-        <div class="mt-3 updateLinkPageCollapse collapse">
-
-          <div class="input-group flex-nowrap update rounded-pill mb-2">
-            <span class="input-group-text prefixUpdateClassColor">Prefijo<span data-bs-toggle="tooltip" data-bs-placement="right" title="Por defecto se importarán los archivos con prefijo TXT (por ejemplo, TXT Sheets Ventanas), pero si usas un paquete de archivos con otro identificativo escribe aquí el prefijo."><i class="fa-regular fa-circle-question fa-questionstyle" style="color:#c0cbd1"></i></span></span> 
-            <input type="text" class="form-control shadow-none prefixUpdateClass" id="updatePrefixID" placeholder="Por defecto: TXT">
-          </div>
-
-          <div class="form-check form-switch">
-            <input class="form-check-input shadow-none prefixUpdateClass" type="checkbox" role="switch" id="prefix-all-switch" onclick="document.getElementById('updatePrefixID').disabled = this.checked">
-            <label class="form-check-label" style="position:relative;top:2px" for="prefix-all-switch">Ignorar prefijos</label> <span data-bs-toggle="tooltip" data-bs-placement="right" title="Añade todos los archivos de la carpeta 'ExpTXT' sin importar el prefijo.">
-            <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:2px"></i>
-          </div>
-
-          <div class="form-check form-switch">
-            <input class="form-check-input shadow-none prefixUpdateClass" type="checkbox" role="switch" id="update-keepVisibility">
-            <label class="form-check-label" style="position:relative;top:2px" for="update-keepVisibility">Mantener visibilidad</label>
-            <span data-bs-toggle="tooltip" data-bs-placement="right" title="Por defecto las hojas importadas se ocultan, marca esta opción para mantenerlas visibles.">
-            <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:2px"></i>
-          </div>
-
-        </div>
-
-          <div id="devmenuhidden" style="display: none;" class="devhiddensection">
-            <div class="form-check form-switch">
-              <input class="form-check-input shadow-none" type="checkbox" role="switch" id="update-debugReport">
-              <label class="form-check-label" style="position:relative;top:2px" for="update-debugReport">Debug Report</label>
-              <span data-bs-toggle="tooltip" data-bs-placement="right" title="Opción para desarrolladores: incluye datos adicionales al logger que pueden ayudar a resolver problemas.">
-              <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:2px"></i>
-            </div>
-          </div>
-
-        </div>
-
-        <div style="margin-bottom: 30px">
-          <h3 class="mb-3"><i class="fa-solid fa-margin fa-fw fa-layer-group"></i>Cuadro de superficies</h3>
-          <p>Diseñado para funcionar en las copias de la <b>NAVE NODRIZA</b> de los <u>cuadros MORPH</u>.</p>
-
-          <button id="csUpdater" class="btn btn-warning gmt sup w-100 shadow-none mt-1 mb-1 centerScroll">Actualizar cuadro de superficies</button>
-          <button id="csFreezer" class="btn btn-primary gmt inf blue w-100 shadow-none centerScroll" onclick="swalConfirm('morphFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">Congelar cuadro de superficies</button>
-        </div>
-
-        <div style="margin-bottom: 30px">
-          <h3 class="mb-3"><i class="fa-solid fa-margin fa-fw fa-ruler"></i>Cuadro de mediciones</h3>
-          <button id="mediciones" class="btn btn-warning gmt btn-xl w-100 shadow-none centerScroll">Actualizar cuadro de mediciones</button>
-        </div>
-
-        <h3 class="menu-h3 mb-3"><i class="fa-solid fa-circle-dot fa-margin fa-fw"></i>Más botonazos</h3>
-
-        <button class="btn btn-purple gmt btn-xl w-100 shadow-none centerScroll" id="historicoSupButton">Crear punto en el histórico de superficies</button>
-      
-        <div class="form-check form-switch mt-3">
-          <input class="form-check-input shadow-none" type="checkbox" role="switch" id="historicoSupAddPlus">
-          <label class="form-check-label" style="position:relative;top:2px" for="historicoSupAddPlus">Añadir al HISTÓRICO desglosado
-          <span data-bs-toggle="tooltip" data-bs-placement="right" title="Crear también un punto histórico en la hoja Histórico CONSTRUIDAS desglosado.">
-          <i class="fa-regular fa-circle-question fa-questionstyle" style=""></i></label>
-        </div>
-
-        <div id="borrarFilasExcesivas" style="margin-top: 30px">
-          <h3 class="mb-3"><i class="fa-solid fa-delete-left fa-margin fa-fw"></i>Quitar filas excesivas</h3>
-          <div class="input-group flex-nowrap update rounded-pill mb-2">
-            <span class="input-group-text prefixUpdateClassColor">Fila máxima<span data-bs-toggle="tooltip" data-bs-placement="right" title="Escribe el número de filas máximas que quieres en la hoja actual."><i class="fa-regular fa-circle-question fa-questionstyle" style="color:#c0cbd1"></i></span></span> 
-            <input type="text" class="form-control shadow-none" id="rowsDeleteInput" placeholder="p.ej: 100">
-          </div>
-          <button class="btn btn-primary btn-lg-gmt w-100 shadow-none centerScroll " id="rowsDeleteButton">Borrar filas</button>
-        </div>
-
-        <div id="devmenuhidden" style="display: none;" class="devhiddensection">
-          <div style="margin-top: 30px">
-            <h3 class="mb-3"><i class="fa-solid fa-diagram-next fa-margin fa-fw"></i>Modificar fórmulas</h3>
-
-            <div class="form-check form-switch mb-2">
-              <input class="form-check-input shadow-none" type="checkbox" role="switch" id="sendFormulaToTemplate">
-              <label class="form-check-label" style="position:relative;top:2px" for="sendFormulaToTemplate">Enviar a Nave Nodriza</label> <span data-bs-toggle="tooltip" data-bs-placement="right" title="Marca la casilla para que un admin evalúe si el cambio debe integrarse en la plantilla. Mantenlo desmarcado si es un cambio de fórmula para un proyecto local.">
-              <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:2px"></i>
-            </div>
-            
-            <div class="form-group">
-              <div class="input-group mb-1">
-                <textarea class="form-control shadow-none me-1" id="formulaLogFormulaText" rows="2" placeholder="Copia o inyecta aquí la fórmula antigua."></textarea>
-                <button type="button" id="formulaDropperButton" class="btn btn-secondary shadow-none" style="width:16%"><i class="fa-solid fa-eye-dropper"></i></button>
-              </div>
-
-            <button class="btn btn-primary gmt w-100 shadow-none centerScroll" id="formulaLogButton">Registrar nueva fórmula</button>
-            </div>
-          </div>
-        </div>
-
-
+        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/cuadros').getContent(); ?>
 
       </div>
     </div>
@@ -207,7 +109,7 @@
     </div>
   </div>
 
-  <div class="accordion-item devhiddensection" style="display: none;">
+  <div class="accordion-item devAreaPermission" style="display: none;">
     <h2 class="accordion-header" id="headingEstCom">
       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEstCom" aria-expanded="false" aria-controls="collapseEstCom">
         Estilos complejos
@@ -233,7 +135,7 @@
       <div id="password_div">
         <div class="card bg-light border-0 border-top rounded-0 mt-2" >
           <div class="card-body">
-            <label for="hidden_password" class="form-label"><i class="fa-solid fa-key fa-margin fa-fw"></i>Introduce una clave:</label>
+            <label for="hidden_password" class="form-label"><i class="fa-solid fa-key fa-margin fa-fw fa-sizing"></i>Introduce una clave:</label>
             <div class="input-group flex-nowrap update rounded-pill">
               <input name="password" type="password" value="" class="input form-control shadow-none" id="hidden_password" required="true" onkeydown = "if (event.keyCode == 13) document.getElementById('hideSectionButton').click()"/>
               <span class="input-group-text" onclick="password_show_hide();">
@@ -287,6 +189,19 @@ function afterSidebarLoads(){
 
 <script> // Funciones relacionadas con el área de desarrollo y validación de contraseñas
 
+function userRolePermission() {
+  var permission = JSON.parse("<?=JSON.stringify(permission)?>");
+  var keysToIterate = ["formulaModPermission", "devAreaPermission"]; 
+
+  for (var i = 0; i < keysToIterate.length; i++) {
+    var property = keysToIterate[i];
+    let x = document.getElementsByClassName(property);
+    for (var j = 0; j < x.length; j++) {
+      permission[property] ? x[j].style.display = 'block' : x[j].style.display = 'none';
+    }
+  }
+}
+
 function check_password () {
   btnLoading('#hideSectionButton', 'Validando...');
   var field = document.getElementById('hidden_password');
@@ -297,29 +212,29 @@ function check_password () {
     field.classList.add("is-invalid"); setTimeout(function(){validatePassword(field); $('#invalid-developer').removeClass("show").addClass("collapse") }, 3500);
     btnReset("#hideSectionButton");
   } else {
-    google.script.run.withSuccessHandler(function(data){
-    if (data.includes(password)) {
-      let x = document.getElementsByClassName("devhiddensection");
+
+    if (permission[`devGlobalKeys`].includes(password)) {
+
+      let x = document.getElementsByClassName("devAreaPermission");
       for (let i = 0; i < x.length; i++) {
           x[i].style.display = 'block';
       }
+
+    } else if (permission[`manualKeys`].includes(password)) {
+
+      let x = document.getElementsByClassName(password);
+      password.style.display = 'block';
+
     } else {
-      switch (password) {
-        case 'pdfsec':
-          document.getElementById('pdfsechidden').style.display = 'block';
-          break;
-        case 'adaptarcuadro':
-          document.getElementById('transicionCuadros').style.display = 'block';
-          break;
-        default:
+
         $('#invalid-developer').html('<small>La clave es incorrecta.</small>').addClass("show");
         field.classList.add("is-invalid"); setTimeout(function(){validatePassword(field);  $('#invalid-developer').removeClass("show").addClass("collapse") }, 3500);
-      }
+
     }
+
     btnReset("#hideSectionButton");
     $('#hidden_password').val('');
 
-    }).getDevPassword('DevAreaKeys');
   }
 }
 
@@ -327,33 +242,7 @@ function validatePassword(field) {
   field.classList.remove("is-invalid");
 }
 
-function check_userRole(field) {
-  let protection = JSON.parse("<?=JSON.stringify(protection)?>");
-  if (protection === true) {
-
-    let x = document.getElementsByClassName("devhiddensection");
-    let i;
-    for (i = 0; i < x.length; i++) {
-        x[i].style.display = 'block';
-    }
-
-  } else {
-
-    let x = document.getElementsByClassName("devhiddensection");
-    let i;
-    for (i = 0; i < x.length; i++) {
-        x[i].style.display = 'none';
-    }
-  }
-}
-
-function validatePassword(field) {
-  field.classList.remove("is-invalid");
-}
-
-// Función para el botón de ocultar/mostrar contraseña
-
-function password_show_hide() {
+function password_show_hide() { // Función para el botón de ocultar/mostrar contraseña
   var x = document.getElementById("hidden_password");
   var show_eye = document.getElementById("show_eye");
   var hide_eye = document.getElementById("hide_eye");
@@ -396,27 +285,6 @@ function updateButtonClicked() {
   }
 }
 
-function medicionesButtonClicked() {
-  let updateLinkPage = document.getElementById("update-linkpage").checked;
-  let keepSheetVisibility = document.getElementById("update-keepVisibility").checked;
-  let updatePrefix = document.getElementById('updatePrefixID').value;
-  let prefixAll = document.getElementById("prefix-all-switch").checked;
-  let updateDebugReport = document.getElementById("update-debugReport").checked;
-  let btnID = 'Mediciones';
-  var rowData = {
-        updatePrefix,
-        prefixAll,
-        updateLinkPage,
-        keepSheetVisibility,
-        updateDebugReport
-      }
-  if (updateLinkPage) {
-    swalConfirm('morphCSUpdater', 'El cuadro se ha actualizado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', btnID, rowData);
-  } else {
-    swalConfirm('morphCSUpdaterDirect(', 'El cuadro se ha actualizado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', rowData);
-  }
-}
-
 function historicoButtonClicked() {
   let addToDesglosado = document.getElementById("historicoSupAddPlus").checked;
 
@@ -434,7 +302,7 @@ function formulaLogButtonClicked() {
         formulaText,
         sendToTemplate
       }
-  swalConfirm('formulaLogger', 'La fórmula ha quedado registrada.', 'Asegúrate de seleccionar la celda modificada antes de continuar.', rowData);
+  swalConfirm('formulaLogger', 'La fórmula ha quedado registrada.', 'Asegúrate de haber copiado la fórmula antigua en el área de texto y de tener seleccionada la celda modificada antes de continuar.', rowData);
 }
 
 $('#formulaDropperButton').click(function() {
@@ -454,6 +322,7 @@ $('#formulaDropperButton').click(function() {
 $(document).ready(function() {
   $('.prefixUpdateClass').attr("disabled", true);
   $('.prefixUpdateClassColor').css('color', '#B0BEC5');
+  $('.fittext').fitText();
 });
 
 $('#update-linkpage').change(function() {
@@ -481,6 +350,28 @@ function adaptButtonDisable() {
   $('#adaptButton').prop('disabled', true);
   $('#adaptButton').html('<i class="fa-solid fa-margin fa-fw fa-triangle-exclamation"></i>Este cuadro ya se ha adaptado');
 }
+
+$('#rowsDeleteButton').click(function() {
+  let rowValue = document.getElementById("rowsDeleteInput").value;
+  execNoSuccess('deleteExcessiveRows', rowValue);
+});
+
+$('.optSpr').click(function() {
+  scrollToPageCenter();
+  var id = $(this).attr('id').substring(6);
+  swalConfirm('optimizeSpreadsheet', 'El documento se ha optimizado, puedes comprobar su tamaño en la pestaña "Ayuda".', `Se analizarán las hojas que tengan más de ${id} filas y después podrás confirmar si deseas optimizar el documento.`, id);
+});
+
+$('#formulaImportButton, #formulaExportButton').click(function() {
+  let formulaInteropSelectFileType = document.getElementById("formulaInteropSelectFileType").value;
+  let formulaInteropActualSheet = document.getElementById("formulaInteropActualSheet").checked;
+  let buttonId = $(this).attr('id');
+  let buttonClicked; let confirmText;
+
+  buttonId.includes('Import') ? buttonClicked = `Import` : buttonClicked = `Export`;
+  confirmText = formulaInteropActualSheet ? `Se ${buttonClicked.toLowerCase()}arán únicamente las fórmulas correspondientes a la hoja actual.` : `Se ${buttonClicked.toLowerCase()}arán las fórmulas de toda la hoja de cálculo.`;
+  swalConfirm(`formulaDatabase${buttonClicked}`, `Las fórmulas se han ${buttonClicked.toLowerCase()}ado correctamente.`, confirmText, formulaInteropSelectFileType, formulaInteropActualSheet);
+});
 
 </script>
 
@@ -530,18 +421,55 @@ function checkReturn(arg) {
 
 document.getElementById('hideSectionButton').addEventListener("click", check_password);
 document.getElementById('csUpdater').addEventListener("click", updateButtonClicked);
-document.getElementById('mediciones').addEventListener("click", medicionesButtonClicked);
 document.getElementById('formulaLogButton').addEventListener("click", formulaLogButtonClicked);
 document.getElementById('historicoSupButton').addEventListener("click", historicoButtonClicked);
 
 document.addEventListener('DOMContentLoaded', () => {
-  check_userRole();
+  userRolePermission();
   afterSidebarLoads();
   getSavedProperties();
   getSavedCSVImport();
   sctGetDropdownSheetnames(wsNames);
   sctGetSavedData();
 });
+
+
+
+document.addEventListener('DOMContentLoaded',function(){
+    const tooltips = document.querySelectorAll('[data-tooltip]');
+    tooltips.forEach((item)=>{
+        const text =item.dataset.tooltip;
+        const title =item.dataset.tooltipTitle;
+        const tooltip = document.createElement('div');
+        item.addEventListener('mouseenter',(evt)=>{
+            const cords = evt.target.getBoundingClientRect();
+            tooltip.className= 'tooltip';
+            tooltip.innerHTML=`<p>${text}</p>`; 
+            document.body.appendChild(tooltip);
+            tooltip.style.top=`${cords.y + cords.height + 10}px`;
+            tooltip.style.left=`${cords.x + cords.width / 40}px`;
+            
+            setTimeout(() => {
+               tooltip.classList.add('active')
+            },20);
+          
+        });
+        
+        item.addEventListener('mouseleave',()=>{
+            tooltip.classList.remove('active');
+            setTimeout(() => {
+              document.body.removeChild(tooltip)
+            },250);
+        });
+           
+    });
+     
+    
+    
+    });
+
+
+
 
 </script>
 

@@ -13,9 +13,38 @@ function deleteEmptyRows(sh) {
 }
 
 function deleteExcessiveRows(rowsInput) {
-  let sh = SpreadsheetApp.getActiveSheet();
+  var sh = SpreadsheetApp.getActiveSheet();
   let maxRows = sh.getMaxRows();
+  if (maxRows < rowsInput) throw new Error(`La hoja ya tiene menos de ${rowsInput} filas.`)
   sh.deleteRows(rowsInput, maxRows - rowsInput);
+}
+
+function optimizeSpreadsheet(rowsInput) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheets = ss.getSheets();
+  var sheetList = { sheets: [], sheetNames: [] };
+
+  sheets.forEach(function(sh) {
+    let maxRows = sh.getMaxRows();
+    if (maxRows > rowsInput) {
+      sheetList.sheets.push(sh);
+      sheetList.sheetNames.push(sh.getName());
+    }
+  });
+
+  if (sheetList.sheets.length === 0) throw new Error(`No hay ninguna hoja con más de ${rowsInput} filas.`)
+
+  var sheetNamesWithFormat = sheetList.sheetNames.map(name => ` ${name}`);
+
+  var confirm = Browser.msgBox('Optimización del documento', `Las siguientes hojas tienen más de ${rowsInput} filas:\\n\\n${sheetNamesWithFormat}\\n\\nSuponiendo que las celdas sobrantes están vacías, ¿Quieres borrar las celdas vacías hasta la fila ${rowsInput} y así optimizar el documento?`, Browser.Buttons.OK_CANCEL);
+  if (confirm == 'ok') {
+    sheetList.sheets.forEach(function(sh) {
+      let maxRows = sh.getMaxRows();
+      sh.deleteRows(rowsInput, maxRows - rowsInput);
+    });
+  } else {
+    throw new Error(`No se ha optimizado el documento.`)
+  }
 }
 
 function removeEmptyColumns(sh) {
@@ -281,7 +310,9 @@ function insertImagesOfFolder(rowData) {
       }
 
     }
+    SpreadsheetApp.flush();
   });
+  
 }
 
 // FUNCTIONS IN INTEROPERABILITY SECTION
@@ -305,29 +336,42 @@ function sheetConnect(rowData) {
   let ss_url = ss.getUrl();
 
   let sourceSheet = ss.getSheetByName(sheetConnectSheetname);
-  let sourceSheetTabColor = sourceSheet.getTabColor();
-  let target = SpreadsheetApp.openById(getIdFromUrl(sheetConnectTargetURL));
-  let targetSheet = sourceSheet.copyTo(target);
-  targetSheet.setName(sheetConnectSheetname).setTabColor(sourceSheetTabColor);
-  targetSheet.clearContents();
+  var target = SpreadsheetApp.openById(getIdFromUrl(sheetConnectTargetURL));
+  var targetSheets = target.getSheets();
+  var targetSheet;
+  
+  var hojaEncontrada = false;
+  
+  for (var i = 0; i < targetSheets.length; i++) {
+    if (targetSheets[i].getName() == sheetConnectSheetname) {
+      hojaEncontrada = true;
+      break;
+    }
+  }
+  
+  if (hojaEncontrada) {
+    targetSheet = target.getSheetByName(sheetConnectSheetname);
+  } else {
+    targetSheet = sourceSheet.copyTo(target);
+    targetSheet.setName(sheetConnectSheetname).setTabColor(sourceSheet.getTabColor());
+    targetSheet.clearContents();
+  }
 
   let targetSheetLink;
 
   if (sheetConnectLinkList == true) {
     targetSheetLink = target.getSheetByName('LINK');
-    Logger.log(targetSheetLink.getLastRow());
-
-    if (targetSheetLink.getRange('E2').getValue() != `Hojas conectadas`) {
-      targetSheetLink.getRange(2, 5, 1, 2).setValues([[`Hojas conectadas`, `Hojas conectadas: archivo de origen`]]);
-    }
+ 
+    if (targetSheetLink.getRange('E2').getValue() != textMark) getEmptyLinkSheet();
 
     let sheetLink = '#gid=' + targetSheet.getSheetId();
-    let lastRow = getLastDataRow(sh, "C"); Logger.log(`Lastrow: ${lastRow}`);
+    let lastRow = getLastDataRow(sh, 'E');
 
     let linkRange_1 = targetSheetLink.getRange(lastRow, 5, 1, 2);
     let linkRange_2 = targetSheetLink.getRange(lastRow, 5, 1, 1);
-    targetSheetLink.getRange(lastRow, 5, sh.getLastRow(), 2).clearFormat().setFontFamily('Montserrat').setFontSize(14).setFontWeight('normal').setHorizontalAlignment('left').setFontColor('#0000FF');
 
+/*
+    targetSheetLink.getRange(lastRow, 5, sh.getLastRow(), 2).clearFormat().setFontFamily('Montserrat').setFontSize(14).setFontWeight('normal').setHorizontalAlignment('left').setFontColor('#0000FF');
     targetSheetLink.getRange(1, 5, 2, 2).setBackground(null).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
     targetSheetLink.getRange(1, 4, 1, 1).setBorder(true, true, true, true, true, true, '#26c6da', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
 
@@ -335,13 +379,14 @@ function sheetConnect(rowData) {
       targetSheetLink.getRange(2, 5, 1, 2).setBackground('#fff').setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
         .setFontFamily('Inconsolata').setFontWeight('bold').setHorizontalAlignment('center');
     }
+*/
 
     linkRange_1.setValues([[`=hyperlink("${sheetLink}";"${targetSheet.getName()}"& " / ${target.getName()}")`, `=hyperlink("${ss_url}";"${ss.getName()}")`]])
       .setBackground('#fafafa').setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
-    linkRange_2.setBackground('#fff').setFontColor('#78909c')
+    linkRange_2.setBackground('#fff').setFontColor('#78909c');
 
   }
-  targetSheet.getRange('A1').setFormula(`=IMPORTRANGE("${ss_url}";"${sheetConnectSheetname}!A1:AZZ50000")`)
+  targetSheet.getRange('A1').setFormula(`=IMPORTRANGE("${ss_url}";"${sheetConnectSheetname}!A1:AZZ10000")`)
 }
 
 /**

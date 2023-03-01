@@ -10,8 +10,9 @@ function morphCSUpdater(btnID, rowData) {
   // Main variables
 
   const ss = SpreadsheetApp.getActive();
-  var sh = ss.getSheetByName('LINK') || ss.insertSheet('LINK', 1);
-  var ss_id = ss.getId();
+  const sh = ss.getSheetByName('LINK') || ss.insertSheet('LINK', 1).setTabColor('#FFFF00');
+  const ss_id = ss.getId();
+  const ss_name = ss.getName();
   var userMail = Session.getActiveUser().getEmail();
   var dateNow = Utilities.formatDate(new Date(), 'GMT+1', 'dd/MM/yyyy - HH:mm:ss');
   const txtFolderName = `ExpTXT`;
@@ -34,16 +35,28 @@ function morphCSUpdater(btnID, rowData) {
   ];
 
   var [updatePrefix, prefixAll, updateLinkPage, keepSheetVisibility, updateDebugReport] = formData;
-  let backupOriginalFormula = sh.getRange('B8').getFormula();
-  let backupOriginalValues = sh.getRange(9, 2, 2, 1).getValues();
-  sh.getRange(1, 1, sh.getMaxRows(), 4).clear();
+
+  let backupOriginalFormula, backupOriginalValues;
+
+  // Backup Checker: eliminar cuando ya todos los cuadros tengan la hoja actualizada a la última versión (con CARPETA BACKUP en A8)
+  if (sh.getRange('A7').getValue().toString().toLowerCase().includes('backup')) {
+    backupOriginalFormula = sh.getRange('B7').getFormula();
+    backupOriginalValues = sh.getRange(8, 2, 2, 1).getValues();
+  } else {
+    backupOriginalFormula = sh.getRange('B8').getFormula();
+    backupOriginalValues = sh.getRange(9, 2, 2, 1).getValues();
+  }
 
   // Main Format and Column A Text
 
+/*
   var textColumnA = [['URL PANEL DE CONTROL'], [null], ['CARPETA PANEL DE CONTROL'], ['ID CARPETA PANEL DE CONTROL'], ['CARPETA CUADRO'], ['ID CARPETA CUADRO'], ['CARPETA EXPORTACIONES'], ['CARPETA BACKUP'], ['ID CARPETA BACKUP'], ['DESCARGAR ARCHIVO XLSX']];
   sh.getRange(1, 1, textColumnA.length, 1).setValues(textColumnA);
 
   linkPageTemplateFormat(sh); // Cell Format
+*/
+  sh.getDataRange().clear();
+  formatLinkSheetOld(ss);
 
   // File Folder
 
@@ -53,10 +66,18 @@ function morphCSUpdater(btnID, rowData) {
 
   // Control Panel and Control Panel Folder
 
-  let controlPanelFileName, controlPanelFileURL, controlPanelFolderID, controlPanelFolder;
+  var tipodearchivo, controlPanelFileName, controlPanelFileURL, controlPanelFolderID, controlPanelFolder;
+  var tiposDeCuadros = ['superficies', 'mediciones', 'exportaciones']
 
   try {
-    let controlPanelData = getControlPanel(file, btnID);
+
+    if (ss_name.toLowerCase().includes(tiposDeCuadros[0])) {
+      tipodearchivo = tiposDeCuadros[0];
+    } else if (ss_name.toLowerCase().includes(tiposDeCuadros[1])) {
+      tipodearchivo = tiposDeCuadros[1];
+    }
+
+    let controlPanelData = getControlPanel(file, tipodearchivo);
     [controlPanelFileName, controlPanelFileID, controlPanelFileURL, controlPanelFolder] = controlPanelData;
     controlPanelFolderID = controlPanelFolder.getId();
     let controlPanelFile = DriveApp.getFileById(controlPanelFileID);
@@ -78,7 +99,7 @@ function morphCSUpdater(btnID, rowData) {
 
   let list = [];
 
-  if (sh.getDataRange().isBlank() == false) sh.getRange(3, 3, sh.getLastRow() - 2, 2).clear();
+  //if (sh.getDataRange().isBlank() == false) sh.getRange(3, 3, sh.getLastRow() - 2, 2).clear();
   let searchFor = 'title contains "ExpTXT"';
   let expFolder = carpetaCuadroBase.searchFolders(searchFor);
   let expFolderDef = expFolder.next();
@@ -92,7 +113,7 @@ function morphCSUpdater(btnID, rowData) {
   var textImportRange = [['=IMPORTRANGE(B1;"Instrucciones!A1")', '=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1CuMcYrtT6NXwxa9fMEIOTgRfkPySnNwKvA_1dyarCro";"DB-SI!B2")']];
   var textColumnB = [
     [controlPanelFileURL],
-    ['Carpetas principales'],
+    [null],
     [controlPanelFolderText],
     [controlPanelFolderID],
     [`=hyperlink("https://drive.google.com/corp/drive/folders/${carpetaCuadroBaseID}";"${carpetaCuadroBase}")`],
@@ -102,7 +123,8 @@ function morphCSUpdater(btnID, rowData) {
   
   sh.getRange(1, 2, textColumnB.length, 1).setValues(textColumnB);
   sh.getRange(1, 3, 1, 2).setValues(textImportRange);
-  sh.getRange('B8').setFormula(backupOriginalFormula); sh.getRange(9, 2, 2, 1).setValues(backupOriginalValues);
+  sh.getRange('B8').setFormula(backupOriginalFormula);
+  sh.getRange(9, 2, 2, 1).setValues(backupOriginalValues);
 
   // Array List of export files
 
@@ -126,17 +148,19 @@ function morphCSUpdater(btnID, rowData) {
 
   if (list.length < 1) throw new Error(`No se ha encontrado ningun archivo en la carpeta ${txtFolderName} que cumpla los criterios seleccionados.`);
 
-  let result = [['Archivos exportados', 'Archivos exportados: IDs', 'Hoja'], ...list.filter((r) => r[0].includes('.txt')).sort()];
+  let result = [['Archivos importados', 'Archivos importados: IDs', 'Hoja'], ...list.filter((r) => r[0].includes('.txt')).sort()];
   let resultCrop = result.map((val) => val.slice(0, -1));
+  //sh.getRange(2, 3, getLastDataRow(sh,"C") - 1, 2).clearContent();
   sh.getRange(2, 3, result.length, 2).setValues(resultCrop);
   Logger.log(`Export Folder: ${expFolderDef.getName()}, Number of files to import: ${result.length - 1}`)
 
   // Export List Format
 
   sh.getRange(3, 3, list.length, 2).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-  .setFontSize(14).setFontFamily('Montserrat').setFontColor('#78909c').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP).setVerticalAlignment('middle');
-  sh.getRange(3, 3, list.length, 1).setFontWeight('bold');
-  sh.getRange(3, 4, list.length, 1).setBackground('#fafafa');
+  .setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
+  //sh.getRange(3, 3, list.length, 1).setFontWeight('bold');
+  //sh.getRange(3, 4, list.length, 1).setBackground('#fafafa');
+  //sh.getRange(3, 2, 8, 1).setBackground('#fafafa'); // Fondo de la columna B, se colcoca aquí para evitar que se desplace el color a celdas sobrantes
 
   // Copy TXT data in Sheets
 
@@ -167,9 +191,23 @@ function morphCSUpdater(btnID, rowData) {
     }
 
     return [
-      { deleteRange: { range: { sheetId }, shiftDimension: "ROWS" } },
-      { pasteData: { data: tsvContent, coordinate: { sheetId }, delimiter: '\t' } }
-    ];
+      { updateCells: { 
+        range: {
+          sheetId: sheetId,
+          startRowIndex: 0,
+          endRowIndex: sheetPaste.getLastRow(),
+          startColumnIndex: 0,
+          endColumnIndex: sheetPaste.getLastColumn()
+        },
+        fields: "userEnteredValue",
+        rows: [],
+        }},
+      { pasteData: { 
+        data: tsvContent,
+        coordinate: { sheetId },
+        delimiter: '\t' 
+        }}
+      ];
   });
 
   Sheets.Spreadsheets.batchUpdate({ requests }, ss_id);
@@ -186,7 +224,8 @@ function morphCSUpdater(btnID, rowData) {
 
   if (functionErrors.length > 0) {
     var ui = SpreadsheetApp.getUi();
-    functionErrors.forEach(element => ui.alert('Advertencia', element, ui.ButtonSet.OK));
+    var message = functionErrors.join('\n\n');
+    ui.alert('Advertencia', message, ui.ButtonSet.OK);
   }
 }
 
@@ -215,7 +254,7 @@ function morphCSUpdaterDirect(rowData) {
 
   let listValues = sh.getRange("C3:C").getValues();
   let listLength = listValues.filter(String).length;
-  if (listLength < 1) throw new Error('No hay ningún archivo en la lista de archivos exportados.');
+  if (listLength < 1) throw new Error('No hay ningún archivo en la lista de archivos importados.');
   Logger.log(`FILENAME: ${file.getName()}, Number of files to import: ${listLength}`);
   let listRaw = sh.getRange(3,3,listLength,2).getValues();
   let list = listRaw.map(function(item) {
@@ -244,12 +283,26 @@ function morphCSUpdaterDirect(rowData) {
       }
 
       return [
-        { deleteRange: { range: { sheetId }, shiftDimension: "ROWS" } },
-        { pasteData: { data: tsvContent, coordinate: { sheetId }, delimiter: '\t' } }
-      ];
+        { updateCells: { 
+          range: {
+            sheetId: sheetId,
+            startRowIndex: 0,
+            endRowIndex: sheetPaste.getLastRow(),
+            startColumnIndex: 0,
+            endColumnIndex: sheetPaste.getLastColumn()
+          },
+          fields: "userEnteredValue",
+          rows: [],
+          }},
+        { pasteData: { 
+          data: tsvContent,
+          coordinate: { sheetId },
+          delimiter: '\t' 
+          }}
+        ];
 
     } catch (e) {
-      functionErrors.push(`No se ha encontrado el archivo "${txtFileSheet}". Comprueba que exista en la carpeta "${txtFolderName}" o que esté bien escrito el nombre/ID en la lista de archivos exportados de la hoja LINK y luego vuelve a actualizar.`)
+      functionErrors.push(`No se ha encontrado el archivo "${txtFileSheet}". Comprueba que exista en la carpeta "${txtFolderName}" o que esté bien escrito el nombre/ID en la lista de archivos importados de la hoja LINK y luego vuelve a actualizar.`)
     }
 
   });
@@ -268,7 +321,8 @@ function morphCSUpdaterDirect(rowData) {
 
   if (functionErrors.length > 0) {
     var ui = SpreadsheetApp.getUi();
-    functionErrors.forEach(element => ui.alert('Advertencia', element, ui.ButtonSet.OK));
+    var message = functionErrors.join('\n\n');
+    ui.alert('Advertencia', message, ui.ButtonSet.OK);
   }
 }
 
@@ -276,13 +330,15 @@ function morphCSUpdaterDirect(rowData) {
  * getControlPanel
  * Function to search the Control Panel Document in the Folder Structure
  */
-function getControlPanel(file, btnID) {
+function getControlPanel(file, tipodearchivo) {
   let controlPanelData = [];
   let parents;
   var pcMask = 'Panel de control';
 
-  switch (btnID) {
-    case 'Superficies':
+  Logger.log(`Se buscará el panel de control asociado a este cuadro de ${tipodearchivo}...`);
+
+  switch (tipodearchivo) {
+    case 'superficies':
 
       parents = file.getParents();
       while (parents.hasNext() && controlPanelData.length == 0) {
@@ -297,9 +353,8 @@ function getControlPanel(file, btnID) {
         }
         parents = tempFolder.getParents();
       }
-      Logger.log(`CONTROL_PANEL_INFO: ${controlPanelData}`)
       break;
-    case 'Mediciones':
+    case 'mediciones':
 
       parents = file.getParents();
       while (parents.hasNext() && controlPanelData.length == 0) {
@@ -346,46 +401,8 @@ function getControlPanel(file, btnID) {
       }
       break;
   }
+  Logger.log(`CONTROL_PANEL_INFO: ${controlPanelData}`);
   return controlPanelData;
-}
-
-/**
- * linkPageTemplateFormat
- * Basic Styling on LINK page
- */
-function linkPageTemplateFormat(sh) {
-  // Estilo global
-  sh.getRange(1, 1, sh.getMaxRows(), 4).setFontSize(14).setFontFamily('Montserrat').setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP)
-    .setVerticalAlignment('middle')
-    .setFontColor('#78909c');
-  // Col A
-  sh.getRange(1, 1, 10, 1).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontWeight('bold');
-  // Row 2
-  sh.getRange(2, 1, 1, 4).setFontFamily('Inconsolata').setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-    .setFontWeight('bold')
-    .setHorizontalAlignment('center');
-  // Col B
-  sh.getRange(3, 2, 8, 1).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setBackground('#fafafa');
-  // ImportRanges
-  sh.getRange(1, 3, 1, 2).setBackground('#e0f7fa').setBorder(true, true, true, true, true, true, '#26c6da', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontColor('#26c6da')
-    .setFontWeight('bold')
-    .setHorizontalAlignment('center');
-  // Control Panel
-  sh.getRange('B1').setBackground('#ECFDF5').setBorder(true, true, true, true, true, true, '#00C853', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-    .setFontColor('#00C853')
-    .setFontWeight('bold');
-  // Folders Bold
-  sh.getRangeList(['B3', 'B5', 'B7', 'B8']).setFontWeight('bold').setFontColor('#0000FF'); sh.getRange('B10').setFontColor('#0000FF');
-  // Column/Row Size
-  sh.setColumnWidth(1, 340);
-  sh.setColumnWidth(2, 380);
-  sh.setColumnWidth(3, 340);
-  sh.setColumnWidth(4, 380);
-
-  for (let i = 1; i < sh.getMaxRows() + 1; i++) {
-    sh.setRowHeight(i, 28);
-  }
-  sh.setRowHeight(1, 35); sh.setRowHeight(2, 50);
 }
 
 /**

@@ -2,7 +2,10 @@
  * GLOBAL VARIABLES AND FUNCTIONS
  */
 
-const morphDivision = '(I+D)'; const morphDev = '(Devs)'; const gmtVersion = '1.8.3'
+const gmtVersion = '1.8.2';
+const morphDivision = '(I+D)';
+const morphDev = '(Devs)';
+
 const titleIX = 'Gsuite Morph Tools'; const barTitleIX = `💡 ${titleIX} ${gmtVersion}`;
 const titleSM = 'Gestor de hojas'; const barTitleSM = `📋 ${titleSM} ${morphDivision}`;
 const titleDS = 'Morph Document Studio'; const barTitleDS = `✨ ${titleDS} ${morphDivision}`;
@@ -29,6 +32,9 @@ function onOpen(e) {
     .addSeparator()
     .addItem('Changelog', 'sidebarChangelog')
     .addToUi();
+
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    Logger.log(`El usuario ${Session.getActiveUser().getEmail()} ha entrado al documento ${ss.getName()} cuya dirección es: ${ss.getUrl()}`);
 }
 
 function onInstall(e) {
@@ -41,7 +47,7 @@ function onInstall(e) {
 
 function sidebarIndex() {
   let html = HtmlService.createTemplateFromFile('public/index');
-  html.protection = getDevPermission('DevAreaMails'); // html.navBarHEX = '#FFCCBC';
+  html.permission = getDevPermission(); // html.navBarHEX = '#FFCCBC';
   html.isAdapted = getDocProperty('adaptedSpreadsheet'); // html.navBarHEX = '#FFCCBC';
   html.wsNames = getWorksheetNamesArray();
   html = html.evaluate().setTitle(barTitleIX); ui().showSidebar(html);

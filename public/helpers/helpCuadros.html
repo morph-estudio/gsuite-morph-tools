@@ -1,14 +1,14 @@
 <div class="">
 
 <p>
-  <button class="btn btn-outline-success rounded-circle border border-success border-2 shadow-none" style="position:absolute;bottom:28px;left:75%;z-index: 7;padding:1px 6px 1px 6px" type="button" data-bs-toggle="collapse" data-bs-target="#helpCuadroCBase" aria-expanded="false" title="Haz clic para obtener información adicional sobre los cuadros Morph.">
-    <i class="fa-solid fa-circle-info"></i>
+  <button class="btn btn-outline info-green btn-lg-gmt btn-round shadow-none switchButtonColor" style="position:absolute;bottom:28px;left:75%;z-index:7" type="button" data-bs-toggle="collapse" data-bs-target="#helpCuadroCBase" aria-expanded="false" title="Haz clic para obtener información adicional sobre los cuadros Morph.">
+    <i class="fa-solid fa-info"></i>
   </button>
 </p>
 <div class="collapse mb-4" id="helpCuadroCBase">
   <div class="card card-body helpbody p-2">
 
-    <button class="btn btn-outline-success border border-success border-2 mb-2 shadow-none" id="helpCuadroCollapseAllButton" style="text-align: center !important;font-weight:bold;" type="button">
+    <button class="btn btn-outline info-green btn-lg-gmt mb-2 shadow-none switchButtonColor" id="helpCuadroCollapseAllButton" style="text-align: center !important;font-weight:bold;" type="button">
       Expandir todo
     </button>
 
@@ -194,9 +194,33 @@ background-color: #F5F5F5 !important;
   margin-bottom: 5px;
 }
 
-button.btn-outline-success:not(.active) {
+.btn.info-green,
+.btn.info-green:not(.active) {
+  color: #2ecc71;
+  background-color: none; /* Cambia esto al color verde que desees */
+  border-color: #2ecc71; /* Cambia esto al color verde que desees */
+  border-width: 2px;
+}
+.btn.info-green:hover,
+.btn.info-green:active
+ {
+  color: #fff;
+  background-color: #2ecc71; /* Cambia esto al color verde oscuro que desees */
+  border-color: #2ecc71; /* Cambia esto al color verde oscuro que desees */
+}
+
+.btn.info-green,
+.btn.info-green:not(.active) {
+  color: #2ecc71;
   background-color: transparent;
-  color: #198754;
+  border-color: #2ecc71;
+  border-width: 2px;
+}
+.btn.info-green:hover,
+.btn.info-green.active {
+  color: #fff;
+  background-color: #2ecc71;
+  border-color: #2ecc71;
 }
 
 </style>
@@ -279,7 +303,7 @@ var targetId = $(this).attr('id');
 $('#' + targetId + ' + .helpCuadroColapseAllDiv').collapse('toggle');
 });
 
-$(".btn-outline-success").click(function() {
+$(".switchButtonColor").click(function() {
   $(this).toggleClass("active");
 });
 
