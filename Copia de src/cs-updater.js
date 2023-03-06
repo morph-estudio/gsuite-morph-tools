@@ -5,14 +5,14 @@
  * Copyright (c) 2022 Morph Estudio
  */
 
-function morphCSUpdater(btnID, rowData) {
+function morphCSUpdaterOldie(btnID, rowData) {
 
   // Main variables
 
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sh = ss.getSheetByName('LINK') || ss.insertSheet('LINK', 1).setTabColor('#FFFF00');
-  var ss_id = ss.getId();
-  var ss_name = ss.getName();
+  const ss = SpreadsheetApp.getActive();
+  const sh = ss.getSheetByName('LINK') || ss.insertSheet('LINK', 1).setTabColor('#FFFF00');
+  const ss_id = ss.getId();
+  const ss_name = ss.getName();
   var userMail = Session.getActiveUser().getEmail();
   var dateNow = Utilities.formatDate(new Date(), 'GMT+1', 'dd/MM/yyyy - HH:mm:ss');
   const txtFolderName = `ExpTXT`;
@@ -26,7 +26,6 @@ function morphCSUpdater(btnID, rowData) {
   if (fileSharing != 'ANYONE_WITH_LINK') file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
 
   // Variables obtained from user configuration
-
   var formData = [
     rowData.updatePrefix,
     rowData.prefixAll,
@@ -39,8 +38,7 @@ function morphCSUpdater(btnID, rowData) {
 
   let backupOriginalFormula, backupOriginalValues;
 
-  // Backup Checker: eliminar cuando ya todos los cuadros tengan la hoja actualizada a la última versión (con CARPETA BACKUP en A7)
-
+  // Backup Checker: eliminar cuando ya todos los cuadros tengan la hoja actualizada a la última versión (con CARPETA BACKUP en A8)
   if (sh.getRange('A7').getValue().toString().toLowerCase().includes('backup')) {
     backupOriginalFormula = sh.getRange('B7').getFormula();
     backupOriginalValues = sh.getRange(8, 2, 2, 1).getValues();
@@ -51,8 +49,14 @@ function morphCSUpdater(btnID, rowData) {
 
   // Main Format and Column A Text
 
-  sh.getRange('A:E').clear();
-  formatLinkSheet(ss);
+/*
+  var textColumnA = [['URL PANEL DE CONTROL'], [null], ['CARPETA PANEL DE CONTROL'], ['ID CARPETA PANEL DE CONTROL'], ['CARPETA CUADRO'], ['ID CARPETA CUADRO'], ['CARPETA EXPORTACIONES'], ['CARPETA BACKUP'], ['ID CARPETA BACKUP'], ['DESCARGAR ARCHIVO XLSX']];
+  sh.getRange(1, 1, textColumnA.length, 1).setValues(textColumnA);
+
+  linkPageTemplateFormat(sh); // Cell Format
+*/
+  sh.getDataRange().clear();
+  formatLinkSheetOld(ss);
 
   // File Folder
 
@@ -107,9 +111,9 @@ function morphCSUpdater(btnID, rowData) {
   let controlPanelFolderText = controlPanelFolder == undefined ? '' : `=hyperlink("https://drive.google.com/corp/drive/folders/${controlPanelFolderID}";"${controlPanelFolder}")`;
 
   var textImportRange = [['=IMPORTRANGE(B1;"Instrucciones!A1")', '=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1CuMcYrtT6NXwxa9fMEIOTgRfkPySnNwKvA_1dyarCro";"DB-SI!B2")']];
-
   var textColumnB = [
     [controlPanelFileURL],
+    [null],
     [controlPanelFolderText],
     [controlPanelFolderID],
     [`=hyperlink("https://drive.google.com/corp/drive/folders/${carpetaCuadroBaseID}";"${carpetaCuadroBase}")`],
@@ -118,8 +122,9 @@ function morphCSUpdater(btnID, rowData) {
   ];
   
   sh.getRange(1, 2, textColumnB.length, 1).setValues(textColumnB);
-  sh.getRange('B7').setFormula(backupOriginalFormula);
-  sh.getRange(8, 2, 2, 1).setValues(backupOriginalValues);
+  sh.getRange(1, 3, 1, 2).setValues(textImportRange);
+  sh.getRange('B8').setFormula(backupOriginalFormula);
+  sh.getRange(9, 2, 2, 1).setValues(backupOriginalValues);
 
   // Array List of export files
 
@@ -143,24 +148,28 @@ function morphCSUpdater(btnID, rowData) {
 
   if (list.length < 1) throw new Error(`No se ha encontrado ningun archivo en la carpeta ${txtFolderName} que cumpla los criterios seleccionados.`);
 
-  let result = list.filter((r) => r[0].includes('.txt')).sort();
+  let result = [['Archivos importados', 'Archivos importados: IDs', 'Hoja'], ...list.filter((r) => r[0].includes('.txt')).sort()];
   let resultCrop = result.map((val) => val.slice(0, -1));
-  sh.getRange(2, 4, result.length, 2).setValues(resultCrop);
+  //sh.getRange(2, 3, getLastDataRow(sh,"C") - 1, 2).clearContent();
+  sh.getRange(2, 3, result.length, 2).setValues(resultCrop);
   Logger.log(`Export Folder: ${expFolderDef.getName()}, Number of files to import: ${result.length - 1}`)
 
   // Export List Format
 
-  sh.getRange(2, 4, list.length, 2).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+  sh.getRange(3, 3, list.length, 2).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
   .setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
+  //sh.getRange(3, 3, list.length, 1).setFontWeight('bold');
+  //sh.getRange(3, 4, list.length, 1).setBackground('#fafafa');
+  //sh.getRange(3, 2, 8, 1).setBackground('#fafafa'); // Fondo de la columna B, se colcoca aquí para evitar que se desplace el color a celdas sobrantes
 
   // Copy TXT data in Sheets
 
   let txt_file, txt_sharing, tsvUrl, tsvContent, sheetPaste, sheetId;
   let loggerData = [];
 
-  if (sh.getRange('B8').getNote() != '') sh.getRange('B7').clearNote(); // Línea temporal para borrar las notas de la antigua versión (BORRAR EN EL FUTURO)
+  if (sh.getRange('B7').getNote() != '') sh.getRange('B7').clearNote(); // Línea temporal para borrar las notas de la antigua versión (BORRAR EN EL FUTURO)
 
-  sh.getRange('D1').setNote(null).setNote(`Última actualización: ${dateNow} por ${userMail}`); // Last Update Note
+  sh.getRange('C2').setNote(null).setNote(`Última actualización: ${dateNow} por ${userMail}`); // Last Update Note
 
   SpreadsheetApp.flush();
 
@@ -224,7 +233,7 @@ function morphCSUpdater(btnID, rowData) {
  * morphCSUpdaterDirect(
  * Created for faster successive updates
  */
-function morphCSUpdaterDirect(rowData) {
+function morphCSUpdaterDirectOldie(rowData) {
 
   const ss = SpreadsheetApp.getActive();
   let sh = ss.getSheetByName('LINK');
@@ -321,7 +330,7 @@ function morphCSUpdaterDirect(rowData) {
  * getControlPanel
  * Search the Control Panel Document in the Folder Structure
  */
-function getControlPanel(file, tipodearchivo) {
+function getControlPanelOldie(file, tipodearchivo) {
   let controlPanelData = [];
   let parents;
   var pcMask = 'Panel de control';

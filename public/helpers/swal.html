@@ -20,12 +20,12 @@ function execFunction(fa, sc, rw, rw2, rw3) {
   [fa](rw, rw2, rw3);
 }
 
-function execNoSuccess(fa, rw, rw2) {
+function execNoSuccess(fa, rw, rw2, rw3) {
   swaload()
   google.script.run
   .withSuccessHandler(success)
   .withFailureHandler(swalerror)
-  [fa](rw, rw2);
+  [fa](rw, rw2, rw3);
 }
 function success() {
   swal.close();

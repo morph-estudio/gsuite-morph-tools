@@ -1,57 +1,42 @@
+// SECTION = FUNCTIONS IN DEVELOPMENT
 
-function fastInit() {
-  Logger.log('Fast Init makes things faster.')
+function CopyPaste() {
+  var sheet_link = SpreadsheetApp.getActive().getSheetByName('LINK');
+  var spreadsheetId = SpreadsheetApp.getActive().getId();
+  var destFolderId = sheet_link.getRange(10,2).getValue();
+  var dateGMT = Utilities.formatDate(new Date(), "GMT+1", "yyyyMMdd")
+
+  // Copy each sheet in the source Spreadsheet by removing the formulas as the temporal sheets.
+  var ss = SpreadsheetApp.openById(spreadsheetId);
+  var tempSheets = ss.getSheets().map(function(sheet) {
+    var dstSheet = sheet.copyTo(ss).setName(sheet.getSheetName() + "_temp");
+    var src = dstSheet.getDataRange();
+    src.copyTo(src, {contentsOnly: true});
+    return dstSheet;
+  });
+  
+  // Copy the source Spreadsheet.
+  var destination = ss.copy(ss.getName() + " - " + dateGMT);
+  
+  // Delete the temporal sheets in the source Spreadsheet.
+  tempSheets.forEach(function(sheet) {ss.deleteSheet(sheet)});
+  
+  // Delete the original sheets from the copied Spreadsheet and rename the copied sheets.
+  destination.getSheets().forEach(function(sheet) {
+    var sheetName = sheet.getSheetName();
+    if (sheetName.indexOf("_temp") == -1) {
+      destination.deleteSheet(sheet);
+    } else {
+      sheet.setName(sheetName.slice(0, -5));
+    }
+  });
+
+  // Move file to the destination folder.
+  var file = DriveApp.getFileById(destination.getId());
+  DriveApp.getFolderById(destFolderId).addFile(file);
+  file.getParents().next().removeFile(file);
 }
 
-// CUSTOM FUNCTIONS FOR THE DEVELOPER SECTION
-
-/**
- * getDatabaseColumn
- * Devuelve los valores de una columna en documento Sheets externo a través de su título.
- */
-function getDatabaseColumn(headerName) {
-  let params = {
-    muteHttpExceptions: true,
-  };
-  const parsedDB = JSON.parse(UrlFetchApp.fetch('https://opensheet.elk.sh/1lcymggGAbACfKuG0ceMDWIIB9zWuxgVtSR9qpgNq4Ng/Permissions', params).getContentText());
-  const dbColumn = parsedDB.map(i => i[headerName]);
-  return dbColumn;
-}
-
-/**
- * getUserRolePermission
- * Comprueba en la base de datos si el usuario tiene acceso a la información.
- */
-function getDevPermission() {
-  const userMail = Session.getActiveUser().getEmail();
-
-  // Permission Database: https://docs.google.com/spreadsheets/d/1lcymggGAbACfKuG0ceMDWIIB9zWuxgVtSR9qpgNq4Ng/edit#gid=0
-
-  const userDevPermission = getDatabaseColumn(`devAreaPermission`);
-  let devAreaPermission = userDevPermission !== '' && userDevPermission.indexOf(userMail) > -1 ? true : false;
-
-  const userformulaMODPermission = getDatabaseColumn(`formulaModPermission`);
-  let formulaModPermission = userformulaMODPermission !== '' && userformulaMODPermission.indexOf(userMail) > -1 ? true : false;
-
-  const devGlobalKeys = getDatabaseColumn(`devGlobalKeys`);
-
-  const databaseManualKeys = getDatabaseColumn(`databaseManualKeys`);
-
-  var permission = { devAreaPermission: devAreaPermission, devGlobalKeys: devGlobalKeys, formulaModPermission: formulaModPermission, databaseManualKeys: databaseManualKeys };
-  Logger.log(permission);
-  return permission;
-}
-
-/**
- * getDevPassword
- * Comprueba en la base de datos si la contraseña es correcta.
- */
-function getDevPassword(headerName) {
-  const devPassArray = getDatabaseColumn(headerName);
-  return devPassArray;
-}
-
-// FUNCTIONS IN DEVELOPMENT
 
 /**
  * macroModificarCuadros
@@ -71,710 +56,6 @@ function macroModificarCuadros(a) {
   });
   modifiedFormulas.push(row);
   sh.getRange(3, 1, 1, maxColumns).setFormulas(modifiedFormulas);
-}
-
-/**
- * purgeDocumentCache
- * Borrar la memoria caché de la hoja de cálculo
- */
-function purgeDocumentCache() {
-  var cache = CacheService.getDocumentCache();
-  cache.flush();
-  SpreadsheetApp.flush();
-}
-
-function formatLinkSheet() {
-
-  const ss = SpreadsheetApp.getActive();
-  const sh = ss.getSheetByName('LINKs') || ss.insertSheet('LINKs', 0).setTabColor('#FFFF00');
-  var maxRows = sh.getMaxRows();
-  var maxColumns = sh.getMaxColumns();
-
-  sh.getDataRange().clearFormat();
-
-  // Headers
-
-  let prefix_one = 'Archivos importados'; `${prefix_one}`
-  let prefix_two = 'AC';
-
-  let result = [[`Carpetas referentes`, `${prefix_one}`, `${prefix_one}: IDs`, `Archivos conectados`, `${prefix_two}: URL`, `${prefix_two}: Hoja origen`, `${prefix_two}: Hoja destino`]];
-  sh.getRange(2, 2, 1, result[0].length).setValues(result);
-
-  // Column A Titles
-
-  var textColumnA = [['URL PANEL DE CONTROL'], [''], ['CARPETA PANEL DE CONTROL'], ['ID CARPETA PANEL DE CONTROL'], ['CARPETA CUADRO'], ['ID CARPETA CUADRO'], ['CARPETA EXPORTACIONES'], ['CARPETA BACKUP'], ['ID CARPETA BACKUP'], ['DESCARGAR ARCHIVO XLSX']];
-
-  sh.getRange(1, 1, textColumnA.length, 1).setValues(textColumnA);
-
-  // Global Style
-  sh.getRange(1, 1, maxRows, maxColumns).setFontFamily('Montserrat').setFontSize(14).setFontWeight('normal').setFontColor('#607D8B')
-    .setVerticalAlignment('middle')
-    .setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
-
-  // First Row Titles
-  sh.getRange(1, 3, 1, maxColumns - 2).setBorder(null, null, null, null, true, null, '#fff', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
-
-  // Second Row Titles
-  sh.getRange(2, 1, 1, 8).setFontFamily('Inconsolata')
-    .setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-    .setHorizontalAlignment('center');
-
-  // Col A
-  sh.getRange(1, 1, 10, 1).setFontWeight('bold')
-    .setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
-
-  // Col B
-  sh.getRange(1, 2, 10, 1).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
-
-  // Archivos importados List
-  sh.getRange(2, 3, getLastDataRow(sh,"C") - 1, 2).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
-  //sh.getRange(1, 3, 1, 2).setFontColor('#64DD17');
-
-  // Hojas conectadas List
-  sh.getRange(3, 5, getLastDataRow(sh,"H") - 2, 4).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
-  //sh.getRange(1, 5, 1, 4).setFontColor('#4DD0E1');
-
-/*
-  // Hojas conectadas
-  sh.getRange(1, 5, 1, 4).setBackground('#e0f7fa').setBorder(true, true, true, true, true, true, '#26c6da', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontColor('#26c6da')
-    .setHorizontalAlignment('center');
-
-  // Archivos importados
-  sh.getRange(1, 3, 1, 2).setBackground('#ECFDF5').setBorder(true, true, true, true, true, true, '#00C853', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontColor('#00C853')
-    .setHorizontalAlignment('center');
-*/
-
-  // Control Panel
-  sh.getRange('B1').setBackground('#ECFDF5').setFontWeight('bold').setFontColor('#00C853')
-    .setBorder(true, true, true, true, true, true, '#00C853', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
-
-  // Folder Text Style
-  sh.getRangeList(['B3', 'B5', 'B7', 'B8']).setFontWeight('bold').setFontColor('#0000FF');
-  sh.getRange('B10').setFontColor('#0000FF');
-  sh.getRangeList(['A1:A', 'A2:H2', 'C2:C', 'E2:E']).setFontWeight('bold');
-  sh.getRange(1, 9, maxRows, 1).setHorizontalAlignment('right');
-  sh.getRange(1, 11, maxRows, 1).setHorizontalAlignment('center');
-
-  // Agrupar las columnas ImportRange
-  toggleGroup(sh, "I:J");
-
-  // Rows and Columns Size
-  const columnWidths = {
-    "1": 340, "2": 340, "3:4": 340, "5": 400, "6": 250, "7:8": 225, "9": 75, "10": 150, "11": 28
-  };
-
-  setColumnWidths(sh, columnWidths);
-  sheetCustomRowHeight(28, sh);
-  sh.setRowHeight(1, 35);
-  sh.setRowHeight(2, 50);
-
-  // Remove Empty Rows and Columns
-  deleteEmptyRows(sh); removeEmptyColumns(sh);
-}
-
-function setColumnWidths(sheet, columnWidths) {
-  for (const column of Object.keys(columnWidths)) {
-    const [start, end] = column.split(":").map(Number);
-    const width = columnWidths[column];
-    if (isNaN(end)) {
-      sheet.setColumnWidth(start, width);
-    } else {
-      for (let i = start; i <= end; i++) {
-        sheet.setColumnWidth(i, width);
-      }
-    }
-  }
-}
-
-function sheetCustomRowHeight(height, sh) {
-  sh = sh || SpreadsheetApp.getActiveSheet();
-  for (let i = 1; i < sh.getMaxRows() + 1; i++) {
-    sh.setRowHeight(i, height);
-  }
-}
-
-
-
-
-function formatLinkSheetOld(ss) {
-
-  ss = ss || SpreadsheetApp.getActive();
-  const sh = ss.getSheetByName('LINK') || ss.insertSheet('LINK', 0).setTabColor('#FFFF00');
-  sh.getDataRange().clearFormat();
-
-  // Headers
-
-  let prefix_one = 'Archivos importados'; `${prefix_one}`
-
-  let result = [[`Carpetas referentes`, `${prefix_one}`, `${prefix_one}: IDs`]];
-  sh.getRange(2, 2, 1, result[0].length).setValues(result);
-
-  // Column A Titles
-
-  var textColumnA = [['URL PANEL DE CONTROL'], [''], ['CARPETA PANEL DE CONTROL'], ['ID CARPETA PANEL DE CONTROL'], ['CARPETA CUADRO'], ['ID CARPETA CUADRO'], ['CARPETA EXPORTACIONES'], ['CARPETA BACKUP'], ['ID CARPETA BACKUP'], ['DESCARGAR ARCHIVO XLSX']];
-
-  sh.getRange(1, 1, textColumnA.length, 1).setValues(textColumnA);
-
-  var maxRows = sh.getMaxRows();
-  var maxColumns = sh.getMaxColumns();
-
-  // Global Style
-  sh.getRange(1, 1, maxRows, maxColumns).setFontFamily('Montserrat').setFontSize(14).setFontWeight('normal').setFontColor('#607D8B')
-    .setVerticalAlignment('middle')
-    .setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
-
-  // First Row Titles
-  sh.getRange(1, 3, 1, maxColumns - 2).setBorder(null, null, null, null, true, null, '#fff', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
-
-  // Second Row Titles
-  sh.getRange(2, 1, 1, 4).setFontFamily('Inconsolata')
-    .setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-    .setHorizontalAlignment('center');
-
-  // Col A
-  sh.getRange(1, 1, 10, 1).setFontWeight('bold')
-    .setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
-
-  // Col B
-  sh.getRange(1, 2, 10, 1).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
-
-  // Archivos importados List
-  sh.getRange(2, 3, getLastDataRow(sh,"C") - 1, 2).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
-  //sh.getRange(1, 3, 1, 2).setFontColor('#64DD17');
-
-  // ImportRange
-  sh.getRange(1, 3, 1, 2).setBackground('#e0f7fa').setFontWeight('bold').setBorder(true, true, true, true, true, true, '#26c6da', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontColor('#26c6da')
-    .setHorizontalAlignment('center');
-
-  // Control Panel
-  sh.getRange('B1').setBackground('#ECFDF5').setFontWeight('bold').setFontColor('#00C853')
-    .setBorder(true, true, true, true, true, true, '#00C853', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
-
-  // Folder Text Style
-  sh.getRangeList(['B3', 'B5', 'B7', 'B8']).setFontWeight('bold').setFontColor('#0000FF');
-  sh.getRange('B10').setFontColor('#0000FF');
-  sh.getRangeList(['A1:A', 'A2:H2', 'C2:C']).setFontWeight('bold');
-
-  // Rows and Columns Size
-  const columnWidths = {
-    "1": 340, "2": 340, "3:4": 340
-  };
-
-  setColumnWidths(sh, columnWidths);
-  sheetCustomRowHeight(28, sh);
-  sh.setRowHeight(1, 35);
-  sh.setRowHeight(2, 50);
-
-  // Remove Empty Rows and Columns
-  deleteEmptyRows(sh); removeEmptyColumns(sh);
-}
-
-
-
-
-
-
-
-
-
-
-function getConectedSheetList() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheets = ss.getSheets();
-  var importedSheets = [];
-
-
-  // Iterar sobre todas las hojas del documento
-  for (var i = 0; i < sheets.length; i++) {
-    var sheet = sheets[i];
-    var range = sheet.getRange("A1");
-    var formula = range.getFormula();
-    
-    
-    // Si la celda A1 contiene una fórmula IMPORTRANGE, guardar la información en un objeto
-    if (formula.indexOf("IMPORTRANGE") !== -1) {
-      Logger.log(`formula: ${formula}`)
-      var sheetName = sheet.getName();
-      var gid = sheet.getSheetId();
-      var firstCell = getFirstCellA1Notation(sheet);
-
-      var formula, formulaMatch,importedSheetUrl, importedSheetRange, importedSheetUrl, arrayValues, importedSheetName, referencedSheetRange
-
-      if (formula.toString().includes('https://')) {
-
-        formulaMatch = formula.match(/\bIMPORTRANGE\("([^"]+)";"([^"]+)"\)/i);
-        importedSheetUrl = formulaMatch[1].trim();
-        importedSheetRange = formulaMatch[2].trim();
-
-        arrayValues = importedSheetRange.split('!');
-        importedSheetName = arrayValues[0];
-        referencedSheetRange = arrayValues[1];
-
-      } else {
-
-        formulaMatch = formula.match(/\bIMPORTRANGE\(([^;)]+);[\"\']?([^\"\');]+)/i);
-        let firstArgument = formulaMatch[1].trim();
-        importedSheetRange = formulaMatch[2].trim();
-
-        arrayValues = firstArgument.split('!');
-        let referencedSheet = ss.getSheetByName(arrayValues[0])
-        importedSheetUrl = referencedSheet.getRange(arrayValues[1]).getValue();
-
-        arrayValues = importedSheetRange.split('!');
-        importedSheetName = arrayValues[0];
-        referencedSheetRange = arrayValues[1];
-
-      }
-
-      Logger.log(`importedSheetUrl: ${importedSheetUrl}`); Logger.log(`importedSheetName: ${importedSheetName}`);
-
-      // Agregar el objeto a un array
-      importedSheets.push({
-        "Name": importedSheetName,
-        "GID": gid,
-        "URL": importedSheetUrl,
-        "TargetSheetName": sheetName,
-        "FirstCellA1": firstCell
-      });
-    }
-  }
-
-Logger.log(`importedSheets: ${importedSheets}`);
-
-
-  
-  // Construir la lista
-  var rows = [];
-  for (var i = 0; i < importedSheets.length; i++) {
-    var importedSheet = importedSheets[i];
-    importedSheetUrl = importedSheet["URL"]; Logger.log(`importedSheetUrlBeforeOpen: ${importedSheetUrl}`);
-    importedSheetID = getIdFromUrl(importedSheet["URL"]);
-    var importedSpreadsheet = SpreadsheetApp.openById(importedSheetID);
-    var importedSpreadsheetName = importedSpreadsheet.getName();
-    var row = [
-                importedSpreadsheetName,
-                importedSheetUrl,
-                `=HYPERLINK("${importedSheetUrl}#gid=${importedSheet["GID"]}";"${importedSheet["Name"]}")`,
-                `=HYPERLINK("#gid=${importedSheet["GID"]}";"${importedSheet["TargetSheetName"]}")`,
-                importedSheet["FirstCellA1"],
-              ];
-    rows.push(row);
-  }
-  
-  // Ordenar la lista alfabéticamente por el nombre del archivo conectado
-  rows.sort(function(a, b) {
-    var nameA = a[0].toUpperCase();
-    var nameB = b[0].toUpperCase();
-    if (nameA < nameB) {
-      return -1;
-    }
-    if (nameA > nameB) {
-      return 1;
-    }
-    return 0;
-  });
-
-
-  let prefix_two = 'AC';
-
-  rows = [[`Archivos conectados`, `${prefix_two}: URL`, `${prefix_two}: Hoja origen`, `${prefix_two}: Hoja destino`, ""], ...rows];
-  
-  // Pegar la lista en la hoja "LINK"
-  var linkSheet = ss.getSheetByName("LINKs");
-  let lastRow = linkSheet.getLastRow();
-  linkSheet.getRange(2, 5, lastRow - 1, 4).clearContent();
-  linkSheet.getRange(2, 5, lastRow - 1, 4).setBorder(false, false, false, false, false, false, 'black', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontColor('#607D8B');
-
-  let listRange = linkSheet.getRange(2, 5, rows.length, 5);
-
-  listRange.setValues(rows);
-  eliminarDuplicados(linkSheet, listRange);
-
-  if(importedSheets.length > 0) {
-    for (var i = 0; i < importedSheets.length; i++) {
-      let n = i + 3;
-      linkSheet.getRange(`J${n}`).setFormula(`=IF(E${n}<>"";IMPORTRANGE(CHAR(34)&F${n}&CHAR(34);CHAR(39)&G${n}&"'!"&I${n});)`);
-    }
-    linkSheet.getRange('K3').setFormula('=ARRAYFORMULA(IF(E3:E<>"";IF(J3:J<>"";"🟩";"🟥");))')
-    
-  }
-  
-
-  // List Style
-  
-  linkSheet.getRange(2, 5, rows.length, 4).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
-}
-
-
-function eliminarDuplicados(sh, dataRange) {
-
-  // Obtener los datos del rango
-  var data = dataRange.getValues();
-  
-  // Crear un objeto para almacenar los valores únicos de "Archivos conectados"
-  var uniqueValues = {};
-  
-  // Recorrer los datos
-  for (var i = 0; i < data.length; i++) {
-    var row = data[i];
-    
-    // Obtener el valor de "Archivos conectados"
-    var value = row[1];
-    
-    // Si el valor no está en el objeto, almacenarlo
-    if (!uniqueValues[value]) {
-      uniqueValues[value] = true;
-    } else {
-      // Si el valor ya está en el objeto, borrar la celda
-      sh.getRange(i + 2, 5, 1, 1).clearContent();
-      sh.getRange(i + 2, 6, 1, 1).setFontColor('#EFEFEF');
-    }
-  }
-}
-
-function getFirstCellA1Notation(sh) {
-  var sheet = sh;
-  var range = sheet.getDataRange();
-  var values = range.getValues();
-  
-  for (var row = 0; row < values.length; row++) {
-    for (var col = 0; col < values[row].length; col++) {
-      if (values[row][col] != "") {
-        var rowNumber = row + 1;
-        var columnNumber = col + 1;
-        var a1Notation = sheet.getRange(rowNumber, columnNumber).getA1Notation();
-        return a1Notation;
-      }
-    }
-  }
-  
-  return "";
-}
-
-function toggleGroup(sh, columnRange) {
-  try {
-    var group = sh.getColumnGroup(9, 1);
-    group.collapse();
-
-  } catch (error) {
-    sh.getRange(columnRange).shiftRowGroupDepth(1);
-  }
-}
-
-
-
-/**
- * formulaDatabaseImport
- * Importa las fórmulas de la base de datos Morph al documento actual
- */
-function formulaDatabaseImport(formulaInteropSelectFileType, formulaInteropActualSheet) {
-  //const ui = SpreadsheetApp.getUi();
-
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  var finalFolder = formulaDatabaseProjectFolder(ss, formulaInteropSelectFileType, 'import');
-
-  var filesList = { files: [] };
-
-  if (formulaInteropActualSheet) {
-    let searchFor = `${ss.getActiveSheet().getName()}.gse`; // Elimina la extensión de archivo del nombre de la hoja activa
-    Logger.log(`Buscando archivo con título '${searchFor}' en carpeta ${finalFolder.getName()} (${finalFolder.getUrl()}) ...`);
-    let filesIterator = finalFolder.searchFiles("title='" + searchFor + "'");
-    if (filesIterator.hasNext()) {
-      let file = filesIterator.next();
-      let fileName = file.getName().split('.')[0].trim();
-      let contenido = file.getBlob().getDataAsString().replace(/\r\n|\r|\n/g, "\n");
-      let filesData = { name: fileName, content: contenido };
-      filesList.files.push(filesData);
-      Logger.log(`Se encontró un archivo con título '${file.getName()}' en la carpeta asociada al documento.`);
-    } else {
-      throw new Error(`No se ha encontrado ningún archivo en la carpeta '${finalFolder.getName()}' correspondiente a la hoja seleccionada.`);
-    }
-  } else {
-    let files = finalFolder.getFiles();
-    while (files.hasNext()) {
-      let file = files.next();
-      let fileName = file.getName().split('.')[0].trim();
-      let contenido = file.getBlob().getDataAsString().replace(/\r\n|\r|\n/g, "\n");
-      let filesData = { name: fileName, content: contenido };
-      filesList.files.push(filesData);
-    }
-  }
-
-  //var message = filesList.files[0].name + "\n" + filesList.files[0].content;
-  //ui.alert(message)
-
-  var sheet = []
-  var cells = [];
-  var formulas = [];
-  var formulaList = {};
-
-
-  filesList.files.forEach(function(file) {
-    formulaList = {};
-    sheet.push(file.name)
-
-    var lines = file.content.split('\n');
-
-    for (var i = 0; i < lines.length; i++) {
-      var line = lines[i];
-      if (!line.trim()) continue; // Saltar a la siguiente iteración si la línea está vacía
-      if (line.startsWith('// CELL=')) {
-        // Extraer la celda y guardarla en el array de celdas
-        var cell = line.split('=')[1].trim();
-        cells.push(cell);
-      
-        // Buscar la fórmula de la celda y guardarla en el array de fórmulas
-        var formula = '';
-        var inComment = false;
-
-        for (var j = i + 1; j < lines.length; j++) {
-          var nextLine = lines[j];
-
-          if (nextLine.startsWith('// CELL=')) {
-              break; // Se ha encontrado otra celda, salir del bucle
-            } else if (nextLine.trim().startsWith('/*')) {
-              inComment = true;
-            } else if (nextLine.trim().startsWith('*/')) {
-              inComment = false;
-            } else if (nextLine.trim().startsWith('//')) {
-              continue;
-            } else if (nextLine.trim().length < 1) {
-              continue;
-            } else if (!inComment && !nextLine.startsWith('/*')) {
-              // No estamos dentro de un comentario y la línea no empieza por /*
-              // Añadir la línea al array de fórmulas
-              formula += nextLine + '\n';
-            }
-        }
-        formulas.push(formula.substring(1));
-      }
-    }
-
-    formulaList = { cell: cells, formula: formulas };
-
-    var sh = ss.getSheetByName(file.name);
-
-    for (var i = 0; i < formulaList.cell.length; i++) {
-      sh.getRange(formulaList.cell[i]).setFormula(formulaList.formula[i])
-    }
-
-    // Limpiar los arrays para el siguiente archivo
-    cells = [];
-    formulas = [];
-  });
-
-}
-
-/**
- * formulaDatabaseProjectFolder
- * Encuentra la carpeta del documento actual en la base de datos de fórmulas
- */
-function formulaDatabaseProjectFolder(ss, formulaInteropSelectFileType, buttonClicked) {
-
-  var ss_name = ss.getName();
-  const cache = CacheService.getScriptCache();
-  const cacheKey = `folder-${ss_name}`;
-
-  const cachedFolder = cache.get(cacheKey);
-  if (cachedFolder !== null) {
-    var finalFolder = DriveApp.getFolderById(cachedFolder);
-    Logger.log(`Aviso: se ha recuperado la carpeta del documento de la memoria caché.`)
-    return finalFolder;
-  }
-
-  const codePattern = /^P\d{5}/;
-  var ss_code;
-  if (codePattern.test(ss_name)) ss_code = ss_name.substring(0, 6);
-  
-  const baseFolder = DriveApp.getFolderById('1vEX2Z9rcJ-ZUMqHosHYYnEfVHzt1ymJ4');
-  var projectFolder;
-
-  switch(formulaInteropSelectFileType) {
-    case "plantilla":
-      projectFolder = baseFolder.getFoldersByName(`_PLANTILLAS`).next();
-      break;
-    case "proyecto":
-      if (!ss_code) throw new Error(`No se ha encontrado un código de proyecto en el nombre del documento. Añade el código correspondiente o elige otra opción en la configuración.`);
-      projectFolder = baseFolder.getFoldersByName(ss_code).next();
-      break;
-    case "otros":
-      projectFolder = baseFolder.getFoldersByName(`_OTROS`).next();
-      break;
-    default:
-      // Acción por defecto si no se cumple ninguna condición
-  }
-
-  var folders = projectFolder.getFolders();
-  var finalFolder;
-  while (folders.hasNext()) {
-    var folder = folders.next();
-    if (folder.getName() == ss_name) {
-      finalFolder = folder;
-      break;
-    }
-  }
-
-  if (buttonClicked === 'import') {
-    if (!finalFolder) throw new Error(`Has seleccionado que el archivo tiene código de proyecto, pero el código no se ha encontrado en el nombre de archivo.`);
-  } else {
-    if (!finalFolder) {
-      finalFolder = projectFolder.createFolder(ss_name);
-    }
-  }
-
-  // Guarda la carpeta en la caché para futuras ejecuciones
-  cache.put(cacheKey, finalFolder.getId());
-
-  return finalFolder;
-
-}
-
-/**
- * formulaDatabaseExport
- * Exporta las fórmulas del documento actual a la base de datos Morph
- */
-function formulaDatabaseExport(formulaInteropSelectFileType, formulaInteropActualSheet) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  var finalFolder = formulaDatabaseProjectFolder(ss, formulaInteropSelectFileType, 'export');
-
-  var sheets; formulaInteropActualSheet ? sheets = [ ss.getActiveSheet() ] : sheets = ss.getSheets();
-
-  for (let i = 0; i < sheets.length; i++) {
-    var sheet = sheets[i];
-    var sheetName = sheet.getName();
-
-    var cellFormulas = extractCellFormulas(sheet);
-    var fileContent = composeFileContent(cellFormulas);
-
-    var searchFor = `${sheetName}.gse`;
-    let filesIterator = finalFolder.searchFiles(`title='${searchFor}'`);
-    if (filesIterator.hasNext()) {
-      let file = filesIterator.next();
-      file.setContent(fileContent);
-    } else {
-      var fileBlob = Utilities.newBlob(fileContent, "application/octet-stream", `${sheetName}.gse`);
-      finalFolder.createFile(fileBlob);
-    }
-  }
-
-}
-
-function extractCellFormulas(sheet) {
-  const lastRow = sheet.getLastRow();
-  const lastColumn = sheet.getLastColumn();
-  const range = sheet.getRange(1, 1, lastRow, lastColumn);
-  const formulas = range.getFormulas();
-
-  const cellFormulas = {};
-
-  for (let row = 0; row < formulas.length; row++) {
-    for (let col = 0; col < formulas[row].length; col++) {
-      const formula = formulas[row][col];
-      if (formula !== "") {
-        const cell = range.getCell(row + 1, col + 1).getA1Notation();
-        cellFormulas[cell] = formula;
-      }
-    }
-  }
-  return cellFormulas;
-}
-
-function composeFileContent(cellFormulas) {
-  let fileContent = "";
-  const cellList = Object.keys(cellFormulas);
-  cellList.sort();
-
-  let cellListLength = cellList.length;
-
-  for (let i = 0; i < cellListLength; i++) {
-    const cell = cellList[i];
-    const formula = cellFormulas[cell];
-    fileContent += `// CELL=${cell}\n${formula}${i !== cellListLength - 1 ? '\n\n\n' : '\n'}`;
-  }
-
-  return fileContent;
-}
-
-/**
- * formulaLogger
- * Script that logs changes made to formulas in a Google Spreadsheet and records details like user, date, and file/cell location in a "Formula Changelog" sheet.
- */
-function formulaLogger(rowData) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sh = ss.getActiveSheet();
-  let sheetName = sh.getName();
-  let formulaSheetName = `Formula Changelog`;
-
-  // Main Variables
-  var formData = [
-    rowData.formulaText,
-    rowData.sendToTemplate
-  ];
-  var [formulaText, sendToTemplate] = formData;
-
-  //Logger.log(`FORMLATEXT: ${formulaText}, SENDTEMPLATE: ${sendToTemplate}`)
-
-  let user = Session.getActiveUser().getEmail();
-  let dateNow = Utilities.formatDate(new Date(), 'GMT+1', 'dd/MM/yyyy - HH:mm');
-
-  let fileName = ss.getName();
-  let fileURL = `${ss.getUrl()}#gid=${sh.getSheetId()}`;
-  let selectedCell = ss.getCurrentCell();
-  let selectedCellNotation = selectedCell.getA1Notation();
-  let newFormula = selectedCell.getFormula();
-
-  let fileType; 
-  let includesArray = ['Superficies', 'Mediciones', 'Exportación'];
-  let foundString = includesArray.find(function(element) {
-    return fileName.includes(element);
-  });
-
-  if (foundString) {
-    fileType = `Cuadro de ${foundString}`;
-  } else {
-    fileType = `Undefined`;
-  }
-  
-  let controlPanelURL = ss.getSheetByName('LINK').getRange('B1').getValue();
-  let controlPanelID = getIdFromUrl(controlPanelURL); Logger.log(`CPURL: ${controlPanelURL}, CPID: ${controlPanelID}`)
-  let controlPanelFile = SpreadsheetApp.openById(controlPanelID);
-  let controlPanelLoggerSheet = controlPanelFile.getSheetByName(formulaSheetName) || controlPanelFile.insertSheet(formulaSheetName, 200).setTabColor('00FF00');
-
-  if (controlPanelLoggerSheet.getDataRange().isBlank()) {
-    controlPanelLoggerSheet.getRange(1, 1, controlPanelLoggerSheet.getMaxRows(), controlPanelLoggerSheet.getMaxColumns()).setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP).setVerticalAlignment("bottom");
-    let rangeList = controlPanelLoggerSheet.getRangeList(["B1:B", "G1:G", "H1:H"]);
-    rangeList.setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
-    let columns = [{column: 1, width: 180},{column: 2, width: 225},{column: 3, width: 160},{column: 4, width: 100},{column: 5, width: 185},{column: 6, width: 150},{column: 7, width: 60},{column: 8, width: 225},{column: 9, width: 225},{column: 10, width: 100}];
-    columns.forEach(function(column) {
-      controlPanelLoggerSheet.setColumnWidth(column.column, column.width);
-    });
-
-    let headerList = ['Filename', 'Sheet Link', 'Type', 'Date', 'User', 'Sheet', 'Cell', 'Old Formula', 'New Formula', 'Send to Nave Nodriza'];
-    let headerRange = controlPanelLoggerSheet.getRange(1, 1, 1, headerList.length);
-    headerRange.setValues([headerList]);
-    deleteEmptyRows(controlPanelLoggerSheet); removeEmptyColumns(controlPanelLoggerSheet); controlPanelLoggerSheet.appendRow([null]);
-    headerRange.setFontWeight('bold');
-  }
-
-  formulaText = "'" + formulaText;
-  newFormula = "'" + newFormula;
-
-  let dataList = [];
-  dataList.push(fileName, fileURL, fileType, dateNow, user, sheetName, selectedCellNotation, formulaText, newFormula, sendToTemplate);
-
-  controlPanelLoggerSheet.getRange(controlPanelLoggerSheet.getLastRow() + 1, 1, 1, dataList.length).setValues([dataList]);
-}
-
-/**
- * formulaDropper
- * Returns formula of selected cell in current Google Spreadsheet.
- */
-function formulaDropper() {
-  let ss = SpreadsheetApp.getActive();
-  var selectedCell = ss.getCurrentCell();
-  var formula = selectedCell.getFormula();
-  Logger.log(formula)
-  return formula;
 }
 
 /**
@@ -1176,7 +457,7 @@ function convertRangeTotsvFile(tsvFileName, sheet) {
   }
 }
 
-// AUTOFOLDERTREE AND PROJECT FOLDER INIT
+// SECTION = AUTOFOLDERTREE AND PROJECT FOLDER INIT
 
 /**
  * Gsuite Morph Tools - Morph autoFolderTree 1.3
@@ -1316,7 +597,7 @@ function autoFolderTreeTpl() {
   SpreadsheetApp.flush();
 }
 
-// MORPH CHATBOT DEVELOPMENT
+// SECTION = MORPH CHATBOT DEVELOPMENT
 
 /**
  * botBrainSave
@@ -1402,7 +683,7 @@ function authCallback(request) {
   return HtmlService.createHtmlOutput('Access Denied');
 }
 
-// DEPRECATED FUNCTIONS
+// SECTION = DEPRECATED FUNCTIONS
 
 /**
  * colorMe
@@ -1508,4 +789,52 @@ function rowToDict(sheet, rownumber) { // Ni idea de para qué era esta función
     dict_data[key] = data[keys];
   }
   return dict_data;
+}
+
+// SECTION = CUSTOM FUNCTIONS FOR THE DEVELOPER SECTION
+
+/**
+ * getDatabaseColumn
+ * Devuelve los valores de una columna en documento Sheets externo a través de su título.
+ */
+function getDatabaseColumn(headerName) {
+  let params = {
+    muteHttpExceptions: true,
+  };
+  const parsedDB = JSON.parse(UrlFetchApp.fetch('https://opensheet.elk.sh/1lcymggGAbACfKuG0ceMDWIIB9zWuxgVtSR9qpgNq4Ng/Permissions', params).getContentText());
+  const dbColumn = parsedDB.map(i => i[headerName]);
+  return dbColumn;
+}
+
+/**
+ * getUserRolePermission
+ * Comprueba en la base de datos si el usuario tiene acceso a la información.
+ */
+function getDevPermission() {
+  const userMail = Session.getActiveUser().getEmail();
+
+  // Permission Database: https://docs.google.com/spreadsheets/d/1lcymggGAbACfKuG0ceMDWIIB9zWuxgVtSR9qpgNq4Ng/edit#gid=0
+
+  const userDevPermission = getDatabaseColumn(`devAreaPermission`);
+  let devAreaPermission = userDevPermission !== '' && userDevPermission.indexOf(userMail) > -1 ? true : false;
+
+  const userformulaMODPermission = getDatabaseColumn(`formulaModPermission`);
+  let formulaModPermission = userformulaMODPermission !== '' && userformulaMODPermission.indexOf(userMail) > -1 ? true : false;
+
+  const devGlobalKeys = getDatabaseColumn(`devGlobalKeys`);
+
+  const databaseManualKeys = getDatabaseColumn(`databaseManualKeys`);
+
+  var permission = { devAreaPermission: devAreaPermission, devGlobalKeys: devGlobalKeys, formulaModPermission: formulaModPermission, databaseManualKeys: databaseManualKeys };
+  Logger.log(permission);
+  return permission;
+}
+
+/**
+ * getDevPassword
+ * Comprueba en la base de datos si la contraseña es correcta.
+ */
+function getDevPassword(headerName) {
+  const devPassArray = getDatabaseColumn(headerName);
+  return devPassArray;
 }

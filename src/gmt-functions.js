@@ -12,10 +12,17 @@ function deleteEmptyRows(sh) {
   }
 }
 
-function deleteExcessiveRows(rowsInput) {
-  var sh = SpreadsheetApp.getActiveSheet();
+function deleteExcessiveRows(rowsInput, sh) {
+  sh = sh || SpreadsheetApp.getActiveSheet();
   let maxRows = sh.getMaxRows();
   if (maxRows < rowsInput) throw new Error(`La hoja ya tiene menos de ${rowsInput} filas.`)
+  sh.deleteRows(rowsInput, maxRows - rowsInput);
+}
+
+function deleteExcessiveRows2(rowsInput, sh) {
+  sh = sh || SpreadsheetApp.getActiveSheet();
+  let maxRows = sh.getMaxRows();
+  if (maxRows < rowsInput) return;
   sh.deleteRows(rowsInput, maxRows - rowsInput);
 }
 

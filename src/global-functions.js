@@ -235,3 +235,159 @@ function deleteAllSheetNotes(sh) {
     sh.getRange(notes[i].getRow(), notes[i].getColumn()).clearNote();
   }
 }
+
+/**
+ * setColumnWidths
+ * Establece el ancho de las columnas en una hoja; el argumento columnWidths debe ofrecerse como objeto
+ */
+function setColumnWidths(sheet, columnWidths) {
+  for (const column of Object.keys(columnWidths)) {
+    const [start, end] = column.split(":").map(Number); 
+    const width = columnWidths[column]; // Logger.log(`start: ${start}`); Logger.log(`end: ${end}`); Logger.log(`width: ${width}`);
+    if (isNaN(end)) {
+      sheet.setColumnWidth(start, width);
+    } else {
+      for (let i = start; i <= end; i++) {
+        sheet.setColumnWidth(i, width);
+      }
+    }
+  }
+}
+
+/**
+ * setCustomRowHeight
+ * Establece un alto para todas las filas de una hoja
+ */
+function setCustomRowHeight(height, sh) {
+  sh = sh || SpreadsheetApp.getActiveSheet();
+  for (let i = 1; i < sh.getMaxRows() + 1; i++) {
+    sh.setRowHeight(i, height);
+  }
+}
+
+/**
+ * purgeDocumentCache
+ * Borrar la memoria caché de la hoja de cálculo
+ */
+function purgeDocumentCache() {
+  var cache = CacheService.getDocumentCache();
+  cache.flush();
+  SpreadsheetApp.flush();
+}
+
+/**
+ * getFirstCellA1Notation
+ * Return the A1 Notation of the first cell with values in a sheet
+ */
+function getFirstCellA1Notation(sh) {
+  var sheet = sh;
+  var range = sheet.getDataRange();
+  var values = range.getValues();
+  
+  for (var row = 0; row < values.length; row++) {
+    for (var col = 0; col < values[row].length; col++) {
+      if (values[row][col] != "") {
+        var rowNumber = row + 1;
+        var columnNumber = col + 1;
+        var a1Notation = sheet.getRange(rowNumber, columnNumber).getA1Notation();
+        return a1Notation;
+      }
+    }
+  }
+  
+  return "";
+}
+
+function numToCol(num) {
+  var col = "";
+  while (num > 0) {
+    var remainder = (num - 1) % 26;
+    col = String.fromCharCode(65 + remainder) + col;
+    num = Math.floor((num - remainder) / 26);
+  }
+  return col;
+}
+
+function createCollapseGroup(sh, columnIndex, shiftDepth, columnRange) {
+  let group;
+  try {
+    group = sh.getColumnGroup(columnIndex, shiftDepth);
+    group.collapse();
+
+  } catch (error) {
+    sh.getRange(columnRange).shiftRowGroupDepth(shiftDepth);
+    group = sh.getColumnGroup(columnIndex, shiftDepth)
+    group.collapse();
+  }
+}
+
+function checkIfSheetIsEmpty(sheet) {
+  var lastRow = sheet.getLastRow();
+  if (lastRow == 0) {
+    return true;
+  }
+  return false;
+}
+
+function deleteUntilLastDataRow(sh) {
+  sh = sh || SpreadsheetApp.getActiveSheet();
+  var maxRows = sh.getMaxRows();
+  var lastDataRow = 0;
+  
+  for (var i = maxRows; i >= 1; i--) {
+    var rowRange = sh.getRange(i, 1, 1, sh.getLastColumn());
+    var rowValues = rowRange.getValues()[0];
+    var rowIsEmpty = true;
+    
+    for (var j = 0; j < rowValues.length; j++) {
+      if (rowValues[j]) {
+        rowIsEmpty = false;
+        break;
+      }
+    }
+    
+    if (rowIsEmpty) {
+      sh.deleteRow(i);
+    } else {
+      lastDataRow = i;
+      break;
+    }
+  }
+  
+  return lastDataRow;
+}
+
+function getLastDataRowIndex(sheet) {
+  var range = sheet.getDataRange();
+  var values = range.getValues();
+  var numRows = values.length;
+  var lastRow = sheet.getMaxRows();
+
+  for (var i = lastRow - 1; i >= 0; i--) {
+    var row = values[i];
+    if (row.length > 0 && row.join("").length > 0) {
+      return i + 1;
+    }
+  }
+  
+  return 0;
+}
+
+
+/**
+ * importRangeToken
+ * This function set automatic permission for ImportRange functions. TokenID is the ID of destination Google Sheet
+ */
+function importRangeToken(ss_id, tokenID) { // 
+  let url = `https://docs.google.com/spreadsheets/d/${ss_id}/externaldata/addimportrangepermissions?donorDocId=${tokenID}`;
+  let token = ScriptApp.getOAuthToken();
+  let params = {
+    method: 'post',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    muteHttpExceptions: true,
+  };
+
+  UrlFetchApp.fetch(url, params);
+}

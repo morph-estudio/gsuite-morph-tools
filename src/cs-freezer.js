@@ -55,6 +55,8 @@ function morphFreezer(btnID, sheetSelection) {
   destinationSheets = destination.getSheets();
   SpreadsheetApp.flush();
 
+  var { hyperlinkFontColor } = formatVariables();
+
   // DBB Variables ImportRange Permission
 
   elapsedTime = (new Date().getTime() - startTime) / 1000; Logger.log(`Elapsed time before permission: ${elapsedTime} seconds.`);
@@ -154,10 +156,58 @@ function morphFreezer(btnID, sheetSelection) {
 
     // Alternative Workflow for Superfreezer and Partial Freezer
 
+/**/
+  var sheetArray = ss.getSheets();
+  var visibleSheets;
+
+  if (btnID === 'superFreezerButton') {
+    visibleSheets = sheetArray.filter(tempsheet => !tempsheet.isSheetHidden());
+  } else if (btnID === 'actPartialFreezer') {
+    visibleSheets = sheetArray.filter(tempsheet => {
+      return sheetSelection.includes(tempsheet.getName());
+    });
+  }
+
+  var tempSheets = visibleSheets.map(function(sheet) {
+    var dstSheet = sheet.copyTo(ss).setName(sheet.getSheetName() + "_temp");
+    var src = dstSheet.getDataRange();
+    src.copyTo(src, {contentsOnly: true});
+    return dstSheet;
+  });
+  
+  // Copy the source Spreadsheet.
+  var destination = ss.copy(ss.getName() + " - " + freezerDate);
+
+    destinationId = destination.getId();
+    destinationFile = DriveApp.getFileById(destinationId);
+    destinationFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    destination = SpreadsheetApp.openById(destination.getId());
+  
+  // Delete the temporal sheets in the source Spreadsheet.
+  tempSheets.forEach(function(sheet) {ss.deleteSheet(sheet)});
+  
+  // Delete the original sheets from the copied Spreadsheet and rename the copied sheets.
+  var destsheets = destination.getSheets();
+  for (var i = 0; i < destsheets.length; i++) {
+    var sheet = destsheets[i];
+    var sheetName = sheet.getSheetName();
+    if (sheetName.indexOf("_temp") == -1) {
+      destination.deleteSheet(sheet);
+    } else {
+      SpreadsheetApp.flush()
+      sheet.setName(sheetName.replace('_temp',''));
+    }
+  }
+
+/*
+
     destination = SpreadsheetApp.create(destName);
     destinationId = destination.getId();
     destinationFile = DriveApp.getFileById(destinationId);
+    destinationFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
     destination = SpreadsheetApp.openById(destination.getId());
+
+    Logger.log(`destinationId: ${destinationId}`);
 
     var sheetArray = ss.getSheets();
     var visibleSheets;
@@ -176,14 +226,19 @@ function morphFreezer(btnID, sheetSelection) {
     Logger.log(`Visible Sheet Array: ${visibleSheetsNames}`);
 
     visibleSheets.map((sheet) => {
-      let src = sheet.getDataRange();
-      let a1Notation = src.getA1Notation();
+      let src = sheet.getDataRange(); 
+      let a1Notation = src.getA1Notation(); Logger.log(`a1Notation: ${a1Notation}`);
       let values = src.getValues();
-      let dstSheet = sheet.copyTo(destination).setName(`${sheet.getSheetName()}`);
-      dstSheet.getRange(a1Notation).setValues(values);
+      sheet.copyTo(destination).setName(`${sheet.getSheetName()}`);
+      
+      let newSheet = destination.getSheetByName(`${sheet.getSheetName()}`); Logger.log(`newSheet: ${newSheet.getName()}`);
+      newSheet.getRange(a1Notation).setValues(values);
     });
 
     destination.deleteSheet(destination.getSheetByName('Hoja 1'));
+
+*/
+
   }
 
   // Move file to the destination folder
@@ -208,9 +263,9 @@ function morphFreezer(btnID, sheetSelection) {
 
   if (btnID === 'csFreezer') {
     let backupFolderText = backupFolderId == undefined ? '' : `=hyperlink("https://drive.google.com/corp/drive/folders/${backupFolderId}";"${backupFolderName}")`;
-    sh.getRange('B8').setValue(backupFolderText).setFontWeight('bold').setFontColor('#0000FF').setNote(null).setNote(`Último congelado: ${dateNow} por ${userMail}`); // Last Update Note
-    sh.getRange('B9').setValue(backupFolderId);
-    sh.getRange('B10').setValue(url).setFontColor('#0000FF').setFontWeight('normal'); // Add XLSX download url to sheet
+    sh.getRange('B7').setValue(backupFolderText).setFontWeight('bold').setFontColor(hyperlinkFontColor).setNote(null).setNote(`Último congelado: ${dateNow} por ${userMail}`); // Last Update Note
+    sh.getRange('B8').setValue(backupFolderId);
+    sh.getRange('B9').setValue(url).setFontColor(hyperlinkFontColor).setFontWeight('normal'); // Add XLSX download url to sheet
     sh.activate();
   } else if (btnID === 'superFreezerButton' || btnID === 'actPartialFreezer') {
     let confirm = Browser.msgBox('Documento Excel', '¿Quieres crear una copia en formato Excel en la misma carpeta?', Browser.Buttons.OK_CANCEL);

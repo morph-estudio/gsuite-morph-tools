@@ -2,6 +2,12 @@
 # Change Log
 Documentación de cambios del proyecto.
 
+## [ 1.8.3 ] - 2023/03/06
+
+### Fixed
+
+- Arreglado bug en el supercongelador.
+
 ## [ 1.8.2 ] - 2023/03/01
 
 ### Added

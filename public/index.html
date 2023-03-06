@@ -364,13 +364,21 @@ $('.optSpr').click(function() {
 
 $('#formulaImportButton, #formulaExportButton').click(function() {
   let formulaInteropSelectFileType = document.getElementById("formulaInteropSelectFileType").value;
-  let formulaInteropActualSheet = document.getElementById("formulaInteropActualSheet").checked;
+  let formulaInteropAllDocument = document.getElementById("formulaInteropAllDocument").checked;
+  let formulaInteropFormat = document.getElementById("formulaInteropFormat").checked;
+
+  var rowData = {
+        formulaInteropSelectFileType,
+        formulaInteropAllDocument,
+        formulaInteropFormat
+      }
+  
   let buttonId = $(this).attr('id');
   let buttonClicked; let confirmText;
 
   buttonId.includes('Import') ? buttonClicked = `Import` : buttonClicked = `Export`;
-  confirmText = formulaInteropActualSheet ? `Se ${buttonClicked.toLowerCase()}arán únicamente las fórmulas correspondientes a la hoja actual.` : `Se ${buttonClicked.toLowerCase()}arán las fórmulas de toda la hoja de cálculo.`;
-  swalConfirm(`formulaDatabase${buttonClicked}`, `Las fórmulas se han ${buttonClicked.toLowerCase()}ado correctamente.`, confirmText, formulaInteropSelectFileType, formulaInteropActualSheet);
+  confirmText = formulaInteropAllDocument ? `Se ${buttonClicked.toLowerCase()}arán únicamente las fórmulas correspondientes a la hoja actual.` : `Se ${buttonClicked.toLowerCase()}arán las fórmulas de toda la hoja de cálculo.`;
+  swalConfirm(`formulaDatabase${buttonClicked}`, `Las fórmulas se han ${buttonClicked.toLowerCase()}ado correctamente.`, confirmText, rowData);
 });
 
 </script>

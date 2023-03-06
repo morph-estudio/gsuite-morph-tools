@@ -87,6 +87,7 @@
   </div>
 </div>
 
+<!--
 <div class="card mt-2 mb-1">
   <div class="card-header font-weight-bold" style="font-weight:bold">
     Otras funciones<span data-bs-toggle="tooltip" data-bs-placement="right" title="Todos los cuadros de superficies cuentan con una hoja HISTÓRICO Construidas donde registrar los cambios en el desarrollo del proyecto">
@@ -94,14 +95,17 @@
   </div>
   <div class="card-body p-0">
 
-    <button class="btn btn-primary index i2 ult2 shadow-none w-100 centerScroll" onclick="swalConfirm('formatLinkSheetOld', 'Se hoja LINK se ha reformateado.', 'Este proceso solo actualizará el formato base a la última versión disponible y no borrará datos relevantes.')"><i class="fa-solid fa-border-none fa-margin fa-fw"></i>Reformatear hoja LINK</button>
-<!--
-    <button class="btn btn-primary index i2 shadow-none w-100 centerScroll" onclick="swalConfirm('formatLinkSheet', 'Se ha generado la hoja LINK.', 'Este proceso solo actualizará el formato base a la última versión, sin tocar los datos de la hoja LINK. Confirma para continuar.')"><i class="fa-solid fa-border-none fa-margin fa-fw"></i>Reformatear hoja LINK (WIP)</button>
-    <button class="btn btn-primary index i2 ult2 shadow-none w-100 centerScroll" onclick="execNoSuccess('getConectedSheetList')"><i class="fa-solid fa-network-wired fa-margin fa-fw"></i>Generar hojas conectadas</button>
--->
+
+    <button class="btn btn-primary index i2 shadow-none w-100 centerScroll" onclick="swalConfirm('formatLinkSheetOld', 'Se hoja LINK se ha reformateado.', 'Este proceso solo actualizará el formato base a la última versión disponible y no borrará datos relevantes.')"><i class="fa-solid fa-border-none fa-margin fa-fw"></i>Reformatear hoja LINK antigua</button>
+
+
+    <button class="btn btn-primary index i2 shadow-none w-100 centerScroll" onclick="execNoSuccess('getConectedSheetList', 0, 0)"><i class="fa-solid fa-network-wired fa-margin fa-fw"></i>Generar lista de archivos conectados en hoja vacía</button>
+    <button class="btn btn-primary index i2 shadow-none w-100 centerScroll" onclick="swalConfirm('formatLinkSheet', 'Se ha actualizado el formato de la hoja LINK.', 'Este proceso solo actualizará el formato a la última versión, sin tocar los datos de la hoja LINK. Confirma para continuar.')"><i class="fa-solid fa-border-none fa-margin fa-fw"></i>Reformatear hoja LINK</button>
+    <button class="btn btn-primary index i2 ult2 shadow-none w-100 centerScroll" onclick="execNoSuccess('getConectedSheetList', 0, 6, 'LINK')"><i class="fa-solid fa-network-wired fa-margin fa-fw"></i>Generar lista de archivos conectados</button>
+
   </div>
 </div>
-
+-->
 
 <div id="borrarFilasExcesivas" style="margin-top:40px">
 
@@ -145,6 +149,7 @@
             <button type="button" class="cache-btn centerScroll" data-toggle="tooltip" data-placement="bottom" title="Borrar caché del documento" onclick="swalConfirm('purgeDocumentCache', 'La caché se ha purgado correctamente.', 'Se borrará la memoria caché del documento. Confirma antes de continuar.')">
               <img src="https://cdn-icons-png.flaticon.com/512/4459/4459985.png" alt="Icono de borrar caché">
             </button>
+            
           </div>
         </div>
       </div>
@@ -168,14 +173,20 @@
     </div>
     <div class="card-body">
 
-      <div class="form-check form-switch mb-3 d-flex align-items-center">
-        <div><input class="form-check-input robotoSwitch shadow-none" type="checkbox" role="switch" id="formulaInteropActualSheet"></div>
-        <label class="form-check-label robotoLabel" for="formulaInteropActualSheet">Aplicar únicamente a la hoja actual<span data-bs-toggle="tooltip" data-bs-placement="right" title="Por defecto se importa/exporta todas las hojas del documento, pero puedes marcar esta casilla para hacerlo solo con la hoja actual">
+      <div class="form-check form-switch d-flex align-items-center mb-1">
+        <div><input class="form-check-input robotoSwitch shadow-none" type="checkbox" role="switch" id="formulaInteropAllDocument"></div>
+        <label class="form-check-label robotoLabel" for="formulaInteropAllDocument">Aplicar a toda la hoja de cálculo<span data-bs-toggle="tooltip" data-bs-placement="right" title="Por defecto se importa/exporta la hoja actual, pero puedes marcar esta casilla para aplicarlo a todo el documento">
+        <i class="fa-regular fa-circle-question fa-questionstyle roboto"></i></span></label>
+      </div>
+
+      <div class="form-check form-switch d-flex align-items-center">
+        <div><input class="form-check-input robotoSwitch shadow-none" type="checkbox" role="switch" id="formulaInteropFormat"></div>
+        <label class="form-check-label robotoLabel" for="formulaInteropFormat">Formatear fórmulas al importar/exportar<span data-bs-toggle="tooltip" data-bs-placement="right" title="Reorganiza las fórmulas en el archivo de modo que sean más sencillas de leer.">
         <i class="fa-regular fa-circle-question fa-questionstyle roboto"></i></span></label>
       </div>
 
 
-      <select class="form-select shadow-none mb-2" id="formulaInteropSelectFileType">
+      <select class="form-select shadow-none mb-2 mt-3" id="formulaInteropSelectFileType">
         <option value="plantilla" selected>Documento de plantilla o relacionados</option>
         <option value="proyecto">El documento tiene código de proyecto</option>
         <option value="otros">Es otro tipo de documento</option>

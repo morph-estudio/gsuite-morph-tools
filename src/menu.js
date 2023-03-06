@@ -2,7 +2,7 @@
  * GLOBAL VARIABLES AND FUNCTIONS
  */
 
-const gmtVersion = '1.8.2';
+const gmtVersion = '1.8.3';
 const morphDivision = '(I+D)';
 const morphDev = '(Devs)';
 
@@ -33,8 +33,10 @@ function onOpen(e) {
     .addItem('Changelog', 'sidebarChangelog')
     .addToUi();
 
+  /*
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     Logger.log(`El usuario ${Session.getActiveUser().getEmail()} ha entrado al documento ${ss.getName()} cuya dirección es: ${ss.getUrl()}`);
+  */
 }
 
 function onInstall(e) {
@@ -111,4 +113,8 @@ function saveSheetPropertiesWithArray(rowData, array, arrayName) {
   PropertiesService.getDocumentProperties().setProperties(rowData);
   let jarray = JSON.stringify(array);
   PropertiesService.getDocumentProperties().setProperty(arrayName, jarray);
+}
+
+function fastInit() {
+  Logger.log('Fast Init makes things faster.')
 }
