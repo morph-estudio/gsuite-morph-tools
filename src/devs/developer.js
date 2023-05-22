@@ -1,40 +1,128 @@
 // SECTION = FUNCTIONS IN DEVELOPMENT
 
-function CopyPaste() {
-  var sheet_link = SpreadsheetApp.getActive().getSheetByName('LINK');
-  var spreadsheetId = SpreadsheetApp.getActive().getId();
-  var destFolderId = sheet_link.getRange(10,2).getValue();
-  var dateGMT = Utilities.formatDate(new Date(), "GMT+1", "yyyyMMdd")
+function getVideoId(url) {
+  var videoId = extractVideoId(url);
+  return videoId;
+}
 
-  // Copy each sheet in the source Spreadsheet by removing the formulas as the temporal sheets.
-  var ss = SpreadsheetApp.openById(spreadsheetId);
-  var tempSheets = ss.getSheets().map(function(sheet) {
-    var dstSheet = sheet.copyTo(ss).setName(sheet.getSheetName() + "_temp");
-    var src = dstSheet.getDataRange();
-    src.copyTo(src, {contentsOnly: true});
-    return dstSheet;
-  });
+function extractVideoId(url) {
+  var videoId = "";
+  var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+  var match = url.match(regExp);
+  if (match && match[7].length == 11) {
+    videoId = match[7];
+  } else {
+    videoId = "Invalid URL";
+  }
+  return videoId;
+}
+
+function convertirReferenciasAbsolutas() {
+  var sh = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var datarange = sh.getDataRange();
+  var backgroundColors = datarange.getBackgrounds();
+  var values = datarange.getValues();
+  var numRows = backgroundColors.length;
+  var numCols = backgroundColors[0].length;
   
-  // Copy the source Spreadsheet.
-  var destination = ss.copy(ss.getName() + " - " + dateGMT);
-  
-  // Delete the temporal sheets in the source Spreadsheet.
-  tempSheets.forEach(function(sheet) {ss.deleteSheet(sheet)});
-  
-  // Delete the original sheets from the copied Spreadsheet and rename the copied sheets.
-  destination.getSheets().forEach(function(sheet) {
-    var sheetName = sheet.getSheetName();
-    if (sheetName.indexOf("_temp") == -1) {
-      destination.deleteSheet(sheet);
-    } else {
-      sheet.setName(sheetName.slice(0, -5));
+  for (var i = 0; i < numRows; i++) {
+    for (var j = 0; j < numCols; j++) {
+      var color = backgroundColors[i][j];
+      switch (color) {
+        case "#CCCCCC":
+          // Hacer algo si la celda tiene fondo rojo
+          sh.getRange(i+1, j+1).setBackground();
+          break;
+        default:
+
+          break;
+      }
     }
-  });
+  }
+}
 
-  // Move file to the destination folder.
-  var file = DriveApp.getFileById(destination.getId());
-  DriveApp.getFolderById(destFolderId).addFile(file);
-  file.getParents().next().removeFile(file);
+function convertirReferenciasAbsolutas2() {
+  var hoja = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var rangoSeleccionado = hoja.getActiveRange();
+  var formulas = rangoSeleccionado.getFormulas();
+  var filas = formulas.length;
+  var columnas = formulas[0].length;
+
+  for (var fila = 0; fila < filas; fila++) {
+    for (var columna = 0; columna < columnas; columna++) {
+      var formula = formulas[fila][columna];
+      if (formula) {
+        // Restar 1 al número de fila en cada celda con fórmula
+        var nuevaFormula = formula.replace(/\$?([A-Z]+)\$?(\d+)/g, function(match, col, row) {
+          return col + (parseInt(row) - 1);
+        });
+        rangoSeleccionado.getCell(fila+1, columna+1).setFormula(nuevaFormula);
+      }
+    }
+  }
+}
+
+
+
+function helperToMoveFormulas() {
+
+  var rowToMoveFormulas = 3;
+
+  var sheet = SpreadsheetApp.getActiveSheet();
+  var selectedRange = sheet.getActiveRange();
+  var startRow = selectedRange.getRow();
+  var startColumn = selectedRange.getColumn();
+  var numRows = selectedRange.getNumRows();
+  var numColumns = selectedRange.getNumColumns();
+  var formulas = sheet.getRange(startRow, startColumn, numRows, numColumns).getFormulas()[0];
+  
+  for (var i = 0; i < formulas.length; i++) {
+    if (formulas[i] !== "") {
+      var colIndex = startColumn + i;
+      var range = sheet.getRange(rowToMoveFormulas, colIndex);
+      var formula = '={"";' + formulas[i].slice(1) + '}';
+      range.setFormula(formula);
+    }
+  }
+
+}
+
+function addComponent() {
+  var sh = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+
+  var rangeList = sh.getRangeList([ 'P1884', 'AQ1884', 'AS1884', 'AU1884', 'AX1884', 'BA1884', 'BE1884', 'BF1884' ]);
+  var values = [['m2'], ['Fachada'], ['Modular'], ['Prueba2'], ['Notas generales al capítulo aislamiento horizontal'], ['0'], ['Poliuretano proyectado 30 celda cerrada CCC4']];
+
+  rangeList.getRanges().forEach(function(range, index) {
+    range.setValues([values[index]]);
+  });
+}
+
+function listNamedRanges() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getActiveSheet();
+  var namedRanges = ss.getNamedRanges();
+  var data = [];
+
+  var name, sheetName, notation, headerRange, header;
+  
+  for (var i = 0; i < namedRanges.length; i++) {
+    name = namedRanges[i].getName();
+    range = namedRanges[i].getRange()
+    notation = range.getA1Notation();
+    sheetName = range.getSheet().getName();
+    headerRange = sheetName + "!" + notation.split(":")[0].replace(/[0-9]/g, '') + "1";
+    //header = ss.getSheetByName(sheetName).getRange(headerRange).getValue();
+    data.push([name, sheetName, notation]);
+  }
+
+  var cell = sheet.getActiveCell();
+  
+  var numRows = data.length;
+  var numCols = data[0].length;
+  sheet.getRange(cell.getRow(), cell.getColumn(), numRows, numCols).setValues(data);
+  
+  return data;
 }
 
 
@@ -43,19 +131,20 @@ function CopyPaste() {
  * Función para realizar macros rápidas para cualquier necesidad en un documento.
  */
 function macroModificarCuadros(a) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sh = ss.getActiveSheet();
 
-  let maxColumns = sh.getMaxColumns();
+  var nombreHoja = "X Variables"; // Nombre de la hoja donde se encuentran las variables
+  var hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(nombreHoja);
+  if (hoja.getName() != "X_Variables") hoja.setName("X_Variables"); // Cambia el nombre de la hoja a "X_VARIABLES"
+  var ultimaColumnaDatos = hoja.getLastColumn() + 1;
 
-  let firstRange = sh.getRange(4, 1, 1, maxColumns).getFormulas();
-  let modifiedFormulas = [];
-  let row = [];
-  firstRange[0].forEach(function(formula) {
-    row.push("={\"\";" + formula.slice(1) + "}");
-  });
-  modifiedFormulas.push(row);
-  sh.getRange(3, 1, 1, maxColumns).setFormulas(modifiedFormulas);
+  hoja.insertColumns(hoja.getMaxColumns(), 12);
+  
+  var formula = `=IMPORTRANGE("https://docs.google.com/spreadsheets/d/1CuMcYrtT6NXwxa9fMEIOTgRfkPySnNwKvA_1dyarCro";"TXT_OP_TEMPLATE!A1:G")`;
+  var columnaFormula = ultimaColumnaDatos + 5; // Columna siguiente a la última con datos
+  var rangoFormula = hoja.getRange(1, columnaFormula, 1, 1);
+  
+  rangoFormula.setFormula(formula); // Aplica la fórmula en la columna correspondiente
+
 }
 
 /**
@@ -223,82 +312,92 @@ function _getAsBlob(url, sheet, secuencialSize, secuencialOrientation, secuencia
 function historicoDeSuperficies(sheetRef) {
 
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheetName = sheetRef == 0 ? `Histórico CONSTRUIDAS` : `Histórico CONSTRUIDAS desglosado`;
-  const sh = ss.getSheetByName(sheetName);
+  const sheetNames = ['Histórico CONSTRUIDAS', 'Histórico CONSTRUIDAS +'];
   const dateNow = Utilities.formatDate(new Date(), 'GMT+2', 'dd/MM/yyyy');
 
-  let mainCell = sheetRef == 0 ? `D1` : `E1`;
-  let firstCell = sheetRef == 0 ? `G1` : `H1`;
-  let secondCell = sheetRef == 0 ? `H1` : `I1`;
-  let thirdCell = sheetRef == 0 ? `E1` : `F1`;
-  let groupRange = sheetRef == 0 ? `H:I` : `I:J`;
-  
-  let mainRange = sh.getRange(mainCell);
-  let secondRange = sh.getRange(secondCell);
-  let firstRange = sh.getRange(firstCell);
-  let mainColumnIndex = mainRange.getColumn();
-  let firstColumnIndex = firstRange.getColumn();
+  sheetRef = 0;
 
-  let originalFormulaRange = sh.getRange(thirdCell);
-  let originalFormula = originalFormulaRange.getFormulas();
+  sheetNames.forEach(sheetName => {
+    var sh = ss.getSheetByName(sheetName);
 
-  let freezeRange;
-  let lastRow = sh.getLastRow();
+    if (!sh) {
+      throw new Error(`No se encontró la hoja correspondiente al histórico de superficies.`);
+    }
+    
+    let mainCell = sheetRef == 0 ? `D1` : `E1`;
+    let firstCell = sheetRef == 0 ? `G1` : `H1`;
+    let secondCell = sheetRef == 0 ? `H1` : `I1`;
+    let thirdCell = sheetRef == 0 ? `E1` : `F1`;
+    let groupRange = sheetRef == 0 ? `H:I` : `I:J`;
+    
+    let mainRange = sh.getRange(mainCell);
+    let secondRange = sh.getRange(secondCell);
+    let firstRange = sh.getRange(firstCell);
+    let mainColumnIndex = mainRange.getColumn();
+    let firstColumnIndex = firstRange.getColumn();
 
-  if (firstRange.isBlank()) {
-    freezeRange = sh.getRange(1, mainColumnIndex, lastRow, 1);
-    freezeRange.copyTo(sh.getRange(1, firstColumnIndex), {contentsOnly:true});
-    sh.getRange(firstCell).setValue(dateNow);
-  } else {
+    let originalFormulaRange = sh.getRange(thirdCell);
+    let originalFormula = originalFormulaRange.getFormulas();
 
-    // Comprobar si han cambiado los valores desde el último histórico
+    let freezeRange;
+    let lastRow = sh.getLastRow();
 
-    var range1 = sh.getRange(2, mainColumnIndex, lastRow, 1).getValues();
-    var range2 = sh.getRange(2, firstColumnIndex, lastRow, 1).getValues();
-    var isEqual = true;
-    for (var i = 0; i < lastRow; i++) {
-      if (range1[i][0] != range2[i][0]) {
-        isEqual = false;
-        break;
+    if (firstRange.isBlank()) {
+      freezeRange = sh.getRange(1, mainColumnIndex, lastRow, 1);
+      freezeRange.copyTo(sh.getRange(1, firstColumnIndex), {contentsOnly:true});
+      sh.getRange(firstCell).setValue(dateNow);
+    } else {
+
+      // Comprobar si han cambiado los valores desde el último histórico
+
+      var range1 = sh.getRange(2, mainColumnIndex, lastRow, 1).getValues();
+      var range2 = sh.getRange(2, firstColumnIndex, lastRow, 1).getValues();
+      var isEqual = true;
+      for (var i = 0; i < lastRow; i++) {
+        if (range1[i][0] != range2[i][0]) {
+          isEqual = false;
+          break;
+        }
       }
+      if (isEqual) {
+        throw new Error('Los valores de superficies no han cambiado desde el último histórico.')
+      }
+
+      // Crear el histórico
+
+      freezeRange = sh.getRange(1, mainColumnIndex, lastRow, 3);
+
+      sh.insertColumns(firstColumnIndex, 3);
+      freezeRange.copyTo(sh.getRange(1, firstColumnIndex), {contentsOnly:true});
+      firstRange.setValue(dateNow);
+
+      // Modificación de estilo / formato de texto
+
+      let columns = [{column: firstColumnIndex, width: 100},{column: firstColumnIndex + 1, width: 100},{column: firstColumnIndex + 2, width: 150}];
+      columns.forEach(function(column) {
+        sh.setColumnWidth(column.column, column.width);
+      });
+
+      let freezeRangeFormat = sh.getRange(1, firstColumnIndex - 2, 1, 2);
+      freezeRangeFormat.copyTo(sh.getRange(1, firstColumnIndex + 1), {formatOnly:true});
+      secondRange.setBorder(false, false, false, false, false, false);
+      let frozenRange2 = sh.getRange(2, firstColumnIndex + 1, sh.getMaxRows() - 1, 2);
+      frozenRange2.setBackgroundColor(null).setFontColor('black');
+      sh.getRange(groupRange).shiftRowGroupDepth(1); // Agrupa las nuevas columnas
+
+      // Arreglo de fórmulas, modificar newFormulas si cambian en la plantilla
+
+      sh.getRange(2, mainColumnIndex + 2, lastRow - 1, 1).clearContent(); // Limpia columna original de justificación
+      sh.getRange(2, firstColumnIndex + 1, lastRow - 1, 1).clearContent(); // Limpia nueva columna diferencia de construidas
+
+      let newFormula = sheetRef == 0 ? `={"Diferencia con "&IF(TO_TEXT(J1)<>"";TO_TEXT(J1);"última fecha");ARRAYFORMULA(IF(B2:B<>"";IF(TO_TEXT(J2:J)<>"";G2:G-J2:J;0);))}` : `={"Diferencia con "&IF(TO_TEXT(K1)<>"";TO_TEXT(K1);"última fecha");ARRAYFORMULA(IF(B2:B<>"";IF(TO_TEXT(K2:K)<>"";H2:H-K2:K;0);))}`;
+      originalFormulaRange.setFormula(originalFormula); 
+      secondRange.setFormula(newFormula); 
     }
-    if (isEqual) {
-      throw new Error('Los valores de superficies no han cambiado desde el último histórico.')
-    }
 
-    // Crear el histórico
+    sheetRef++;
 
-    freezeRange = sh.getRange(1, mainColumnIndex, lastRow, 3);
-
-    sh.insertColumns(firstColumnIndex, 3);
-    freezeRange.copyTo(sh.getRange(1, firstColumnIndex), {contentsOnly:true});
-    firstRange.setValue(dateNow);
-
-    // Modificación de estilo / formato de texto
-
-    let columns = [{column: firstColumnIndex, width: 100},{column: firstColumnIndex + 1, width: 100},{column: firstColumnIndex + 2, width: 130}];
-    columns.forEach(function(column) {
-      sh.setColumnWidth(column.column, column.width);
-    });
-
-    let freezeRangeFormat = sh.getRange(1, firstColumnIndex - 2, 1, 2);
-    freezeRangeFormat.copyTo(sh.getRange(1, firstColumnIndex + 1), {formatOnly:true});
-    secondRange.setBorder(false, false, false, false, false, false);
-    let frozenRange2 = sh.getRange(2, firstColumnIndex + 1, lastRow - 1, 2);
-    frozenRange2.setBackgroundColor(null).setFontColor('black');
-    sh.getRange(1, firstColumnIndex, lastRow, 1).setBorder(null, true, null, null, null, null, firstRange.getBackground(), SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
-
-    sh.getRange(groupRange).shiftRowGroupDepth(1); // Agrupa las nuevas columnas
-
-    // Arreglo de fórmulas, modificar newFormulas si cambian en la plantilla
-
-    sh.getRange(2, mainColumnIndex + 2, lastRow - 1, 1).clearContent(); // Limpia columna original de justificación
-    sh.getRange(2, firstColumnIndex + 1, lastRow - 1, 1).clearContent(); // Limpia nueva columna diferencia de construidas
-
-    let newFormula = sheetRef == 0 ? `={"Diferencia con "&IF(TO_TEXT(J1)<>"";TO_TEXT(J1);"última fecha");ARRAYFORMULA(IF(B2:B<>"";IF(TO_TEXT(J2:J)<>"";G2:G-J2:J;0);))}` : `={"Diferencia con "&IF(TO_TEXT(K1)<>"";TO_TEXT(K1);"última fecha");ARRAYFORMULA(IF(B2:B<>"";IF(TO_TEXT(K2:K)<>"";H2:H-K2:K;0);))}`;
-    originalFormulaRange.setFormula(originalFormula); 
-    secondRange.setFormula(newFormula); 
-  }
+  });
 }
 
 /**

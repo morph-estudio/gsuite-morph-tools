@@ -2,7 +2,32 @@
 # Change Log
 Documentación de cambios del proyecto.
 
+## [ 1.8.4 ] - 2023/05/18
+
+### Added
+
+- Nueva herramienta para eliminar todos los rangos nombrados / actualizar los rangos nombrados según la plantilla Morph.
+- Botones "Formula W+/U-" para hacer "wrap" y "unwrap" de la fórmula de una celda (WIP)
+- Listado de hojas conectadas en hoja LINK.
+
+### Changed
+
+- HOJA LINK MODULAR: las tres secciones de la hoja Link pueden actualizarse independientemente. El código del actualizador se ha modificado para adaptarse a este nuevo formato.
+- Se ha eliminado el botón del histórico de superficies y se ha integrado en las opciones del actualizador.
+- Eliminado botón para crear lista de miembros Morph.
+- Eliminada la herramienta para borrar filas innecesarias.
+- Cambios estéticos en la herramienta del gestor de hojas.
+
+### Fixed
+
+- Notas adaptadas al horario de verano.
+- Arreglado el error en el botón para limpiar la caché del documento.
+
 ## [ 1.8.3 ] - 2023/03/06
+
+### Added
+
+- Al actualizar/congelar, creará la carpeta automáticamente si no encuentra la carpeta de exportación/congelados.
 
 ### Fixed
 

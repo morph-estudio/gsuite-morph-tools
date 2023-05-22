@@ -12,7 +12,7 @@
   <link href="https://unpkg.com/bootstrap-table@1.21.2/dist/extensions/reorder-rows/bootstrap-table-reorder-rows.css" rel="stylesheet">
 
   <?!= HtmlService.createHtmlOutputFromFile('public/helpers/header').getContent(); ?>
-  <?!= HtmlService.createHtmlOutputFromFile('public/stylesheet').getContent(); ?>
+  <?!= HtmlService.createHtmlOutputFromFile('public/main/stylesheet').getContent(); ?>
 
   <script src="https://cdn.jsdelivr.net/npm/tablednd@1.0.5/dist/jquery.tablednd.min.js"></script>
   <script src="https://unpkg.com/bootstrap-table@1.21.2/dist/bootstrap-table.min.js"></script>
@@ -29,7 +29,7 @@
 
 <button id="delete-button" class="btn btn-primary btn-xl w-100 rounded-0 shadow-none pt-2 pb-2 ps-3 centerScroll" style="font-size: 26px;">Ejecutar</button>
 
-<select id="select-action" class="form-select form-select-lg border-0 border-bottom rounded-0 mt-0 shadow-none" data-role="select" data-filter="false">
+<select id="select-action" class="form-select form-select-lg border-0 border-bottom rounded-0 mt-0 shadow-none " data-role="select" data-filter="false">
   <option value="actDelete" selected="selected">Eliminar</option>
   <option value="actClear">Limpiar</option>
   <option value="actDuplicate">Duplicar</option>
@@ -40,7 +40,27 @@
 
 <input type="text" class="form-control form-control-lg border-0 border-bottom rounded-0 mt-0 shadow-none" id="sheet-deleter-search" placeholder="Buscar hojas..." aria-describedby="destination-folder-help">
 
-<div class="body-padding w-100 ps-2 pe-2 pt-1 pb-3">
+<div class="mt-0">
+  <div class="btn-group d-flex" role="group">
+  </div>
+
+  <div id="" class="rounded">
+    <div class="input-group flex-nowrap update border-0 rounded-0">
+      <span class="input-group-text greyborder" style="border-radius: 0px 0px 0px 0px">Mover</span>
+      <select id="selSht1" class="form-select shadow-none rounded-0 greyborder border-0 sheetSelect"></select>
+      <span class="input-group-text rounded-0 greyborder">tras</span>
+      <select id="selSht2" class="form-select shadow-none sheetSelect greyborder border-0" style="border-radius: 0px 0px 0px 0px"></select>
+    </div>
+  </div>
+</div>
+
+<button id="moveSheetButton" class="btn btn-secondary shadow-none ps-3 brownbutton2 border-0 w-100 centerScroll" style="border-radius: 0px 0px 0px 0px">Mover hoja individual</button>
+
+<button id="reorderButton" class="btn btn-secondary shadow-none brownbutton1 border-0 w-100 centerScroll" style="border-radius: 0px 0px 0px 0px;font-weight:bold">Reordenar todo<span data-bs-toggle="tooltip" data-bs-placement="right" title="Para reordenar en masa, haz 'clic y arrastrar' en la lista de hojas inferior y luego presiona este botón">
+  <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:1px; color: #fff"></i>
+</span></button>
+
+<div class="body-padding w-100 ps-2 pe-2 pt-0 pb-3">
 
   <div id="errorNotSheets" class="toast fade hide shadow-sm w-100 mt-1" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="toast-header">
@@ -52,24 +72,6 @@
       
     </div>
   </div>
-
-<div class="mt-3">
-  <div class="btn-group d-flex" role="group">
-    <button id="moveSheetButton" class="btn btn-secondary shadow-none ps-3 border-0 brownbutton2 centerScroll" style="border-radius: 10px 0px 0px 0px">Mover</button>
-    <button id="reorderButton" class="btn btn-secondary shadow-none ps-3 border-0 brownbutton1 centerScroll" style="border-radius: 0px 10px 0px 0px">Reordenar todo<span data-bs-toggle="tooltip" data-bs-placement="right" title="Para reordenar en masa, haz 'clic y arrastrar' en la lista de hojas inferior y luego presiona este botón.">
-  <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:1px; color: #fff"></i>
-</span></button>
-  </div>
-
-  <div id="" class="rounded">
-    <div class="input-group flex-nowrap update border-0 rounded-0">
-      <span class="input-group-text greyborder" style="border-radius: 0px 0px 0px 10px">Mover</span>
-      <select id="selSht1" class="form-select shadow-none rounded-0 greyborder sheetSelect"></select>
-      <span class="input-group-text rounded-0 greyborder">tras</span>
-      <select id="selSht2" class="form-select shadow-none sheetSelect greyborder" style="border-radius: 0px 0px 10px 0px"></select>
-    </div>
-  </div>
-</div>
 
   <table class="table table-striped borderless"
     id="table"
@@ -244,7 +246,7 @@
 	$(document).on("click", ".viewSheetButton", function(){
     
     let sheetName = $(this).closest('tr').find("td:eq(1)").html();
-    google.script.run.withSuccessHandler(e => {WorksheetDeleteApp.refreshWorksheets()}).goToSheet(sheetName)
+    google.script.run.goToSheet(sheetName)
 /*
     let sheetName = $(this).closest('tr').find("td:eq(1)").html();
     var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();

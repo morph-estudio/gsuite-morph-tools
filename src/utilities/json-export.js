@@ -16,6 +16,27 @@ var DEFAULT_FORMAT = FORMAT_PRETTY;
 var DEFAULT_LANGUAGE = LANGUAGE_JS;
 var DEFAULT_STRUCTURE = STRUCTURE_LIST;
 
+function exportSheet(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getActiveSheet();
+  var rowsData = getRowsData_(sheet, getExportOptions(e));
+  var json = makeJSON_(rowsData, getExportOptions(e));
+  displayText_(json);
+}
+
+function exportAllSheets(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheets = ss.getSheets();
+  var sheetsData = {};
+  for (var i = 0; i < sheets.length; i++) {
+    var sheet = sheets[i];
+    var rowsData = getRowsData_(sheet, getExportOptions(e));
+    var sheetName = sheet.getName(); 
+    sheetsData[sheetName] = rowsData;
+  }
+  var json = makeJSON_(sheetsData, getExportOptions(e));
+  displayText_(json);
+}
  
 function makeLabel(app, text, id) {
   var lb = app.createLabel(text);
@@ -50,29 +71,6 @@ function makeButton(app, parent, name, callback) {
 function makeTextBox(app, name) { 
   var textArea    = app.createTextArea().setWidth('100%').setHeight('200px').setId(name).setName(name);
   return textArea;
-}
-
-function exportAllSheets(e) {
-  
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheets = ss.getSheets();
-  var sheetsData = {};
-  for (var i = 0; i < sheets.length; i++) {
-    var sheet = sheets[i];
-    var rowsData = getRowsData_(sheet, getExportOptions(e));
-    var sheetName = sheet.getName(); 
-    sheetsData[sheetName] = rowsData;
-  }
-  var json = makeJSON_(sheetsData, getExportOptions(e));
-  displayText_(json);
-}
-
-function exportSheet(e) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = ss.getActiveSheet();
-  var rowsData = getRowsData_(sheet, getExportOptions(e));
-  var json = makeJSON_(rowsData, getExportOptions(e));
-  displayText_(json);
 }
 
 function importDatabase(docID, sheetName) {

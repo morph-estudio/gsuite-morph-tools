@@ -1,5 +1,5 @@
 /**
- * Gsuite Morph Tools - Sheet Manager 1.8.0
+ * Gsuite Morph Tools - Sheet Manager 1.8.4
  * Developed by alsanchezromero
  *
  * Copyright (c) 2022 Morph Estudio

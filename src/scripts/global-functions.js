@@ -1,11 +1,33 @@
-/* eslint-disable no-only-tests/no-only-tests */
-
 /**
  * waiting
  * Pausa el script por milisegundos, lo que en ocasiones permite evitar bloqueos
  */
 function waiting(ms) {
   Utilities.sleep(ms);
+}
+
+/**
+ * Útiles de programación
+ * Función para transponer o simplificar arrays
+ */
+ function transpose(a) {
+  return Object.keys(a[0]).map(function (c) { return a.map(function (r) { return r[c]; }); });
+}
+
+function flatten(arrayOfArrays) {
+  return [].concat.apply([], arrayOfArrays);
+}
+
+/**
+ * checkIfSheetIsEmpty
+ * Empty Sheet Checker
+ */
+ function checkIfSheetIsEmpty(sheet) {
+  var lastRow = sheet.getLastRow();
+  if (lastRow == 0) {
+    return true;
+  }
+  return false;
 }
 
 /**
@@ -122,18 +144,6 @@ function searchFile(fileName, folderId) {
 }
 
 /**
- * Útiles de programación
- * Función para transponer o simplificar arrays
- */
-function transpose(a) {
-  return Object.keys(a[0]).map(function (c) { return a.map(function (r) { return r[c]; }); });
-}
-
-function flatten(arrayOfArrays) {
-  return [].concat.apply([], arrayOfArrays);
-}
-
-/**
  * keepNewestFilesOfEachNameInAFolder
  * Borrar archivos duplicados en una carpeta (elimina el más antiguo)
  */
@@ -170,26 +180,26 @@ function keepNewestFilesOfEachNameInAFolder(folder) {
 }
 
 /**
- * getLastDataRow
- * Get last row in a single column
- */
-function getLastDataRow(sh, column) {
-  var lastRow = sh.getLastRow();
-  var range = sh.getRange(column + lastRow);
-  if (range.getValue() !== "") {
-    return lastRow;
-  } else {
-    return range.getNextDataCell(SpreadsheetApp.Direction.UP).getRow();
-  }              
-}
-
-/**
  * getSplitA1Notation
  * Separa las letras y números de una notación A1 de Google Sheets.
  */
 function getSplitA1Notation(cell) {
   let splitArray = cell.split(/([0-9]+)/);
   return splitArray;
+}
+
+/**
+ * numToCol
+ * Return the letter corresponding to a column index in a sheet
+ */
+ function numToCol(num) {
+  var col = "";
+  while (num > 0) {
+    var remainder = (num - 1) % 26;
+    col = String.fromCharCode(65 + remainder) + col;
+    num = Math.floor((num - remainder) / 26);
+  }
+  return col;
 }
 
 /**
@@ -266,16 +276,6 @@ function setCustomRowHeight(height, sh) {
 }
 
 /**
- * purgeDocumentCache
- * Borrar la memoria caché de la hoja de cálculo
- */
-function purgeDocumentCache() {
-  var cache = CacheService.getDocumentCache();
-  cache.flush();
-  SpreadsheetApp.flush();
-}
-
-/**
  * getFirstCellA1Notation
  * Return the A1 Notation of the first cell with values in a sheet
  */
@@ -294,20 +294,13 @@ function getFirstCellA1Notation(sh) {
       }
     }
   }
-  
   return "";
 }
 
-function numToCol(num) {
-  var col = "";
-  while (num > 0) {
-    var remainder = (num - 1) % 26;
-    col = String.fromCharCode(65 + remainder) + col;
-    num = Math.floor((num - remainder) / 26);
-  }
-  return col;
-}
-
+/**
+ * createCollapseGroup
+ * Makes easy to create collapse groups in a sheet
+ */
 function createCollapseGroup(sh, columnIndex, shiftDepth, columnRange) {
   let group;
   try {
@@ -321,51 +314,32 @@ function createCollapseGroup(sh, columnIndex, shiftDepth, columnRange) {
   }
 }
 
-function checkIfSheetIsEmpty(sheet) {
-  var lastRow = sheet.getLastRow();
-  if (lastRow == 0) {
-    return true;
-  }
-  return false;
+/**
+ * getLastDataRow
+ * Get last row in a single column
+ */
+ function getLastDataRow(sh, column) {
+  var lastRow = sh.getLastRow();
+  var range = sh.getRange(column + lastRow);
+  if (range.getValue() !== "") {
+    return lastRow;
+  } else {
+    return range.getNextDataCell(SpreadsheetApp.Direction.UP).getRow();
+  }              
 }
 
-function deleteUntilLastDataRow(sh) {
-  sh = sh || SpreadsheetApp.getActiveSheet();
-  var maxRows = sh.getMaxRows();
-  var lastDataRow = 0;
-  
-  for (var i = maxRows; i >= 1; i--) {
-    var rowRange = sh.getRange(i, 1, 1, sh.getLastColumn());
-    var rowValues = rowRange.getValues()[0];
-    var rowIsEmpty = true;
-    
-    for (var j = 0; j < rowValues.length; j++) {
-      if (rowValues[j]) {
-        rowIsEmpty = false;
-        break;
-      }
-    }
-    
-    if (rowIsEmpty) {
-      sh.deleteRow(i);
-    } else {
-      lastDataRow = i;
-      break;
-    }
-  }
-  
-  return lastDataRow;
-}
-
+/**
+ * getLastDataRowIndex
+ * Index of the last row with data in a sheet
+ */
 function getLastDataRowIndex(sheet) {
   var range = sheet.getDataRange();
   var values = range.getValues();
-  var numRows = values.length;
   var lastRow = sheet.getMaxRows();
 
   for (var i = lastRow - 1; i >= 0; i--) {
-    var row = values[i];
-    if (row.length > 0 && row.join("").length > 0) {
+    var row = values[i]; Logger.log(`coso: ${row}`)
+    if (row && row.length > 0 && row.join("").length > 0) {
       return i + 1;
     }
   }
@@ -373,6 +347,13 @@ function getLastDataRowIndex(sheet) {
   return 0;
 }
 
+/**
+ * eliminarGruposColumnas
+ * Delete all column groups in a sheet
+ */
+function eliminarGruposColumnas(hoja) {
+
+}
 
 /**
  * importRangeToken

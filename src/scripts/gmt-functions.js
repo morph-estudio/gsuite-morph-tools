@@ -1,3 +1,84 @@
+// CATEGORY: RANGES
+
+/**
+ * deleteNamedRanges
+ * Remove all Named Ranges in a Spreadsheet
+ */
+ function deleteNamedRanges() {
+  var ss = SpreadsheetApp.getActive();
+  var namedRanges = ss.getNamedRanges();
+  for (var i = 0; i < namedRanges.length; i++) {
+    namedRanges[i].remove();
+  }
+}
+
+/**
+ * refreshNamedRanges
+ * Refresh Named Ranges in a Morph Table based on TXT_OP_TPL
+ */
+function refreshNamedRanges() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sh = ss.getSheetByName('X_Variables');
+  var sh_txtop = ss.getSheetByName('TXT OPERACIONES');
+
+  if (!sh || !sh_txtop) {
+    throw new Error(`No se encontraron las hojas 'TXT OPERACIONES' o 'X_Variables'`);
+  }
+
+  var headers = sh_txtop.getRange(1, 1, 1, sh_txtop.getLastColumn()).getValues()[0];
+
+  var headers_template = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0];
+  var parametrosColumnIndex = headers_template.indexOf("PLANTILLA PARAMETRO ARCHI");
+
+  if (parametrosColumnIndex !== -1 && parametrosColumnIndex < headers_template.length - 1) {
+    var columnARange = sh.getRange(2, parametrosColumnIndex + 1, sh.getLastRow() - 1, 1);
+    var columnBRange = sh.getRange(2, parametrosColumnIndex + 2, sh.getLastRow() - 1, 1);
+
+    var columnA = columnARange.getValues();
+    var columnB = columnBRange.getValues();
+  } else {
+
+  }
+
+  // Caché de la lista de rangos nombrados
+  var namedRanges = ss.getNamedRanges();
+  var namedRangesDict = {};
+  for (var i = 0; i < namedRanges.length; i++) {
+    namedRangesDict[namedRanges[i].getName()] = namedRanges[i];
+  }
+
+  var namedRangeName, namedRange, txtvalue;
+
+  for (var i = 0; i < columnB.length; i++) {
+    namedRangeName = columnB[i][0];
+    txtvalue = columnA[i][0];
+
+    if (!namedRangeName) {
+      continue;
+    }
+
+    var columnIndex = headers.indexOf(txtvalue);
+
+    if (columnIndex === -1) {
+      continue;
+    }
+
+    columnIndex += 1;
+
+    namedRange = sh_txtop.getRange(2, columnIndex, sh_txtop.getMaxRows() - 1, 1);
+
+    // Buscar si el rango nombrado existe utilizando el diccionario
+    var existingNamedRange = namedRangesDict[namedRangeName];
+    if (existingNamedRange) {
+      existingNamedRange.setRange(namedRange);
+    } else {
+      ss.setNamedRange(namedRangeName, namedRange);
+    }
+  }
+}
+
+// CATEGORY: ROW/COLUMN DELETION AND SPREADSHEET OPTIMIZATION
+
 /**
  * deleteEmptyRows, removeEmptyColumns
  * Delete the rows and columns up to the last one that contains data
@@ -12,17 +93,81 @@ function deleteEmptyRows(sh) {
   }
 }
 
+function removeEmptyColumns(sh) {
+  sh = sh || SpreadsheetApp.getActiveSheet();
+  let maxCol = sh.getMaxColumns();
+  let lastCol = sh.getLastColumn();
+  let checker = maxCol - (maxCol - lastCol);
+  if (checker != maxCol) {
+    sh.deleteColumns(lastCol + 1, maxCol - lastCol);
+  }
+}
+
+/**
+ * deleteAllEmptyRows
+ * Delete any row without data in a specified sheet
+ */
+ function deleteAllEmptyRows() {
+  let spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = spreadsheet.getActiveSheet();
+  let data = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
+  let row = sheet.getLastRow();
+
+  while (row > 2) {
+    let rec = data.pop();
+    if (rec.join('').length === 0) {
+      sheet.deleteRow(row);
+    }
+    row--;
+  }
+  let maxRows = sheet.getMaxRows();
+  let lastRow = sheet.getLastRow();
+  if (maxRows - lastRow != 0) {
+    sheet.deleteRows(lastRow + 1, maxRows - lastRow);
+  }
+}
+
+/**
+ * deleteUntilLastDataRow
+ * Delete any row without data in a specified sheet.
+ * DON'T KNOW IF "deleteAllEmptyRows" IS THE SAME FUNCTION <- REVISAR
+ */
+function deleteUntilLastDataRow(sh) {
+  sh = sh || SpreadsheetApp.getActiveSheet();
+  var maxRows = sh.getMaxRows();
+  var lastDataRow = 0;
+  
+  for (var i = maxRows; i >= 1; i--) {
+    var rowRange = sh.getRange(i, 1, 1, sh.getLastColumn());
+    var rowValues = rowRange.getValues()[0];
+    var rowIsEmpty = true;
+    
+    for (var j = 0; j < rowValues.length; j++) {
+      if (rowValues[j]) {
+        rowIsEmpty = false;
+        break;
+      }
+    }
+    
+    if (rowIsEmpty) {
+      sh.deleteRow(i);
+    } else {
+      lastDataRow = i;
+      break;
+    }
+  }
+  
+  return lastDataRow;
+}
+
+/**
+ * deleteExcessiveRows, optimizeSpreadsheet
+ * Spreadsheet Optimization based on excessive empty rows
+ */
 function deleteExcessiveRows(rowsInput, sh) {
   sh = sh || SpreadsheetApp.getActiveSheet();
   let maxRows = sh.getMaxRows();
   if (maxRows < rowsInput) throw new Error(`La hoja ya tiene menos de ${rowsInput} filas.`)
-  sh.deleteRows(rowsInput, maxRows - rowsInput);
-}
-
-function deleteExcessiveRows2(rowsInput, sh) {
-  sh = sh || SpreadsheetApp.getActiveSheet();
-  let maxRows = sh.getMaxRows();
-  if (maxRows < rowsInput) return;
   sh.deleteRows(rowsInput, maxRows - rowsInput);
 }
 
@@ -54,39 +199,15 @@ function optimizeSpreadsheet(rowsInput) {
   }
 }
 
-function removeEmptyColumns(sh) {
-  sh = sh || SpreadsheetApp.getActiveSheet();
-  let maxCol = sh.getMaxColumns();
-  let lastCol = sh.getLastColumn();
-  let checker = maxCol - (maxCol - lastCol);
-  if (checker != maxCol) {
-    sh.deleteColumns(lastCol + 1, maxCol - lastCol);
-  }
-}
-
 /**
- * deleteAllEmptyRows
- * Borra cualquier fila donde no haya datos
+ * purgeDocumentCache
+ * Borrar la memoria caché de la hoja de cálculo
  */
-function deleteAllEmptyRows() {
-  let spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  let sheet = spreadsheet.getActiveSheet();
-  let data = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
-  let row = sheet.getLastRow();
-
-  while (row > 2) {
-    let rec = data.pop();
-    if (rec.join('').length === 0) {
-      sheet.deleteRow(row);
-    }
-    row--;
-  }
-  let maxRows = sheet.getMaxRows();
-  let lastRow = sheet.getLastRow();
-  if (maxRows - lastRow != 0) {
-    sheet.deleteRows(lastRow + 1, maxRows - lastRow);
-  }
+ function purgeDocumentCache() {
+  SpreadsheetApp.flush()
 }
+
+// CATEGORY: SHEET FORMATTING
 
 /**
  * increaseFontSize, decreaseFontSize
@@ -117,6 +238,8 @@ function decreaseFontSize() {
     }
   }
 }
+
+// CATEGORY: UTILITIES
 
 /**
  * getDomainUsersList

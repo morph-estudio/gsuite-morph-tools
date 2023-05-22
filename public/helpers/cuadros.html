@@ -9,24 +9,38 @@
   </div>
   <div class="card-body">
 
-    <!--
-    <h3 class="mb-3"><i class="fa-solid fa-margin fa-fw fa-layer-group fa-sizing"></i>Cuadro de superficies</h3>
-    <h3 class="mb-3"><i class="fa-solid fa-margin fa-fw fa-ruler fa-sizing"></i>Cuadro de mediciones</h3>
-    <p>Usar en las copias de la <b>NAVE NODRIZA</b> de los <u>cuadros MORPH</u>.</p>
-    <h3 class="menu-h3"><i class="fa-solid fa-circle-dot fa-margin fa-fw fa-sizing"></i>Más botoncillos</h3>
-    -->
-
     <div class="mb-3">
 
       <div class="form-check form-switch">
         <input class="form-check-input shadow-none" type="checkbox" role="switch" id="update-linkpage">
-        <label class="form-check-label" style="position:relative;top:2px" for="update-linkpage">Actualizar hoja LINK </label>
+        <label class="form-check-label" style="position:relative;top:1px" for="update-linkpage">Actualizar hoja LINK </label>
         <span data-bs-toggle="tooltip" data-bs-placement="right" title="Marcar esta casilla en la primera actualización del cuadro o cuando haya nuevos archivos .txt de exportación. Se buscarán de nuevo los archivos y carpetas y se formateará la hoja LINK">
         <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:1px"></i>
         </span>
       </div>
 
-      <div class="mt-3 updateLinkPageCollapse collapse">
+      <div class="mt-2 updateLinkPageCollapse collapse">
+
+        <div style="margin-left: 20px; margin-bottom: 20px;">
+          <div class="form-check">
+            <input class="form-check-input shadow-none" type="checkbox" value="" id="update-maindata" checked>
+            <label class="form-check-label" for="update-maindata">
+              Datos principales
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input shadow-none" type="checkbox" value="" id="update-ai" checked>
+            <label class="form-check-label" for="update-ai">
+              Archivos importados
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input shadow-none" type="checkbox" value="" id="update-ac" disabled>
+            <label class="form-check-label" for="update-ac" title="Esta opción aún no está disponible...">
+              Archivos conectados
+            </label>
+          </div>
+        </div>
 
         <div class="input-group flex-nowrap update rounded-pill mb-2">
           <span class="input-group-text prefixUpdateClassColor">Prefijo<span data-bs-toggle="tooltip" data-bs-placement="right" title="Por defecto se importarán los archivos con prefijo TXT (por ejemplo, TXT Sheets Ventanas), pero si usas un paquete de archivos con otro identificativo escribe aquí el prefijo"><i class="fa-regular fa-circle-question fa-questionstyle" style="color:#c0cbd1"></i></span></span> 
@@ -35,23 +49,30 @@
 
         <div class="form-check form-switch">
           <input class="form-check-input shadow-none prefixUpdateClass" type="checkbox" role="switch" id="prefix-all-switch" onclick="document.getElementById('updatePrefixID').disabled = this.checked">
-          <label class="form-check-label" style="position:relative;top:2px" for="prefix-all-switch">Ignorar prefijos</label> <span data-bs-toggle="tooltip" data-bs-placement="right" title="Añade todos los archivos de la carpeta 'ExpTXT' sin importar el prefijo.">
+          <label class="form-check-label" style="position:relative;top:1px" for="prefix-all-switch">Ignorar prefijos</label> <span data-bs-toggle="tooltip" data-bs-placement="right" title="Añade todos los archivos de la carpeta 'ExpTXT' sin importar el prefijo.">
           <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:2px"></i>
         </div>
 
         <div class="form-check form-switch">
           <input class="form-check-input shadow-none prefixUpdateClass" type="checkbox" role="switch" id="update-keepVisibility">
-          <label class="form-check-label" style="position:relative;top:2px" for="update-keepVisibility">Mantener visibilidad</label>
+          <label class="form-check-label" style="position:relative;top:1px" for="update-keepVisibility">Mantener visibilidad</label>
           <span data-bs-toggle="tooltip" data-bs-placement="right" title="Por defecto las hojas importadas se ocultan, marca esta opción para mantenerlas visibles">
           <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:2px"></i>
         </div>
 
       </div>
 
+      <div class="form-check form-switch">
+        <input class="form-check-input shadow-none" type="checkbox" role="switch" id="update-historico">
+        <label class="form-check-label" style="position:relative;top:1px" for="update-historico">Crear punto en histórico de superficies
+        <span data-bs-toggle="tooltip" data-bs-placement="right" title="Todos los cuadros de superficies cuentan con una hoja HISTÓRICO Construidas donde registrar los cambios en el desarrollo del proyecto">
+        <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:2px"></i></label>
+      </div>
+
       <div id="devmenuhidden" style="display: none;" class="devAreaPermission">
-        <div class="form-check form-switch">
+        <div class="form-check form-switch mt-2">
           <input class="form-check-input shadow-none" type="checkbox" role="switch" id="update-debugReport">
-          <label class="form-check-label" style="position:relative;top:2px" for="update-debugReport">Debug Report</label>
+          <label class="form-check-label" style="position:relative;top:1px" for="update-debugReport">Debug Report</label>
           <span data-bs-toggle="tooltip" data-bs-placement="right" title="Opción para desarrolladores: incluye datos adicionales al logger que pueden ayudar a resolver problemas">
           <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:2px"></i>
         </div>
@@ -69,43 +90,49 @@
 
 <div class="card mt-2 mb-1">
   <div class="card-header font-weight-bold" style="font-weight:bold">
-    Histórico de superficies<span data-bs-toggle="tooltip" data-bs-placement="right" title="Todos los cuadros de superficies cuentan con una hoja HISTÓRICO Construidas donde registrar los cambios en el desarrollo del proyecto">
-    <i class="fa-regular fa-circle-question fa-questionstyle" style=""></i></span>
-  </div>
-  <div class="card-body">
-
-    <div>
-      <button class="btn btn-purple gmt btn-xl w-100 shadow-none centerScroll" id="historicoSupButton">Crear punto en el histórico de superficies</button>
-
-      <div class="form-check form-switch d-flex align-items-center mt-2">
-        <div><input class="form-check-input robotoSwitch shadow-none" type="checkbox" role="switch" id="historicoSupAddPlus"></div>
-        <label class="form-check-label robotoLabel" for="historicoSupAddPlus">Añadir al HISTÓRICO desglosado<span data-bs-toggle="tooltip" data-bs-placement="right" title="Crear también un punto histórico en la hoja Histórico CONSTRUIDAS desglosado">
-        <i class="fa-regular fa-circle-question fa-questionstyle roboto"></i></span></label>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!--
-<div class="card mt-2 mb-1">
-  <div class="card-header font-weight-bold" style="font-weight:bold">
-    Otras funciones<span data-bs-toggle="tooltip" data-bs-placement="right" title="Todos los cuadros de superficies cuentan con una hoja HISTÓRICO Construidas donde registrar los cambios en el desarrollo del proyecto">
-    <i class="fa-regular fa-circle-question fa-questionstyle" style=""></i></span>
+    Otras funciones
   </div>
   <div class="card-body p-0">
 
+    <button class="btn btn-primary index i2 shadow-none w-100 centerScroll dashed" onclick="swalConfirm('refreshNamedRanges', 'Los rangos se han actualizado correctamente.', 'Se actualizarán los rangos nombrados. Por favor, no continúes si no sabes lo que estás haciendo...')"><i class="fa-solid fa-registered fa-margin fa-fw"></i>Actualizar rangos nombrados</button>
+    <button class="btn btn-primary index i2 shadow-none w-100 centerScroll" onclick="swalConfirm('deleteNamedRanges', 'Se han borrado todos los rangos nombrados.', 'Cuidado, podrían perderse referencias de celda. Por favor, no continúes si no sabes lo que estás haciendo...')"><i class="fa-solid fa-eraser fa-margin fa-fw"></i>Eliminar rangos nombrados</button>
+    <button class="btn btn-primary index i2 shadow-none w-100 centerScroll ult2" onclick="swalConfirm('historicoDeSuperficies', 'El punto histórico se ha añadido correctamente.', 'Se creará un punto temporal en el histórico de superficies. Confirma para continuar.')"><i class="fa-solid fa-clock-rotate-left fa-margin fa-fw"></i>Crear punto manual en el histórico de superficies</button>
 
-    <button class="btn btn-primary index i2 shadow-none w-100 centerScroll" onclick="swalConfirm('formatLinkSheetOld', 'Se hoja LINK se ha reformateado.', 'Este proceso solo actualizará el formato base a la última versión disponible y no borrará datos relevantes.')"><i class="fa-solid fa-border-none fa-margin fa-fw"></i>Reformatear hoja LINK antigua</button>
-
-
+    <!--
+    <button class="btn btn-primary index i2  shadow-none w-100 centerScroll" onclick="execNoSuccess('getConectedSheetList', 0, 6, 'LINK')"><i class="fa-solid fa-network-wired fa-margin fa-fw"></i>Generar lista de archivos conectados</button>
     <button class="btn btn-primary index i2 shadow-none w-100 centerScroll" onclick="execNoSuccess('getConectedSheetList', 0, 0)"><i class="fa-solid fa-network-wired fa-margin fa-fw"></i>Generar lista de archivos conectados en hoja vacía</button>
-    <button class="btn btn-primary index i2 shadow-none w-100 centerScroll" onclick="swalConfirm('formatLinkSheet', 'Se ha actualizado el formato de la hoja LINK.', 'Este proceso solo actualizará el formato a la última versión, sin tocar los datos de la hoja LINK. Confirma para continuar.')"><i class="fa-solid fa-border-none fa-margin fa-fw"></i>Reformatear hoja LINK</button>
-    <button class="btn btn-primary index i2 ult2 shadow-none w-100 centerScroll" onclick="execNoSuccess('getConectedSheetList', 0, 6, 'LINK')"><i class="fa-solid fa-network-wired fa-margin fa-fw"></i>Generar lista de archivos conectados</button>
+    -->
 
   </div>
 </div>
--->
+
+<div id="devmenuhidden" style="display: none;" class="devAreaPermission">
+  <div class="card mt-2 mb-1">
+    <div class="card-header font-weight-bold" style="font-weight:bold">
+      Spreadsheet System<span data-bs-toggle="tooltip" data-bs-placement="right" title="Morph Spreadsheet System es un sistema que realiza funciones de Google Sheets en diferido, evitando la actualización de fórmulas a tiempo real">
+      <i class="fa-regular fa-circle-question fa-questionstyle" style=""></i></span>
+    </div>
+    <div class="card-body p-3">
+
+  <div class="input-group flex-nowrap update rounded-pill mt-2 mb-1" style="">
+    <span class="input-group-text" style="">Referencia<span data-bs-toggle="tooltip" data-bs-placement="right" title="Escribe la letra de la columna que se usará como referencia. Se actualizará el documento a partir de la última celda con datos de esa columna">
+      <i class="fa-regular fa-circle-question fa-questionstyle" style=""></i></span></span> 
+    <input type="text" class="form-control shadow-none" id="mssUpdateColRef" onclick="stopPropagation()" style="" placeholder="ej: C">
+  </div>
+
+        <button class="btn btn-purple gmt btn-xl w-100 shadow-none centerScroll" style="" id="mssUpdate">Actualizar base de datos
+          
+        </button>
+
+        <div class="form-check form-switch d-flex align-items-center mt-3">
+          <div><input class="form-check-input robotoSwitch shadow-none" type="checkbox" role="switch" id="mssUpdateAll"></div>
+          <label class="form-check-label robotoLabel" for="mssUpdateAll">Actualizar todo<span data-bs-toggle="tooltip" data-bs-placement="right" title="Actualizar todas las filas usando Spreadsheet System">
+          <i class="fa-regular fa-circle-question fa-questionstyle roboto"></i></span></label>
+        </div>
+
+    </div>
+  </div>
+</div>
 
 <div id="borrarFilasExcesivas" style="margin-top:40px">
 
@@ -114,21 +141,21 @@
     <h3 class="montserrat">Optimizar documento</h3>
   </div>
 
+<!--
   <div class="card">
     <div class="card-header" style="font-weight:bold">
       Eliminar filas innecesarias<span data-bs-toggle="tooltip" data-bs-placement="right" title="Elimina las filas sobrantes de la hoja actual hasta llegar a la fila que establezcas como fila máxima">
   <i class="fa-regular fa-circle-question fa-questionstyle" style=""></i></span>
     </div>
     <div class="card-body">
-
       <div class="input-group flex-nowrap update rounded-pill">
         <span class="input-group-text prefixUpdateClassColor">Fila máxima<span data-bs-toggle="tooltip" data-bs-placement="right" title="Escribe el número de fila máxima que quieres en la hoja actual"><i class="fa-regular fa-circle-question fa-questionstyle" style="color:#c0cbd1"></i></span></span> 
         <input type="text" class="form-control shadow-none" id="rowsDeleteInput" placeholder="ej: 100">
       </div>
       <button class="btn btn-primary btn-lg-gmt w-100 shadow-none centerScroll mt-1" id="rowsDeleteButton">Borrar filas</button>
-
     </div>
   </div>
+-->
 
   <div class="card mt-2 mb-1">
     <div class="card-header" style="font-weight:bold">

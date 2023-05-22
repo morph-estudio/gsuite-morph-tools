@@ -20,8 +20,8 @@
   --fontweight-bold: 600;
   --placeholder-color: #dadfe1;
   --menu-fontsize: 22px;
-  --menu-color: #95a5a6;
-  --menu-color-hover: #6c7a89;
+  --menu-color: #607D8B;
+  --menu-color-hover: #546E7A;
 
   --color-main-button: #19b5fe; --color-main-button-hover: #263fcb;
   --color-yellow-button: #FFC107; --color-yellow-button-hover: #ffce3a;
@@ -92,6 +92,9 @@ td {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+}
+.btn textarea {
+  pointer-events: none;
 }
 
 @media (max-width: 550px) {
@@ -220,7 +223,9 @@ img {
   color: var(--secondary-color);
   border-bottom: 1px solid var(--primary-color);
 }
-
+.btn.btn-primary.index.separator {
+  border-bottom: 2px solid var(--primary-color);
+}
 .btn.btn-primary.index.i2 {
   background-color: transparent;
   border: none;
@@ -244,6 +249,7 @@ img {
 .btn.btn-primary.index.ult{ border-bottom: none !important; }
 
 .btn.btn-primary.index.i2.ult2{ border-bottom: none !important; border-radius: 0px 0px 5px 5px }
+.btn.btn-primary.index.i2.dashed{ border-bottom: 1px dashed #D2D2D2 !important; }
 
 .btn.btn-primary.index.half{ border-right: 1px dotted var(--primary-color); }
 .btn.gmt {
@@ -256,6 +262,15 @@ img {
   transition: all .15s linear;
   -moz-transition: all .15s linear;
 }
+
+.btn.btn-danger.popup{
+  text-align: left;
+  line-height: 0.8em;
+  padding-top: 6px !important;
+  padding-bottom: 8px !important;
+}
+
+
 
 .form-control.update {
   background-color: #FFF8E1;
@@ -460,17 +475,24 @@ textarea[data-placeholder="placeholderFormula"]::placeholder {
   background-color: #bb33ff;
 }
 
+.btn.btn-purple {
+  background-color: #00BFA5;
+  color: #fff;
+}
+.btn.btn-purple:hover {
+  background-color: #1DE9B6;
+}
+
 .greybutton1, greybutton1:active{ background-color: #37474F }
 .greybutton1:hover{ background-color: #455A64 }
 .greybutton2, greybutton2:active{ background-color: #78909C }
 .greybutton2:hover{ background-color: #90A4AE }
 .greyborder{ border-color: #E9ECEF !important }
-.brownbutton1{ background-color: #9E9E9E }
-.brownbutton1:hover{ background-color: #BDBDBD }
-.brownbutton1:active{ background-color: #9E9E9E }
-.brownbutton2, brownbutton2:active{ background-color: #757575 }
-.brownbutton2:hover{ background-color: #616161 }
-.brownbutton2:active{ background-color: #757575 }
+.brownbutton1{ background-color: #90A4AE }
+.brownbutton1:hover{ background-color: #78909C }
+.brownbutton1:active{ background-color: #78909C }
+.brownbutton2, brownbutton2:active{ background-color: #80CBC4 }
+.brownbutton2:hover{ background-color: #4DB6AC }
 .viewSheetButton {
   background: none;
   color: #9E9E9E;

@@ -1,13 +1,13 @@
 /**
  * formulaDatabaseImport
- * Importa las fórmulas de la base de datos Morph al documento actual
+ * Importa a una hoja de cálculo desde la base de datos de fórmulas
+ * @param {Object} rowData - objeto que contiene los datos necesarios para realizar la función
  */
 function formulaDatabaseImport(rowData) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-
   var { formulaInteropSelectFileType, formulaInteropAllDocument, formulaInteropFormat } = rowData;
-
   var finalFolder = formulaDatabaseProjectFolder(ss, formulaInteropSelectFileType, 'import');
+
   var filesList = { files: [] };
 
   if (!formulaInteropAllDocument) {
@@ -35,24 +35,21 @@ function formulaDatabaseImport(rowData) {
     }
   }
 
-  var sheet = []
-  var cells = [];
-  var formulas = [];
-  var formulaList = {};
+  var filesData = {};
 
   filesList.files.forEach(function(file) {
-    formulaList = {};
-    sheet.push(file.name)
+    var fileName = file.name;
+    var cells = [];
+    var formulas = [];
 
     var lines = file.content.split('\n');
 
     for (var i = 0; i < lines.length; i++) {
       var line = lines[i];
       if (!line.trim()) continue; // Saltar a la siguiente iteración si la línea está vacía
-      if (line.startsWith('// CELL=')) {
+      if (line.startsWith('/** CELL=')) {
         // Extraer la celda y guardarla en el array de celdas
         var cell = line.split('=')[1].trim();
-        cells.push(cell);
       
         // Buscar la fórmula de la celda y guardarla en el array de fórmulas
         var formula = '';
@@ -61,18 +58,19 @@ function formulaDatabaseImport(rowData) {
         for (var j = i + 1; j < lines.length; j++) {
           var nextLine = lines[j];
 
-          if (nextLine.startsWith('// CELL=')) {
+          if (nextLine.startsWith('/** CELL=')) {
               break; // Se ha encontrado otra celda, salir del bucle
             } else if (nextLine.trim().startsWith('/*')) {
               inComment = true;
             } else if (nextLine.trim().startsWith('*/')) {
               inComment = false;
+            } else if (nextLine.trim().startsWith('*')) {
+              continue;
             } else if (nextLine.trim().startsWith('//')) {
               continue;
             } else if (nextLine.trim().length < 1) {
               continue;
             } else if (!inComment && !nextLine.startsWith('/*')) {
-              // No estamos dentro de un comentario y la línea no empieza por /*
               // Añadir la línea al array de fórmulas
               formula += nextLine + '\n';
             }
@@ -84,31 +82,60 @@ function formulaDatabaseImport(rowData) {
         } else {
           finalFormula = formula.substring(1).slice(0, -1);
         }
-
-        formulas.push(finalFormula);
+        if(finalFormula.trim().length > 1) {
+          cells.push(cell);
+          formulas.push(finalFormula);
+        };
       }
     }
 
-    formulaList = { cell: cells, formula: formulas };
-
-    var sh = ss.getSheetByName(file.name);
-
-    for (var i = 0; i < formulaList.cell.length; i++) {
-      sh.getRange(formulaList.cell[i]).clearContent();
-    }
-
-    SpreadsheetApp.flush();
-
-    for (var i = 0; i < formulaList.cell.length; i++) {
-      sh.getRange(formulaList.cell[i]).setFormula(formulaList.formula[i])
-    }
-
-    // Limpiar los arrays para el siguiente archivo
-    cells = [];
-    formulas = [];
+    filesData[fileName] = { cells: cells, formulas: formulas };
   });
 
+  Logger.log(filesData)
+
+  var sh_loop, cells, formulas
+
+  for (var file in filesData) {
+    sh_loop = ss.getSheetByName(file);
+    cells = filesData[file].cells;
+    formulas = filesData[file].formulas;
+    for (var i = 0; i < cells.length; i++) {
+      sh_loop.getRange(cells[i]).setFormula(formulas[i]);
+    }
+  }
 }
+
+
+/*
+  // Batch update de todas las celdas
+  for (var fileName in filesData) {
+    var sheet = ss.getSheetByName(fileName);
+    var fileData = filesData[fileName];
+    var rangeList = [];
+
+    for (var i = 0; i < fileData.cells.length; i++) {
+      rangeList.push(sheet.getRange(fileData.cells[i]));
+    }
+
+    Logger.log(`rangeList: ${JSON.stringify(rangeList)}`)
+
+    var formulaBatchRequests = rangeList.map(function(range, index) {
+      return { 
+        updateCells: { 
+          range: range.getA1Notation(),
+          fields: 'userEnteredValue.formula',
+          rows: [{ values: [{ userEnteredValue: { formula: fileData.formulas[index] } }] }]
+        } 
+      };
+    });
+
+    Logger.log(`formulaBatchRequests: ${JSON.stringify(formulaBatchRequests)}`)
+
+    Sheets.Spreadsheets.batchUpdate({requests: formulaBatchRequests}, ss.getId());
+  }
+*/
+
 
 /**
  * formulaDatabaseProjectFolder
@@ -117,8 +144,15 @@ function formulaDatabaseImport(rowData) {
 function formulaDatabaseProjectFolder(ss, formulaInteropSelectFileType, buttonClicked) {
 
   var ss_name = ss.getName();
+
+  if (formulaInteropSelectFileType === 'proyecto') {
+    var codePattern = /^P\d{5}/;
+    var ss_code;
+    if (codePattern.test(ss_name)) ss_code = ss_name.substring(0, 6);
+    if (!ss_code) throw new Error(`No se ha encontrado un código de proyecto en el nombre del documento. Añade el código correspondiente o elige otra opción en la configuración.`);
+  }
   
-  const cache = CacheService.getScriptCache();
+  const cache = CacheService.getDocumentCache();
   const cacheKey = `folder-${ss_name}`;
 
   const cachedFolder = cache.get(cacheKey);
@@ -127,10 +161,6 @@ function formulaDatabaseProjectFolder(ss, formulaInteropSelectFileType, buttonCl
     Logger.log(`Aviso: se ha recuperado la carpeta del documento de la memoria caché.`)
     return finalFolder;
   }
-
-  const codePattern = /^P\d{5}/;
-  var ss_code;
-  if (codePattern.test(ss_name)) ss_code = ss_name.substring(0, 6);
   
   const baseFolder = DriveApp.getFolderById('1vEX2Z9rcJ-ZUMqHosHYYnEfVHzt1ymJ4');
   var projectFolder;
@@ -140,7 +170,6 @@ function formulaDatabaseProjectFolder(ss, formulaInteropSelectFileType, buttonCl
       projectFolder = baseFolder.getFoldersByName(`_PLANTILLAS`).next();
       break;
     case "proyecto":
-      if (!ss_code) throw new Error(`No se ha encontrado un código de proyecto en el nombre del documento. Añade el código correspondiente o elige otra opción en la configuración.`);
       projectFolder = baseFolder.getFoldersByName(ss_code).next();
       break;
     case "otros":
@@ -171,6 +200,8 @@ function formulaDatabaseProjectFolder(ss, formulaInteropSelectFileType, buttonCl
   // Guarda la carpeta en la caché para futuras ejecuciones
   cache.put(cacheKey, finalFolder.getId());
 
+  Logger.log(`Document Folder: ${finalFolder.getName()}`)
+
   return finalFolder;
 
 }
@@ -178,15 +209,18 @@ function formulaDatabaseProjectFolder(ss, formulaInteropSelectFileType, buttonCl
 /**
  * formulaDatabaseExport
  * Exporta las fórmulas del documento actual a la base de datos Morph
+ * 
+ * @param {Object} rowData - objeto que contiene los datos necesarios para realizar la exportación
  */
 function formulaDatabaseExport(rowData) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sh = ss.getActiveSheet();
   
   var { formulaInteropSelectFileType, formulaInteropAllDocument, formulaInteropFormat } = rowData;
 
   var finalFolder = formulaDatabaseProjectFolder(ss, formulaInteropSelectFileType, 'export');
 
-  var sheets; formulaInteropAllDocument ? sheets = ss.getSheets() : sheets = [ ss.getActiveSheet() ];
+  var sheets; formulaInteropAllDocument ? sheets = ss.getSheets() : sheets = [ sh ];
 
   for (let i = 0; i < sheets.length; i++) {
     var sheet = sheets[i];
@@ -209,6 +243,14 @@ function formulaDatabaseExport(rowData) {
   }
 }
 
+/**
+ * extractCellFormulas
+ * Extrae las fórmulas de todas las celdas de una hoja de cálculo y las devuelve en un objeto
+ * 
+ * @param {Sheet} sheet - la hoja de cálculo de la que se extraerán las fórmulas
+ * @param {Boolean} formulaInteropFormat - si se formatearán las fórmulas extraídas o no
+ * @returns {Object} - objeto que contiene las fórmulas de todas las celdas de la hoja de cálculo
+ */
 function extractCellFormulas(sheet, formulaInteropFormat) {
   var lastRow = sheet.getLastRow();
   var lastColumn = sheet.getLastColumn();
@@ -242,49 +284,179 @@ function extractCellFormulas(sheet, formulaInteropFormat) {
   return cellFormulas;
 }
 
-/*
-function extractCellFormulas(sheet, formulaInteropFormat) {
-  var lastRow = sheet.getLastRow();
-  var lastColumn = sheet.getLastColumn();
-  var range = sheet.getRange(1, 1, lastRow, lastColumn);
-  var formulas = range.getFormulas();
-
-  var cellFormulas = {};
-
-  for (let row = 0; row < formulas.length; row++) {
-    for (let col = 0; col < formulas[row].length; col++) {
-
-      formula = formulaInteropFormat ? formatFormula(formulas[row][col]) : formulas[row][col];
-      //const formula = formulas[row][col];
-      if (formula !== "") {
-        var cell = range.getCell(row + 1, col + 1).getA1Notation();
-        cellFormulas[cell] = formula;
-      }
-    }
-  }
-  return cellFormulas;
-}
-*/
-
+/**
+ * composeFileContent
+ * Crea el contenido del archivo que se exportará a la base de datos Morph
+ * 
+ * @param {Object} cellFormulas - objeto que contiene las fórmulas de todas las celdas de la hoja de cálculo
+ * @returns {String} - contenido del archivo que se exportará a la base de datos Morph
+ */
 function composeFileContent(cellFormulas) {
   let fileContent = "";
+
+  Logger.log(cellFormulas)
   const cellList = Object.keys(cellFormulas);
-  cellList.sort();
+  
+  sortCellList(cellList);
+
+  Logger.log(cellList)
 
   let cellListLength = cellList.length;
 
   for (let i = 0; i < cellListLength; i++) {
     const cell = cellList[i];
     const formula = cellFormulas[cell];
-    fileContent += `// CELL=${cell}\n${formula}${i !== cellListLength - 1 ? '\n\n\n' : '\n'}`;
+    fileContent += `/** CELL=${cell}\n  *\n  */\n${formula}${i !== cellListLength - 1 ? '\n\n' : '\n'}`;
   }
 
   return fileContent;
 }
 
+function sortCellList(cellList) {
+  const getColumnNumber = (columnName) => {
+    let columnNumber = 0;
+    for (let i = 0; i < columnName.length; i++) {
+      columnNumber *= 26;
+      columnNumber += columnName.charCodeAt(i) - 'A'.charCodeAt(0) + 1;
+    }
+    return columnNumber;
+  };
+
+  return cellList.sort((a, b) => {
+    const [aColumn, aRow] = a.match(/[A-Z]+|[0-9]+/g);
+    const [bColumn, bRow] = b.match(/[A-Z]+|[0-9]+/g);
+    const aColumnNumber = getColumnNumber(aColumn);
+    const bColumnNumber = getColumnNumber(bColumn);
+
+    if (aColumnNumber < bColumnNumber) {
+      return -1;
+    } else if (aColumnNumber > bColumnNumber) {
+      return 1;
+    } else {
+      return aRow - bRow;
+    }
+  });
+}
+
+/**
+ * formatFormula
+ * Formatea una formula dada para que sea más sencilla de leer
+ * Se pueden usar espacios para la indentación o tabulación cambiando la variable indentation
+ * @param {string} formula - La formula a formatear
+ * @param {Array} noIndentChars - Caracteres de apertura que no deben causar indentación
+ */
+function formatFormula(formula) {
+  let indentationLevel = 0;
+  let formattedFormula = "";
+  var indentation = "  "
+
+  for (let i = 0; i < formula.length; i++) {
+    const char = formula[i];
+
+    switch (char) {
+      case "(":
+        formattedFormula += char + "\n" + indentation.repeat(indentationLevel + 1);
+        indentationLevel++;
+        break;
+      case ")":
+        indentationLevel--;
+        formattedFormula += "\n" + indentation.repeat(indentationLevel) + char;
+        break;
+      case ",":
+        formattedFormula += char + "\n" + indentation.repeat(indentationLevel);
+        break;
+      case ";":
+        formattedFormula += char + "\n" + indentation.repeat(indentationLevel);
+        break;
+      case ".":
+        formattedFormula += char;
+        break;
+      case "&":
+        if (formattedFormula.slice(-1) !== " ") {
+          formattedFormula += " ";
+        }
+        formattedFormula += char;
+        if (formula[i + 1] !== " ") {
+          formattedFormula += " ";
+        }
+        break;
+      default:
+        formattedFormula += char;
+        break;
+    }
+  }
+
+  formattedFormula = formatFormulaExclude(formattedFormula);
+  return formattedFormula;
+}
+
+/**
+ * formatFormulaExclude
+ * Elimina los saltos de línea y tabulaciones de una serie de fórmulas excluidas, de modo que el formateo sea más limpio
+ * @param {string} formula - La formula a formatear
+ */
+function formatFormulaExclude(formula) {
+
+  var excludedFormulas = [ "CHAR(", "NOW(", "TODAY(", "TEXT(", "LEN(", "LEFT(", "RIGHT(", "FIND(", "SEARCH(" ];
+
+  var cleanFormula = formula;
+  for (var i = 0; i < excludedFormulas.length; i++) {
+    var excludedFormula = excludedFormulas[i];
+    var formulaIndex = cleanFormula.indexOf(excludedFormula);
+    while (formulaIndex !== -1) {
+      var startIndex = formulaIndex;
+      var endIndex = cleanFormula.indexOf(")", startIndex) + 1;
+      var formulaToClean = cleanFormula.substring(startIndex, endIndex);
+      var cleanSubFormula = formulaToClean.replace(/^[ \t]+|[ \t]+$/gm, '').replace(/\n/g, '');
+      
+      cleanFormula = cleanFormula.substring(0, startIndex) + cleanSubFormula + cleanFormula.substring(endIndex);
+      formulaIndex = cleanFormula.indexOf(excludedFormula, startIndex + cleanSubFormula.length);
+    }
+  }
+  cleanFormula = cleanFormula.replace(/^\s*$(?:\r\n?|\n)/gm, ""); // Eliminar líneas vacías
+
+  return cleanFormula;
+}
+
+/**
+ * cleanFormulaFormat
+ * Elimina los saltos de línea para que la formula se desarrolle en una sola línea
+ * @param {string} formula - La formula a formatear
+ */
+function cleanFormulaFormat(formula) {
+
+  var caracteres = ["&", "*", "+", "-"];
+  var regExp = new RegExp("(\\s*)([" + caracteres.join("") + "])(\\s*)", "g");
+
+  var clean = formula.replace(/^[ \t]+|[ \t]+$/gm, '').replace(/\n/g, '').replace(regExp, '$2').trim();
+  return clean;
+}
+
+function formulaUnwrap() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sh = ss.getActiveSheet();
+  var selectedCell = sh.getActiveCell();
+  var formula = selectedCell.getFormula().toString();
+
+  var unwrappedFormula = formatFormula(formula);
+  selectedCell.setFormula(unwrappedFormula)
+}
+
+function formulaWrap() {
+  var sh = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var selectedCell = sh.getActiveCell();
+  var formula = selectedCell.getFormula().toString();
+
+  var newFormula = cleanFormulaFormat(formula);
+  selectedCell.setFormula(newFormula);
+}
+
+
 /**
  * formulaLogger
- * Script that logs changes made to formulas in a Google Spreadsheet and records details like user, date, and file/cell location in a "Formula Changelog" sheet.
+ * Script that logs changes made to formulas in a Google Spreadsheet and records details like user, date, and file/cell location in a "Formula Changelog" sheet
+ * 
+ * @param {Object} rowData - objeto que contiene los datos necesarios para realizar la función
  */
 function formulaLogger(rowData) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -354,7 +526,7 @@ function formulaLogger(rowData) {
 
 /**
  * formulaDropper
- * Returns formula of selected cell in current Google Spreadsheet.
+ * Returns formula of selected cell in current Google Spreadsheet
  */
 function formulaDropper() {
   let ss = SpreadsheetApp.getActive();
@@ -363,166 +535,3 @@ function formulaDropper() {
   Logger.log(formula)
   return formula;
 }
-
-/**
- * formatFormula
- * Formatea una formula dada para que sea más sencilla de leer
- * @param {string} formula - La formula a formatear
- * @param {Array} noIndentChars - Caracteres de apertura que no deben causar indentación
- */
-function formatFormula(formula) {
-  let indentationLevel = 0;
-  let formattedFormula = "";
-  var indentation = "  "
-
-  for (let i = 0; i < formula.length; i++) {
-    const char = formula[i];
-
-    switch (char) {
-      case "(":
-        formattedFormula += char + "\n" + indentation.repeat(indentationLevel + 1);
-        indentationLevel++;
-        break;
-      case ")":
-        indentationLevel--;
-        formattedFormula += "\n" + indentation.repeat(indentationLevel) + char;
-        break;
-      case ",":
-        formattedFormula += char + "\n" + indentation.repeat(indentationLevel);
-        break;
-      case ";":
-        formattedFormula += char + "\n" + indentation.repeat(indentationLevel);
-        break;
-      case ".":
-        formattedFormula += char;
-        break;
-      case "&":
-        if (formattedFormula.slice(-1) !== " ") {
-          formattedFormula += " ";
-        }
-        formattedFormula += char;
-        if (formula[i + 1] !== " ") {
-          formattedFormula += " ";
-        }
-        break;
-      default:
-        formattedFormula += char;
-        break;
-    }
-  }
-
-  formattedFormula = cleanFormulas(formattedFormula);
-
-  return formattedFormula;
-}
-
-function formatFormulaold(formula) {
-  let indentationLevel = 0;
-  let formattedFormula = "";
-
-  for (let i = 0; i < formula.length; i++) {
-    const char = formula[i];
-
-    switch (char) {
-      case "(":
-
-        if (formattedFormula.slice(-1) === "\n") {
-          formattedFormula += char;
-        } else {
-          formattedFormula += char + "\n" + "\t".repeat(indentationLevel + 1);
-          indentationLevel++;
-        }
-
-        break;
-      case ")":
-        
-        if (formattedFormula.slice(-1) === "\n") {
-          formattedFormula += char;
-        } else {
-          indentationLevel--;
-          formattedFormula += "\n" + "\t".repeat(indentationLevel) + char;
-        }
-        break;
-      case ",":
-        if (formattedFormula.slice(-1) === "\n") {
-          formattedFormula += char;
-        } else {
-          formattedFormula += char + "\n" + "\t".repeat(indentationLevel);
-        }
-        break;
-      case ";":
-        if (formattedFormula.slice(-1) === "\n") {
-          formattedFormula += char;
-        } else {
-          formattedFormula += char + "\n" + "\t".repeat(indentationLevel);
-        }
-        break;
-      case ".":
-        formattedFormula += char;
-        break;
-      case "&":
-        if (formattedFormula.slice(-1) !== " ") {
-          formattedFormula += " ";
-        }
-        formattedFormula += char;
-        if (formula[i + 1] !== " ") {
-          formattedFormula += " ";
-        }
-        break;
-      default:
-        formattedFormula += char;
-        break;
-    }
-  }
-
-  formattedFormula = cleanFormulas(formattedFormula);
-  
-  return formattedFormula;
-}
-
-
-
-function cleanFormulas(formula) {
-
-  var excludedFormulas = ["CHAR(", "NOW(", "TODAY("];
-
-  var cleanFormula = formula;
-  for (var i = 0; i < excludedFormulas.length; i++) {
-    var excludedFormula = excludedFormulas[i];
-    var formulaIndex = cleanFormula.indexOf(excludedFormula);
-    while (formulaIndex !== -1) {
-      var startIndex = formulaIndex;
-      var endIndex = cleanFormula.indexOf(")", startIndex) + 1;
-      var formulaToClean = cleanFormula.substring(startIndex, endIndex);
-      var cleanSubFormula = formulaToClean.replace(/^[ \t]+|[ \t]+$/gm, '').replace(/\n/g, '');
-      
-      cleanFormula = cleanFormula.substring(0, startIndex) + cleanSubFormula + cleanFormula.substring(endIndex);
-      formulaIndex = cleanFormula.indexOf(excludedFormula, startIndex + cleanSubFormula.length);
-    }
-  }
-  cleanFormula = cleanFormula.replace(/^\s*$(?:\r\n?|\n)/gm, ""); // Eliminar líneas vacías
-
-  return cleanFormula;
-}
-
-function cleanFormulaFormat(formula) {
-  var clean = formula.replace(/^[ \t]+|[ \t]+$/gm, '').replace(/\n/g, '');
-  return clean;
-}
-
-
-function eliminarEspaciosEnFormulas() {
-  var hoja = SpreadsheetApp.getActiveSheet();
-  var rango = hoja.getDataRange();
-  var formulas = rango.getFormulas();
-  for (var i = 0; i < formulas.length; i++) {
-    for (var j = 0; j < formulas[i].length; j++) {
-      var formula = formulas[i][j];
-      if (formula != "") {
-        var nuevaFormula = formula.replace(/\s/g, '').replace(/\t/g, '').replace(/\n/g, '');
-        hoja.getRange(i+1, j+1).setFormula(nuevaFormula);
-      }
-    }
-  }
-}
-

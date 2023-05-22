@@ -1,8 +1,6 @@
-/**
- * GLOBAL VARIABLES AND FUNCTIONS
- */
+/** GLOBAL VARIABLES AND FUNCTIONS */
 
-const gmtVersion = '1.8.3';
+const gmtVersion = '1.8.4';
 const morphDivision = '(I+D)';
 const morphDev = '(Devs)';
 
@@ -18,12 +16,9 @@ const sh = function() {
 const ui = function() {
   return SpreadsheetApp.getUi() }
 
-/**
- * MAIN MENU ENGINE
- */
+/** MAIN MENU ENGINE */
 
 function onOpen(e) {
-  
   SpreadsheetApp.getUi().createAddonMenu()
     .addItem(titleIX, 'sidebarIndex')
     .addItem(titleSM, 'sidebarSM')
@@ -32,11 +27,6 @@ function onOpen(e) {
     .addSeparator()
     .addItem('Changelog', 'sidebarChangelog')
     .addToUi();
-
-  /*
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    Logger.log(`El usuario ${Session.getActiveUser().getEmail()} ha entrado al documento ${ss.getName()} cuya dirección es: ${ss.getUrl()}`);
-  */
 }
 
 function onInstall(e) {
@@ -48,7 +38,7 @@ function onInstall(e) {
  */
 
 function sidebarIndex() {
-  let html = HtmlService.createTemplateFromFile('public/index');
+  let html = HtmlService.createTemplateFromFile('public/main/index');
   html.permission = getDevPermission(); // html.navBarHEX = '#FFCCBC';
   html.isAdapted = getDocProperty('adaptedSpreadsheet'); // html.navBarHEX = '#FFCCBC';
   html.wsNames = getWorksheetNamesArray();
@@ -57,39 +47,39 @@ function sidebarIndex() {
 
 function sidebarDS() {
   // Browser.msgBox('Herramienta en desarrollo', 'Morph Document Studio estará disponible en la próxima versión de G-Suite Morph Tools.', Browser.Buttons.OK);
-  let html = HtmlService.createTemplateFromFile('public/document-studio');
+  let html = HtmlService.createTemplateFromFile('public/main/document-studio');
   html.dsProperties = getDocProperties(); html.emailDropdown = emailDropdown();
   html = html.evaluate().setTitle(barTitleDS); ui().showSidebar(html);
 }
 
 function sidebarSM() {
-  let html = HtmlService.createTemplateFromFile('public/sheet-manager');
+  let html = HtmlService.createTemplateFromFile('public/main/sheet-manager');
   html.wsNames = getWorksheetNames();
   html.wsNamesArray = getWorksheetNamesArray();
   html = html.evaluate().setTitle(barTitleSM); ui().showSidebar(html)
 }
 
 function sidebarCL() {
-  let html = HtmlService.createTemplateFromFile('public/styles-front');
+  let html = HtmlService.createTemplateFromFile('public/main/styles-front');
   
   html.obj = cargarEstilos();
   html = html.evaluate().setTitle(barTitleCL); ui().showSidebar(html)
 }
 
 function sidebarDSDevs() {
-  let html = HtmlService.createTemplateFromFile('public/document-studio');
+  let html = HtmlService.createTemplateFromFile('public/main/document-studio');
   html.dsProperties = getDocProperties(); html.emailDropdown = emailDropdown();
   html = html.evaluate().setTitle(`${barTitleDS} Devs`); ui().showSidebar(html);
 }
 
 function sidebarSMDevs() {
-  let html = HtmlService.createTemplateFromFile('public/sheet-manager');
+  let html = HtmlService.createTemplateFromFile('public/main/sheet-manager');
   html.wsNames = getWorksheetNames();
   html = html.evaluate().setTitle(`${barTitleSM} Devs`); ui().showSidebar(html)
 }
 
 function sidebarCLDevs() {
-  let html = HtmlService.createTemplateFromFile('public/styles-front');
+  let html = HtmlService.createTemplateFromFile('public/main/styles-front');
   html.obj = cargarEstilos();
   var estilos_sheet = PropertiesService.getDocumentProperties();
   html = html.evaluate().setTitle(`${barTitleCL} Devs`); ui().showSidebar(html)

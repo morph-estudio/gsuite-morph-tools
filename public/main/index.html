@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <?!= HtmlService.createHtmlOutputFromFile('public/helpers/header').getContent(); ?>
-  <?!= HtmlService.createHtmlOutputFromFile('public/stylesheet').getContent(); ?>
+  <?!= HtmlService.createHtmlOutputFromFile('public/main/stylesheet').getContent(); ?>
 
 </head>
 
@@ -14,6 +14,36 @@
 
 <?!= HtmlService.createHtmlOutputFromFile('public/helpers/navbar').getContent(); ?>
 
+<div class="houdini" style="display:none">
+  <div class="d-flex align-items-center justify-content-center text-center">
+      <a id="GMTUPDATEBUTTON" class="btn btn-danger popup rounded-0 w-100 text-decoration-none" href="#" role="button">
+          
+              <img src="https://cdna.artstation.com/p/assets/images/images/044/684/370/original/tiina-hirvonen-pet1-export.gif" style="margin-top:5px;margin-right: 5px;width:46px;height:31px" class="vertical-align-middle"/>
+              <span style="font-weight:bold;font-size:16px;line-height:0em;vertical-align:middle">Actualización 1.8.4</span>
+          <br>
+          <span style="font-size:10px">La aplicación se ha actualizado recientemente. Si te produce algún fallo, contacta con I+D.</span>
+      </a>
+  </div>
+</div>
+<script>
+    document.getElementById("GMTUPDATEBUTTON").addEventListener("click", function() {
+        window.open("https://github.com/morph-estudio/gsuite-morph-tools/blob/main/CHANGELOG.md", "_blank"); // Abre la página en una nueva pestaña del navegador
+    });
+</script>
+<script>
+  window.setInterval(function() {
+    var current = new Date();
+    var expiry = new Date("May 26, 2023 00:00:00")
+
+    if (current.getTime() > expiry.getTime()) {
+      $('.houdini').hide();
+
+    } else if (current.getTime() < expiry.getTime()) {
+      $('.houdini').show();
+    }
+
+  }, 0);
+</script>
 
 <div class="accordion" id="accordionExample">
   <div class="accordion-item">
@@ -43,11 +73,17 @@
           <button class="btn btn-primary index shadow-none half w-50" title="Aumenta proporcionalmente el tamaño de letra en la hoja" onclick="execNoSuccess('increaseFontSize')"><i class="fa-solid fa-margin fa-fw fa-arrows-up-to-line"></i>Font Size +</button>
           <button class="btn btn-primary index shadow-none w-50" title="Disminuye proporcionalmente el tamaño de letra en la hoja" onclick="execNoSuccess('decreaseFontSize')"><i class="fa-solid fa-margin fa-fw fa-arrows-down-to-line"></i>Font Size -</button>
         </div>
-
+        <!--
+        <div class="btn-group d-flex" role="group">
+          <button class="btn btn-primary index shadow-none half w-50" title="Aumenta proporcionalmente el tamaño de letra en la hoja" onclick="execNoSuccess('formulaUnwrap')"><i class="fa-solid fa-greater-than-equal fa-margin fa-fw"></i>Formula W+</button>
+          <button class="btn btn-primary index shadow-none w-50" title="Disminuye proporcionalmente el tamaño de letra en la hoja" onclick="execNoSuccess('formulaWrap')"><i class="fa-solid fa-less-than-equal fa-margin fa-fw"></i>Formula U-</button>
+        </div>
+        -->
         <button class="btn btn-primary index shadow-none w-100" title="Genera un identificador por cada celda seleccionada" onclick="execNoSuccess('uniqueIdentifier')"><i class="fa-solid fa-barcode fa-margin fa-fw"></i>Identificadores automáticos</button>
-        <button class="btn btn-primary index w-100 shadow-none" title="Crea una lista de usuarios del Google Workspace de Morph" onclick="swalConfirm('getDomainUsersList', 'Se ha creado una lista de usuarios.', 'Asegúrate de tener seleccionada la celda donde comenzará el listado antes de continuar.')"><i class="fa-solid fa-margin fa-users fa-fw"></i>Lista de miembros Morph</button>
 
         <!--
+        <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('convertirReferenciasAbsolutas')"><i class="fa-solid fa-margin fa-table-list fa-fw"></i>AA-FormulaReference</button>
+        <button class="btn btn-primary index w-100 shadow-none" title="Crea una lista de usuarios del Google Workspace de Morph" onclick="swalConfirm('getDomainUsersList', 'Se ha creado una lista de usuarios.', 'Asegúrate de tener seleccionada la celda donde comenzará el listado antes de continuar.')"><i class="fa-solid fa-margin fa-users fa-fw"></i>Lista de miembros Morph</button>
         <button class="btn btn-primary btn-lg-gmt mt-1 mb-3"  onclick="swalConfirm('exportXML', 'El archivo se ha convertido correctamente.', 'Congelar', 'Una vez ejecutado no se puede detener. Confirma para continuar.')">EXPORTAR XML</button>
         <div class="btn-group d-flex" role="group">
         <button class="btn btn-primary index shadow-none half w-50" onclick="execNoSuccess('drawPalette')"><i class="fa-solid fa-margin fa-palette fa-fw"></i>Paleta Morph</button>
@@ -270,13 +306,23 @@ function updateButtonClicked() {
   let updatePrefix = document.getElementById('updatePrefixID').value;
   let prefixAll = document.getElementById("prefix-all-switch").checked;
   let updateDebugReport = document.getElementById("update-debugReport").checked;
+
+  let updateHistorico = document.getElementById("update-historico").checked;
+  let updateBasic = document.getElementById("update-maindata").checked;
+  let updateAI = document.getElementById("update-ai").checked;
+  let updateAC = document.getElementById("update-ac").checked;
+
   let btnID = 'Superficies';
   var rowData = {
         updatePrefix,
         prefixAll,
         updateLinkPage,
         keepSheetVisibility,
-        updateDebugReport
+        updateDebugReport,
+        updateHistorico,
+        updateBasic,
+        updateAI,
+        updateAC
       }
   if (updateLinkPage) {
     swalConfirm('morphCSUpdater', 'El cuadro se ha actualizado correctamente.', 'Se actualizará la hoja LINK en el proceso de actualización. Confirma para continuar.', btnID, rowData);
@@ -284,7 +330,7 @@ function updateButtonClicked() {
     swalConfirm('morphCSUpdaterDirect', 'El cuadro se ha actualizado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', rowData);
   }
 }
-
+/*
 function historicoButtonClicked() {
   let addToDesglosado = document.getElementById("historicoSupAddPlus").checked;
 
@@ -294,7 +340,7 @@ function historicoButtonClicked() {
     swalConfirm('historicoDeSuperficies', 'Se ha creado un punto temporal en el histórico.', 'Se creará un nuevo punto en la hoja Histórico CONSTRUIDAS.', 0);
   }
 }
-
+*/
 function formulaLogButtonClicked() {
   let formulaText = document.getElementById("formulaLogFormulaText").value;
   let sendToTemplate = document.getElementById("sendFormulaToTemplate").checked;
@@ -308,10 +354,27 @@ function formulaLogButtonClicked() {
 $('#formulaDropperButton').click(function() {
   swaload();
   google.script.run.withSuccessHandler(function(data){
-    document.getElementById('formulaLogFormulaText').innerText = data;
+    let field = $('#formulaLogFormulaText');
+    field.val(data);
     Swal.close();
   }).formulaDropper();
 });
+
+$('#mssUpdate').click(function() {
+  let mssUpdateColumnReferenceText = document.getElementById("mssUpdateColRef").value;
+  let mssUpdateAllCheck = document.getElementById("mssUpdateAll").checked;
+
+  swalConfirm('bddcompuestos', 'Se ha creado un punto temporal en el histórico.', '¿Estás seguro que quieres actualizar el documento con Morph Spreadsheet System?', mssUpdateColumnReferenceText, mssUpdateAllCheck);
+});
+
+$('#mssUpdateAll').change(function() {
+    if ($(this).prop('checked')) {
+      $('#mssUpdateColRef').attr("disabled", true).val('');
+    } else {
+      $('#mssUpdateColRef').attr("disabled", false);
+    }
+});
+
 
 </script>
 
@@ -430,7 +493,7 @@ function checkReturn(arg) {
 document.getElementById('hideSectionButton').addEventListener("click", check_password);
 document.getElementById('csUpdater').addEventListener("click", updateButtonClicked);
 document.getElementById('formulaLogButton').addEventListener("click", formulaLogButtonClicked);
-document.getElementById('historicoSupButton').addEventListener("click", historicoButtonClicked);
+//document.getElementById('historicoSupButton').addEventListener("click", historicoButtonClicked);
 
 document.addEventListener('DOMContentLoaded', () => {
   userRolePermission();

@@ -4,42 +4,78 @@
     <h3 class="menu-h3 mb-3"><i class="fa-solid fa-laptop-code fa-margin fa-fw fa-sizing"></i>Funciones en desarrollo</h3>
   </div>
 
-  <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('deleteProperties')"><i class="fa-solid fa-trash-can fa-margin fa-fw"></i>Delete Document Properties</button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" onclick="execNoSuccess('deleteProperties')"><i class="fa-solid fa-trash-can fa-margin fa-fw"></i>Delete Document Properties</button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" title="Adaptar la hoja variables para los rangos nombrados" onclick="execNoSuccess('macroModificarCuadros')"><i class="fa-solid fa-microchip fa-margin fa-fw"></i>Aplicar macro de cuadros</button>
+  <button class="btn btn-primary index i2 shadow-none w-100 centerScroll" onclick="swalConfirm('formatLinkSheet', 'La hoja LINK se ha actualizado.', 'Este proceso borrará todos los datos de la hoja LINK y la actualizará a la última versión. Confirma para continuar.', 'general')"><i class="fa-solid fa-border-none fa-margin fa-fw"></i>Reformatear hoja LINK</button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" onclick="execNoSuccess('helperToMoveFormulas')"><i class="fa-solid fa-margin fa-table-list fa-fw"></i>Fórmulas a fila tres</button>
+  <button class="btn btn-primary index separator shadow-none w-100 centerScroll" onclick="execFunction('saveSheetAsTSV')"><i class="fa-solid fa-margin fa-file-excel fa-fw"></i>Exportar TSV con fórmulas</button>
 
-  <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('macroModificarCuadros')"><i class="fa-solid fa-microchip fa-margin fa-fw"></i>Aplicar macro de cuadros</button>
-  <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('deleteExcessiveRows')"><i class="fa-solid fa-microchip fa-margin fa-fw"></i>Borrar filas excesivas</button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" onclick="execNoSuccess('postLessons')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Enviar mensajes de Chat</button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" onclick="execNoSuccess('createTimeTriggerSpecifcDate')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Programar base de mensajes</button>
+  <button class="btn btn-primary index separator shadow-none w-100 centerScroll" onclick="swalConfirm('botBrainSave', 'Se ha acualizado la IA de Morph Robot', 'Por favor, no utilices esta función avanzada si no sabes lo que estás haciendo. Confirma para continuar.')"><i class="fa-solid fa-brain fa-margin fa-fw"></i>Actualizar cerebro de robot</button>
 
-  <button class="btn btn-primary index shadow-none w-100" onclick="swalConfirm('morphFastFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.')"><i class="fa-solid fa-margin fa-snowflake fa-fw"></i>Congelador rápido</button>
-  <button class="btn btn-primary index shadow-none w-100" onclick="execFunction('saveSheetAsTSV')"><i class="fa-solid fa-margin fa-file-excel fa-fw"></i>Exportar TSV con fórmulas</button>
-
-  <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('postLessons')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Enviar mensajes de Chat</button>
-  <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('createTimeTriggerSpecifcDate')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Programar base de mensajes</button>
-  <button class="btn btn-primary index shadow-none w-100" onclick="swalConfirm('botBrainSave', 'Se ha acualizado la IA de Morph Robot', 'Por favor, no utilices esta función avanzada si no sabes lo que estás haciendo. Confirma para continuar.')"><i class="fa-solid fa-brain fa-margin fa-fw"></i>Actualizar cerebro de robot</button>
-
-  <button class="btn btn-primary index shadow-none w-100" id="adaptButton" onclick="execFunction('adaptarCuadroAntiguo', 'El cuadro se ha adaptado correctamente.')"><i class="fa-solid fa-margin fa-fw fa-triangle-exclamation"></i>Adaptar cuadro antiguo<span data-bs-toggle="tooltip" data-bs-placement="right" title="Adapta la hoja LINK de los cuadros anteriores a Gsuite Morph Tools">
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" id="adaptButton" onclick="execFunction('adaptarCuadroAntiguo', 'El cuadro se ha adaptado correctamente.')"><i class="fa-solid fa-margin fa-fw fa-triangle-exclamation"></i>Adaptar cuadro antiguo<span data-bs-toggle="tooltip" data-bs-placement="right" title="Adapta la hoja LINK de los cuadros anteriores a Gsuite Morph Tools">
   <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:1px"></i>
 </span></button>
-  <button class="btn btn-primary index shadow-none w-100" id="adaptDeleteButton" onclick="execNoSuccess('setCuadroAdaptado')"><i class="fa-solid fa-lock fa-margin fa-fw"></i>Bloquear botón adaptar</button>
-  <button class="btn btn-primary index shadow-none w-100" id="adaptDeleteButton" onclick="execNoSuccess('deleteProperty', 'adaptedSpreadsheet'), execDirect('sidebarIndex')"><i class="fa-solid fa-unlock fa-margin fa-fw"></i>Desbloquear botón adaptar</button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" id="adaptDeleteButton" onclick="execNoSuccess('setCuadroAdaptado')"><i class="fa-solid fa-lock fa-margin fa-fw"></i>Bloquear botón adaptar</button>
+  <button class="btn btn-primary index separator shadow-none w-100 centerScroll" id="adaptDeleteButton" onclick="execNoSuccess('deleteProperty', 'adaptedSpreadsheet'), execDirect('sidebarIndex')"><i class="fa-solid fa-unlock fa-margin fa-fw"></i>Desbloquear botón adaptar</button>
+
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" id="adaptDeleteButton" onclick="execNoSuccess('listNamedRanges')"><i class="fa-solid fa-list-ol fa-margin fa-fw"></i>Listado de rangos nombrados</button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" id="adaptDeleteButton" onclick="execNoSuccess('addComponent')"><i class="fa-solid fa-file-circle-question fa-margin fa-fw"></i>Añadir componente de prueba a la BDD Componentes</button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" onclick="swalConfirm('morphFastFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.')"><i class="fa-solid fa-margin fa-snowflake fa-fw"></i>Congelador rápido</button>
 
   <div class="accordion-body pb-0 mt-4">
     <h3 class="menu-h3 mb-3"><i class="fa-solid fa-square-caret-down fa-margin fa-fw fa-sizing"></i>Menú para developers</h3>
   </div>
 
-  <!--
-  <button class="btn btn-primary index shadow-none w-100" onclick="execDirect('sidebarSMDevs')"><i class="fa-solid fa-margin fa-fw fa-file-circle-check"></i>Gestor de hojas</button>
-  <button class="btn btn-primary index shadow-none w-100" onclick="execDirect('sidebarDSDevs')"><i class="fa-solid fa-margin fa-fw fa-wand-magic-sparkles"></i>Morph Document Studio</button>
-  -->
   <button class="btn btn-primary index shadow-none w-100 ult" onclick="execDirect('sidebarCLDevs')"><i class="fa-solid fa-margin fa-fw fa-swatchbook"></i>Guía de estilos WIP</button>
   
 
 </div>
 
+<!--
 <div id="transicionCuadros" style="display: none" class="accordion-body mt-4 pb-3 devAreaPermission">
     <h3 class="mb-3"><i class="fa-solid fa-triangle-exclamation fa-margin fa-fw fa-sizing"></i>Transición de cuadros</h3>
     <p>Si es un cuadro anterior a <u>Octubre 2022</u> debes adaptarlo antes de actualizar.</p>
     <button class="btn btn-success mainbtn btn-xl w-100" id="adaptButton" onclick="execFunction('adaptarCuadroAntiguo', 'El cuadro se ha adaptado correctamente.')">Adaptar cuadro antiguo</button>
 </div>
+-->
+
+<div style="display: none;" class="accordion-body devAreaPermission mt-4 ">
+  <h3 class="menu-h3 mb-3"><i class="fa-solid fa-network-wired fa-margin fa-fw fa-sizing"></i>Table Debugging</h3>
+
+  <div class="rounded">
+    <div class="input-group flex-nowrap update mb-1">
+      <span class="input-group-text"><i class="fa-solid fa-link"></i></span>
+      <input type="text" class="form-control shadow-none" id="videoUrl" placeholder="Introduce una URL...">
+    </div>
+  </div>
+
+  <button type="button" class="btn btn-primary gmt w-100 shadow-none" onclick="showVideo()">Mostrar fallos</button>
+
+  <div class="row mt-2">
+    <div class="">
+      <div id="videoPlayer"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showVideo() {
+    var videoUrl = document.getElementById('videoUrl').value;
+    google.script.run.withSuccessHandler(displayVideoPlayer).getVideoId(videoUrl);
+  }
+
+  function displayVideoPlayer(videoId) {
+    if (videoId === "Invalid URL") {
+      document.getElementById('videoPlayer').innerHTML = "La URL no es válida.";
+    } else {
+      var embedUrl = "https://www.youtube.com/embed/" + videoId;
+      var iframe = '<iframe width="100%" height="100%" src="' + embedUrl + '" frameborder="0" allowfullscreen></iframe>';
+      document.getElementById('videoPlayer').innerHTML = iframe;
+    }
+  }
+</script>
 
 <div id="pdfsechidden" style="display: none" class="accordion-body mt-4 pb-3 devAreaPermission">
 
@@ -135,7 +171,5 @@
 
     swalConfirm('printValidation', 'Se han generado todos los archivos PDF.', 'Asegúrate de tener seleccionada la celda desplegable. Confirma para continuar.', rowData);
   }
-
-
 
 </script>

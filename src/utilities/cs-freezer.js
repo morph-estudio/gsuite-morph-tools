@@ -2,7 +2,7 @@
  * Gsuite Morph Tools - CS Freezer 1.8.0
  * Developed by alsanchezromero
  *
- * Copyright (c) 2022 Morph Estudio
+ * Copyright (c) 2023 Morph Estudio
  */
 
 function morphFreezer(btnID, sheetSelection) {
@@ -39,9 +39,26 @@ function morphFreezer(btnID, sheetSelection) {
     var backupFolder, backupFolderId, backupFolderName;
     let searchFor = 'title contains "Congelados"';
     backupFolder = backupFolderSearch.searchFolders(searchFor);
-    backupFolder = backupFolder.next();
-    backupFolderId = backupFolder.getId();
-    backupFolderName = backupFolder.getName();
+
+    if (!backupFolder.hasNext()) { // La carpeta no fue encontrada
+      var response = Browser.msgBox("Atención", "No se ha encontrado la carpeta para los archivos congelados. ¿Deseas crearla automáticamente?", Browser.Buttons.OK_CANCEL);
+      if (response == "cancel") {
+        throw new Error(`No se ha podido encontrar la carpeta de archivos congelados.`);
+      }
+
+      var folderName = `${ss.getName().substring(0, 6)}-A-CS-${searchFor.substring(16, searchFor.length - 1)}`; // Obtener el nombre de la carpeta desde la cadena de búsqueda
+      var newFolder = backupFolderSearch.createFolder(folderName);
+
+      backupFolderId = newFolder.getId();
+      backupFolder = DriveApp.getFolderById(backupFolderId);
+      backupFolder = [backupFolder]; // Actualizar la variable expFolder para usar la carpeta recién creada
+      
+    } else { // La carpeta fue encontrada
+      backupFolder = backupFolder.next();
+      backupFolderId = backupFolder.getId();
+    }
+
+    var backupFolderName = backupFolder.getName();
   }
 
   // Creating destination file
