@@ -2,7 +2,14 @@
 # Change Log
 Documentación de cambios del proyecto.
 
-## [ 1.8.4 ] - 2023/05/18
+## [ 1.8.5 ] - 2023/05/24
+
+### Fixed
+
+- Bugs arreglados y código optimizado en la herramienta para actualizar rangos nombrados.
+- Notas adaptadas al horario de verano.
+
+## [ 1.8.4 ] - 2023/05/19
 
 ### Added
 
@@ -20,7 +27,6 @@ Documentación de cambios del proyecto.
 
 ### Fixed
 
-- Notas adaptadas al horario de verano.
 - Arreglado el error en el botón para limpiar la caché del documento.
 
 ## [ 1.8.3 ] - 2023/03/06

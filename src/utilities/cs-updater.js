@@ -14,7 +14,7 @@ function morphCSUpdater(btnID, rowData) {
   var ss_id = ss.getId();
   var ss_name = ss.getName();
   var userMail = Session.getActiveUser().getEmail();
-  var dateNow = Utilities.formatDate(new Date(), 'GMT+2', 'dd/MM/yyyy - HH:mm:ss');
+  var dateNow = Utilities.formatDate(new Date(), 'GMT+3', 'dd/MM/yyyy - HH:mm:ss');
   const txtFolderName = `ExpTXT`;
   var file = DriveApp.getFileById(ss_id);
   Logger.log(`FILENAME: ${file.getName()}, URL: ${file.getUrl()}`);

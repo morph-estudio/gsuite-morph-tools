@@ -5,7 +5,7 @@
  * Remove all Named Ranges in a Spreadsheet
  */
  function deleteNamedRanges() {
-  var ss = SpreadsheetApp.getActive();
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
   var namedRanges = ss.getNamedRanges();
   for (var i = 0; i < namedRanges.length; i++) {
     namedRanges[i].remove();
@@ -18,6 +18,7 @@
  */
 function refreshNamedRanges() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var spreadsheetId = ss.getId();
   var sh = ss.getSheetByName('X_Variables');
   var sh_txtop = ss.getSheetByName('TXT OPERACIONES');
 
@@ -25,57 +26,238 @@ function refreshNamedRanges() {
     throw new Error(`No se encontraron las hojas 'TXT OPERACIONES' o 'X_Variables'`);
   }
 
-  var headers = sh_txtop.getRange(1, 1, 1, sh_txtop.getLastColumn()).getValues()[0];
+  var headers = flattenArray(sh_txtop.getRange(1, 1, 1, sh_txtop.getLastColumn()).getValues());
+  // headers = headers.filter(Boolean);
+  Logger.log(`Headers: ${headers}`);
 
   var headers_template = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0];
   var parametrosColumnIndex = headers_template.indexOf("PLANTILLA PARAMETRO ARCHI");
 
-  if (parametrosColumnIndex !== -1 && parametrosColumnIndex < headers_template.length - 1) {
-    var columnARange = sh.getRange(2, parametrosColumnIndex + 1, sh.getLastRow() - 1, 1);
-    var columnBRange = sh.getRange(2, parametrosColumnIndex + 2, sh.getLastRow() - 1, 1);
+  if (parametrosColumnIndex !== -1) {
+    var columnARange = sh.getRange(2, parametrosColumnIndex + 1, sh.getMaxRows() - 1, 1);
+    var columnBRange = sh.getRange(2, parametrosColumnIndex + 2, sh.getMaxRows() - 1, 1);
 
     var columnA = columnARange.getValues();
     var columnB = columnBRange.getValues();
-  } else {
 
+    var filteredColumnA = [];
+    var filteredColumnB = [];
+
+    for (var i = 0; i < columnB.length; i++) {
+      var valueB = columnB[i][0];
+      if (valueB) {
+        filteredColumnA.push(columnA[i][0]);
+        filteredColumnB.push(valueB);
+      }
+    }
   }
 
-  // Caché de la lista de rangos nombrados
-  var namedRanges = ss.getNamedRanges();
+  Logger.log(`filteredColumnA: ${filteredColumnA}, filteredColumnB: ${filteredColumnB}`)
+
+  // Get Named Ranges using Google Sheets API
+  var response = Sheets.Spreadsheets.get(spreadsheetId);
+  var namedRanges = response.namedRanges;
   var namedRangesDict = {};
   for (var i = 0; i < namedRanges.length; i++) {
-    namedRangesDict[namedRanges[i].getName()] = namedRanges[i];
+    namedRangesDict[namedRanges[i].name] = namedRanges[i];
   }
 
-  var namedRangeName, namedRange, txtvalue;
+  var batchRequests = [];
 
-  for (var i = 0; i < columnB.length; i++) {
-    namedRangeName = columnB[i][0];
-    txtvalue = columnA[i][0];
-
-    if (!namedRangeName) {
-      continue;
-    }
-
+  for (var i = 0; i < filteredColumnB.length; i++) {
+    //SpreadsheetApp.flush();
+    var namedRangeName = filteredColumnB[i].toString().trim();
+    var txtvalue = filteredColumnA[i].toString().trim();
     var columnIndex = headers.indexOf(txtvalue);
-
-    if (columnIndex === -1) {
+  
+    if (columnIndex == -1) {
       continue;
-    }
-
-    columnIndex += 1;
-
-    namedRange = sh_txtop.getRange(2, columnIndex, sh_txtop.getMaxRows() - 1, 1);
-
-    // Buscar si el rango nombrado existe utilizando el diccionario
-    var existingNamedRange = namedRangesDict[namedRangeName];
-    if (existingNamedRange) {
-      existingNamedRange.setRange(namedRange);
     } else {
-      ss.setNamedRange(namedRangeName, namedRange);
+      var namedRange = {
+        range: {
+          sheetId: sh_txtop.getSheetId(),
+          startRowIndex: 1,
+          endRowIndex: 5000,
+          startColumnIndex: columnIndex,
+          endColumnIndex: columnIndex + 1
+        }
+      };
+
+      var existingNamedRange = namedRangesDict[namedRangeName];
+
+      Logger.log(`El rango es de tipo ${existingNamedRange}`)
+
+      if (existingNamedRange != undefined) {
+        // Update existing Named Range
+        batchRequests.push({
+          updateNamedRange: {
+            namedRange: {
+              name: namedRangeName.trim(),
+              namedRangeId: existingNamedRange.namedRangeId,
+              range: namedRange.range
+            },
+            fields: 'range'
+          }
+        });
+      } else {
+        // Add new Named Range
+        batchRequests.push({
+          addNamedRange: {
+            namedRange: {
+              name: namedRangeName,
+              range: namedRange.range
+            }
+          }
+        });
+      }
     }
+  }
+
+  // Send batch update request
+
+  //SpreadsheetApp.flush();
+
+    Sheets.Spreadsheets.batchUpdate({
+      requests: batchRequests
+    }, spreadsheetId);
+
+}
+
+/**
+ * refreshNamedRanges
+ * Refresh Named Ranges in a Morph Table based on TXT_OP_TPL
+ */
+function refreshNamedRanges_2() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var spreadsheetId = ss.getId();
+  var sh = ss.getSheetByName('X_Variables');
+  var sh_txtop = ss.getSheetByName('TXT OPERACIONES_2');
+  //var sh_txtsuperficies = ss.getSheetByName('TXT SUPERFICIES');
+
+  if (!sh || !sh_txtop) {
+    throw new Error(`No se encontraron las hojas 'TXT OPERACIONES' o 'X_Variables'`);
+  }
+
+/*
+  // Copiar contenido de 'TXT SUPERFICIES'
+  var txtSuperficiesRange = sh_txtsuperficies.getDataRange();
+  var txtSuperficiesValues = txtSuperficiesRange.getValues();
+
+  // Borrar contenido de 'TXT SUPERFICIES'
+  sh_txtsuperficies.clear();
+
+  // Pegar contenido en 'TXT SUPERFICIES' nuevamente
+  var targetRange = sh_txtsuperficies.getRange(1, 1, txtSuperficiesValues.length, txtSuperficiesValues[0].length);
+  targetRange.setValues(txtSuperficiesValues);
+*/
+
+  var headers = flattenArray(sh_txtop.getRange(1, 1, 1, sh_txtop.getLastColumn()).getValues());
+  headers = headers.filter(Boolean);
+  Logger.log(`Headers: ${headers}`);
+
+  var headers_template = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0];
+  var parametrosColumnIndex = headers_template.indexOf("PLANTILLA PARAMETRO ARCHI");
+
+  if (parametrosColumnIndex !== -1) {
+    var columnARange = sh.getRange(2, parametrosColumnIndex + 1, sh.getMaxRows() - 1, 1);
+    var columnBRange = sh.getRange(2, parametrosColumnIndex + 2, sh.getMaxRows() - 1, 1);
+
+    var columnA = columnARange.getValues();
+    var columnB = columnBRange.getValues();
+
+    var filteredColumnA = [];
+    var filteredColumnB = [];
+
+    for (var i = 0; i < columnB.length; i++) {
+      var valueB = columnB[i][0];
+      if (valueB) {
+        filteredColumnA.push(columnA[i][0]);
+        filteredColumnB.push(valueB);
+      }
+    }
+  }
+
+  Logger.log(`filteredColumnA: ${filteredColumnA}, filteredColumnB: ${filteredColumnB}`)
+
+  // Get Named Ranges using Google Sheets API
+  var response = Sheets.Spreadsheets.get(spreadsheetId);
+  var namedRanges = response.namedRanges;
+  var namedRangesDict = {};
+  for (var i = 0; i < namedRanges.length; i++) {
+    namedRangesDict[namedRanges[i].name] = namedRanges[i];
+  }
+
+  var batchRequests = [];
+  var batchSize = 5; // Tamaño del lote
+
+  for (var i = 0; i < filteredColumnB.length; i += batchSize) {
+    //SpreadsheetApp.flush();
+
+    var batchFilteredColumnA = filteredColumnA.slice(i, i + batchSize);
+    var batchFilteredColumnB = filteredColumnB.slice(i, i + batchSize);
+
+    for (var j = 0; j < batchFilteredColumnB.length; j++) {
+      var namedRangeName = batchFilteredColumnB[j].toString().trim();
+      var txtvalue = batchFilteredColumnA[j].toString().trim();
+      var columnIndex = headers.indexOf(txtvalue);
+    
+      if (columnIndex == -1) {
+        continue;
+      } else {
+        var namedRange = {
+          range: {
+            sheetId: sh_txtop.getSheetId(),
+            startRowIndex: 1,
+            endRowIndex: 50,
+            startColumnIndex: columnIndex,
+            endColumnIndex: columnIndex + 1
+          }
+        };
+
+        var existingNamedRange = namedRangesDict[namedRangeName];
+
+        Logger.log(`El rango es de tipo ${existingNamedRange}`)
+
+        if (existingNamedRange != undefined) {
+          // Update existing Named Range
+          batchRequests.push({
+            updateNamedRange: {
+              namedRange: {
+                name: namedRangeName.trim(),
+                namedRangeId: existingNamedRange.namedRangeId,
+                range: namedRange.range
+              },
+              fields: 'range'
+            }
+          });
+        } else {
+          // Add new Named Range
+          batchRequests.push({
+            addNamedRange: {
+              namedRange: {
+                name: namedRangeName,
+                range: namedRange.range
+              }
+            }
+          });
+        }
+      }
+    }
+
+    // Ejecutar lote de solicitudes
+
+    if (batchRequests.length > 0) {
+      Sheets.Spreadsheets.batchUpdate({
+        requests: batchRequests
+      }, spreadsheetId);
+
+      batchRequests = []; // Reiniciar las solicitudes del lote
+      //Utilities.sleep(1000);
+    }
+    
   }
 }
+
 
 // CATEGORY: ROW/COLUMN DELETION AND SPREADSHEET OPTIMIZATION
 
@@ -284,12 +466,12 @@ function getDomainUsersList() {
  * Genera identificadores únicos en las celdas seleccionadas.
  */
 function uniqueIdentifier() {
-  const selection = sh().getActiveRange();
-  const columns = selection.getNumColumns();
-  const rows = selection.getNumRows();
+  var selection = sh().getActiveRange();
+  var columns = selection.getNumColumns();
+  var rows = selection.getNumRows();
   for (let column = 1; column <= columns; column++) {
     for (let row = 1; row <= rows; row++) {
-      const cell = selection.getCell(row, column);
+      var cell = selection.getCell(row, column);
       cell.setValue(Utilities.getUuid());
     }
   }

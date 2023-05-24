@@ -1,6 +1,6 @@
 /** GLOBAL VARIABLES AND FUNCTIONS */
 
-const gmtVersion = '1.8.4';
+const gmtVersion = '1.8.5';
 const morphDivision = '(I+D)';
 const morphDev = '(Devs)';
 
