@@ -65,7 +65,7 @@ function refreshNamedRanges() {
   var batchRequests = [];
 
   for (var i = 0; i < filteredColumnB.length; i++) {
-    //SpreadsheetApp.flush();
+    SpreadsheetApp.flush();
     var namedRangeName = filteredColumnB[i].toString().trim();
     var txtvalue = filteredColumnA[i].toString().trim();
     var columnIndex = headers.indexOf(txtvalue);

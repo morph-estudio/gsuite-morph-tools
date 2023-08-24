@@ -2,7 +2,7 @@
  * Gsuite Morph Tools - CS Freezer 1.8.0
  * Developed by alsanchezromero
  *
- * Copyright (c) 2023 Morph Estudio
+ * Morph Estudio, 2023
  */
 
 function morphFreezer(btnID, sheetSelection) {

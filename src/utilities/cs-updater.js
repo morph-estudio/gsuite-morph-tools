@@ -2,7 +2,7 @@
  * Gsuite Morph Tools - CS Updater 1.8.4
  * Developed by alsanchezromero
  *
- * Copyright (c) 2023 Morph Estudio
+ * Morph Estudio, 2023
  */
 
 function morphCSUpdater(btnID, rowData) {
@@ -164,7 +164,7 @@ function morphCSUpdater(btnID, rowData) {
 
       keepNewestFilesOfEachNameInAFolder(expFolderDef); // Delete duplicated files in Exports Folder
 
-      let prefijo = [updatePrefix] || ['TXT','MED']; // prefix mask
+      let prefijo = [updatePrefix] || ['TXT','MED', 'CSV', 'SUP']; // prefix mask
       let files = expFolderDef.getFiles();
       while (files.hasNext()) {
         file = files.next();
@@ -182,7 +182,8 @@ function morphCSUpdater(btnID, rowData) {
 
       if (list.length < 1) throw new Error(`No se ha encontrado ningun archivo en la carpeta ${txtFolderName} que cumpla los criterios seleccionados.`);
 
-      let result = list.filter((r) => r[0].includes('.txt')).sort();
+      var allowedExtensions = ['.txt', '.tsv', '.csv'];
+      let result = list.filter((r) => allowedExtensions.some(ext => r[0].includes(ext))).sort();
       let resultCrop = result.map((val) => val.slice(0, -1));
       sh.getRange(2, 4, result.length, 2).setValues(resultCrop);
       Logger.log(`Export Folder: ${expFolderDef.getName()}, Number of files to import: ${result.length - 1}`)
@@ -203,7 +204,7 @@ function morphCSUpdater(btnID, rowData) {
 
       SpreadsheetApp.flush();
 
-      var changeTabColors = [];
+      var changeTabColors = []; var tabColor = '#00ff00';
 
       const requests = list.map(([txtFileName, txtFileId, txtFileSheet]) => {
         txt_file = DriveApp.getFileById(txtFileId);
@@ -212,13 +213,18 @@ function morphCSUpdater(btnID, rowData) {
 
         sheetPaste = ss.getSheetByName(txtFileSheet) || ss.insertSheet(`${txtFileSheet}`, 200); sh.activate();
 
-        var currentTabColor = sheetPaste.getTabColorObject();
-        if (currentTabColor != "#00FF00") changeTabColors.push(sheetPaste);
+        var currentTabColor = sheetPaste.getTabColorObject(); Logger.log(`Tab color: ${currentTabColor}`)
+        if (currentTabColor != tabColor) changeTabColors.push(sheetPaste);
 
         if (keepSheetVisibility != true) sheetPaste.hideSheet();
         sheetId = sheetPaste.getSheetId();
         tsvUrl = `https://drive.google.com/uc?id=${txtFileId}&x=.tsv`;
         tsvContent = UrlFetchApp.fetch(tsvUrl).getContentText();
+
+        let delimiter = '\t';
+        if (txtFileName.endsWith('.csv')) {
+          delimiter = ',';
+        }
 
         if (updateDebugReport) {
           let tsvData = Utilities.parseCsv(tsvContent, '\t');
@@ -241,7 +247,7 @@ function morphCSUpdater(btnID, rowData) {
           { pasteData: { 
             data: tsvContent,
             coordinate: { sheetId },
-            delimiter: '\t' 
+            delimiter: delimiter 
             }}
           ];
       });
@@ -257,7 +263,7 @@ function morphCSUpdater(btnID, rowData) {
 
   if (updateAI) {
     for (var i = 0; i < changeTabColors.length; i++) {
-      changeTabColors[i].setTabColor("#00FF00");
+      changeTabColors[i].setTabColor(tabColor);
     }
   }
 

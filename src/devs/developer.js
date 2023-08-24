@@ -1,5 +1,487 @@
 // SECTION = FUNCTIONS IN DEVELOPMENT
 
+function translatePresentation() {
+  var presentationId = '1g6hOkkSEw7K2RJlAtsZasFnnET8dVHAXtH9LklPiY2s'; // Asegúrate de poner aquí el ID de tu presentación.
+  var presentation = SlidesApp.openById(presentationId);
+  var slides = presentation.getSlides();
+  
+  for (var i = 0; i < slides.length; i++) {
+    var shapes = slides[i].getShapes();
+    for (var j = 0; j < shapes.length; j++) {
+      if (shapes[j].getText) { // Verificamos que el objeto tenga texto
+        var originalText = shapes[j].getText().asString();
+        //var originalText = textRange.getText();
+        if (originalText !== '') { // Verificamos que el texto no esté vacío
+          var translatedText = LanguageApp.translate(originalText, 'es', 'en'); // Traducimos el texto
+          shapes[j].setText(translatedText); // Establecemos el texto traducido
+        }
+      }
+    }
+  }
+}
+
+function updateCSDB() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sh = ss.getSheetByName('CS-OP');
+  var data = sh.getRange('B4:B').getValues();
+  var data_2 = sh.getRange('M4:M').getValues();
+
+  var folderIdsByProjectCode = {
+    P05: "0AHyQttPCl3bJUk9PVA",
+    P06: "0AMR_I9BV2NhPUk9PVA",
+    P07: "0AB4Gq6lkAaEqUk9PVA",
+    P08: "0AJxCS-3KvMXEUk9PVA",
+    P09: "0AKuz_Ey_m-O4Uk9PVA",
+    P10: "0AApa1UiYkMUIUk9PVA",
+    P11: "0ADEoIVQFg9Y8Uk9PVA",
+    P12: "0AOG8vnC0w0qsUk9PVA",
+    P13: "0AKAUEcok-cppUk9PVA",
+    P16: "0AKMKawyNToCKUk9PVA"
+  };
+
+  var folderPairs = [
+    {
+      folderStructure: {
+        a: ['Trabajo'],
+        b: ['Arquitectura'],
+        c: ['Doc Escrita'],
+        d: ['Cuadro Superficies', 'CS']
+      },
+      filesPattern: {
+        "superficies": {
+          pattern: { a: `Cuadro Superficies` },
+          columnToSetValue: 'O',
+          filetype: 'google_sheets'
+        },
+        "exportacion": {
+          pattern: { a: `Exportación Superficies` },
+          columnToSetValue: 'S',
+          filetype: 'google_sheets'
+        },
+        "cliente": {
+          pattern: { a: `Cliente`, b: `AVINTIA` },
+          columnToSetValue: 'W',
+          filetype: 'google_sheets'
+        }
+      }
+    },
+    {
+      folderStructure: {
+        a: ['Trabajo'],
+        b: ['Arquitectura'],
+        c: ['Maq']
+      },
+      filesPattern: {
+        "slides": {
+          pattern: { a: `CD` },
+          columnToSetValue: 'N',
+          filetype: 'google_slides'
+        }
+      }
+    }
+  ];
+
+  for (var i = 0; i < data.length; i++) {
+    var projectCode = data[i][0];
+    var projectFolderURL = data_2[i][0].toString().trim();
+    var projectFolder = null;
+
+    if (projectFolderURL !== "") {
+      Logger.log(`${projectCode}: Value in COLUMN M already exists. Skipping root folder search.`);
+      var projectFolderID = getFolderIdFromUrl(projectFolderURL);
+      projectFolder = DriveApp.getFolderById(projectFolderID);
+    } else {
+      var folderId = folderIdsByProjectCode[projectCode.substring(0, 3)];
+      var folders = DriveApp.getFolderById(folderId).getFolders();
+      //Logger.log(`Share Drive is: ${projectCode.substring(0, 3)} and its URL: ${folderId}`);
+
+      while (folders.hasNext()) {
+        var folder = folders.next();
+        if (folder.getName().includes(projectCode)) {
+          projectFolderURL = folder.getUrl();
+          sh.getRange('M' + (i + 4)).setValue(projectFolderURL);
+          projectFolder = folder;
+          break;
+        }
+      }
+    }
+
+    if (projectFolder !== null) {
+      for (var j = 0; j < folderPairs.length; j++) {
+        var folderStructure = folderPairs[j].folderStructure;
+        var filesPattern = folderPairs[j].filesPattern;
+        var rootFolderId = projectFolder.getId();
+        var finalFolderID = followFolderStructure(rootFolderId, folderStructure);
+        var finalFolder = DriveApp.getFolderById(finalFolderID);
+
+        for (var key in filesPattern) {
+          var patterns = filesPattern[key].pattern;
+          var columnToSetValue = filesPattern[key].columnToSetValue;
+          var filetype = filesPattern[key].filetype;
+          
+          // Check if the value already exists in the column
+          var currentValue = sh.getRange(columnToSetValue + (i + 4)).getValue();
+          if (currentValue !== "") {
+            Logger.log(`${projectCode}: Value in COLUMN ${columnToSetValue} already exists. Skipping file search.`);
+            continue;
+          }
+
+          var matchingFiles = findMatchingFiles(finalFolder, patterns, filetype);
+
+          if (matchingFiles.length > 0) {
+            matchingFiles.sort(function(a, b) {
+              return a.getLastUpdated() < b.getLastUpdated() ? 1 : -1;
+            });
+            var definitiveFile = matchingFiles[0];
+            Logger.log(`${projectCode}: Found file: ${definitiveFile.getName()}, Last updated: ${definitiveFile.getLastUpdated()}`);
+            sh.getRange(columnToSetValue + (i + 4)).setValue(definitiveFile.getUrl());
+          } else {
+            Logger.log(`${projectCode}: No files found matching the pattern.`);
+          }
+        }
+      }
+    }
+  }
+}
+
+function followFolderStructure(rootFolderId, folderStructure) {
+  var folder = DriveApp.getFolderById(rootFolderId);
+  for (var key in folderStructure) {
+    var folderNamesToMatch = folderStructure[key];
+    var subFolders = folder.getFolders();
+    var foundFolder = null;
+
+    while (subFolders.hasNext()) {
+      var subFolder = subFolders.next();
+      var folderName = subFolder.getName();
+      var folderNameMatches = folderNamesToMatch.some(name => folderName.includes(name));
+      
+      if (folderNameMatches) {
+        foundFolder = subFolder;
+        break;
+      }
+    }
+
+    if (foundFolder) {
+      folder = foundFolder;
+    } else {
+      continue;
+      //throw new Error('No se encuentra la carpeta con el nombre: ' + folderNamesToMatch.join(' / '));
+    }
+  }
+
+  return folder.getId();
+}
+
+function findMatchingFiles(rootFolder, patterns, filetype) {
+  var matchingFiles = [];
+  var rootFiles = rootFolder.getFilesByType(getMimeTypeByFileType(filetype));
+
+  while (rootFiles.hasNext()) {
+    var rootFile = rootFiles.next();
+    if (matchesPatterns(rootFile.getName(), patterns)) {
+      matchingFiles.push(rootFile);
+    }
+  }
+
+  if (matchingFiles.length === 0) {
+    var subFolders = rootFolder.getFolders();
+
+    while (subFolders.hasNext()) {
+      var subFolder = subFolders.next();
+      var subFiles = subFolder.getFilesByType(getMimeTypeByFileType(filetype));
+
+      while (subFiles.hasNext()) {
+        var subFile = subFiles.next();
+        if (matchesPatterns(subFile.getName(), patterns)) {
+          matchingFiles.push(subFile);
+        }
+      }
+    }
+  }
+
+  return matchingFiles;
+}
+
+function matchesPatterns(filename, patterns) {
+  for (var key in patterns) {
+    var pattern = patterns[key];
+    if (filename.includes(pattern)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function getMimeTypeByFileType(filetype) {
+  //Logger.log(`Mimetype: ${filetype}`);
+  switch (filetype) {
+    case 'google_sheets':
+      return 'application/vnd.google-apps.spreadsheet';
+    case 'google_slides':
+      return 'application/vnd.google-apps.presentation';
+    // Agregar más tipos de archivos según sea necesario
+    default:
+      return '';
+  }
+}
+
+function getFolderIdFromUrl(url) {
+  var id = "";
+  var match = url.match(/[-\w]{25,}/);
+  if (match) {
+    id = match[0];
+  }
+  return id;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function contarComentarios() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('CS-OP'); // Reemplaza 'CS-OP' con el nombre de la hoja donde están los datos
+
+  var data = sheet.getRange('O4:O').getValues();
+  var numRows = data.length;
+  var comments = [];
+
+  var modsArray = ['asanchez@morphestudio.es', 'lmmielgo@morphestudio.es'];
+
+  for (var i = 0; i < numRows; i++) {
+    var fileUrl = data[i][0];
+    if (fileUrl) {
+      var fileId = getIdFromUrl(fileUrl);
+      var commentStats = obtenerComentarios(fileId, modsArray);
+      comments.push([commentStats.unresolvedCommentsWithMods, commentStats.unresolvedComments, commentStats.totalComments]);
+    } else {
+      comments.push(['', '', '']); // Si no hay URL, dejar las celdas vacías
+    }
+  }
+
+  sheet.getRange(4, 16, numRows, 3).setValues(comments);
+
+  Logger.log('Conteo de comentarios completado.');
+}
+
+function obtenerComentarios(fileId, modsArray) {
+  var comments = Drive.Comments.list(fileId, { maxResults: 100 }).items;
+  var totalComments = comments.length;
+  var unresolvedComments = 0;
+  var unresolvedCommentsWithMods = 0;
+
+  comments.forEach(function(comment) {
+    Logger.log(`CONTENT: ${comment.content}, STATUS: ${comment.status}`);
+    if (comment.status !== "resolved") {
+      unresolvedComments++;
+      if (modsArray.some(function(mod) { return comment.content.includes(mod); })) {
+        unresolvedCommentsWithMods++;
+      }
+    }
+  });
+
+  return {
+    totalComments: totalComments,
+    unresolvedComments: unresolvedComments,
+    unresolvedCommentsWithMods: unresolvedCommentsWithMods
+  };
+}
+
+function formatearIDCS() {
+
+  headers = {
+    "✅": {
+      anchocolumna: 35,
+      negrita: true,
+      color: "#000000",
+      backgroundColor: null,
+    },
+    "Code": {
+      anchocolumna: 80,
+      negrita: true,
+      color: "#000000",
+      backgroundColor: null
+    },
+    "Nombre": {
+      anchocolumna: 550,
+      negrita: false,
+      color: "#000000",
+      backgroundColor: null
+    },
+    "Coordinador/a 1": {
+      anchocolumna: 225,
+      negrita: false,
+      color: "#000000",
+      backgroundColor: null
+    },
+    "Coordinador/a 2": {
+      anchocolumna: 225,
+      negrita: false,
+      color: "#000000",
+      backgroundColor: null
+    },
+    "Personal": {
+      anchocolumna: 400,
+      negrita: false,
+      color: "#000000",
+      backgroundColor: null
+    },
+    "Dept.": {
+      anchocolumna: 125,
+      negrita: false,
+      color: "#000000",
+      backgroundColor: null
+    },
+    "Estado": {
+      anchocolumna: 125,
+      negrita: false,
+      color: "#000000",
+      backgroundColor: null
+    },
+    "Fecha": {
+      anchocolumna: 125,
+      negrita: false,
+      color: "#000000",
+      backgroundColor: null
+    },
+    "Fase": {
+      anchocolumna: 75,
+      negrita: false,
+      color: "#000000",
+      backgroundColor: null
+    },
+    "BIM": {
+      anchocolumna: 125,
+      negrita: false,
+      color: "#000000",
+      backgroundColor: null
+    },
+    "P. Folder": {
+      anchocolumna: 125,
+      negrita: true,
+      color: "#009688",
+      backgroundColor: "#B7E1CD"
+    },
+    "Slides": {
+      anchocolumna: 125,
+      negrita: true,
+      color: "#FFAB00",
+      backgroundColor: "#FFF8E1"
+    },
+    "URL-SUP": {
+      anchocolumna: 125,
+      negrita: true,
+      color: "#4CAF50",
+      backgroundColor: "#E8F5E9"
+    },
+    "URL-EXP": {
+      anchocolumna: 125,
+      negrita: true,
+      color: "#4CAF50",
+      backgroundColor: "#E8F5E9"
+    },
+    "URL-CLI": {
+      anchocolumna: 125,
+      negrita: true,
+      color: "#4CAF50",
+      backgroundColor: "#E8F5E9"
+    },
+    "Cm": {
+      anchocolumna: 50,
+      negrita: true,
+      color: "#000000",
+      backgroundColor: "#FAFAFA"
+    },
+    "Cu": {
+      anchocolumna: 50,
+      negrita: false,
+      color: "#000000",
+      backgroundColor: "#F5F5F5"
+    },
+    "Ct": {
+      anchocolumna: 50,
+      negrita: false,
+      color: "#000000",
+      backgroundColor: "#EEEEEE"
+    },
+    "": {
+      anchocolumna: 50,
+      negrita: false,
+      color: null,
+      backgroundColor: null
+    }
+  };
+
+  var tabColours = ['#e91e63'];
+
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheets = ss.getSheets();
+
+  for (var i = 0; i < sheets.length; i++) {
+    var sheet = sheets[i];
+    var sheetColor = sheet.getTabColor(); Logger.log(sheetColor);
+    var sheetIndex = tabColours.indexOf(sheetColor);
+
+    if (sheetIndex !== -1) {
+      Logger.log(`Hemos entrado en la hoja.`);
+      var headerRow = sheet.getRange(2, 1, 1, sheet.getLastColumn());
+      var headersArray = headerRow.getValues()[0];
+
+      for (var j = 0; j < headersArray.length; j++) {
+        var header = headersArray[j];
+        var headerFormat = headers[header];
+
+        Logger.log(`El header es ${header} y su formato ${headerFormat}`);
+
+        if (headerFormat) {
+          var column = sheet.getRange(3, j + 1, sheet.getMaxRows(), 1);
+          column.setFontWeight(headerFormat.negrita ? "bold" : "normal");
+          column.setFontColor(headerFormat.color);
+          column.setBackground(headerFormat.backgroundColor);
+          sheet.setColumnWidth(j + 1, headerFormat.anchocolumna);
+        }
+      }
+    }
+  }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function getVideoId(url) {
   var videoId = extractVideoId(url);
   return videoId;
@@ -920,11 +1402,21 @@ function getDevPermission() {
   const userformulaMODPermission = getDatabaseColumn(`formulaModPermission`);
   let formulaModPermission = userformulaMODPermission !== '' && userformulaMODPermission.indexOf(userMail) > -1 ? true : false;
 
+  const userLoggerMODPermission = getDatabaseColumn(`loggerModPermission`);
+  let loggerModPermission = userformulaMODPermission !== '' && userLoggerMODPermission.indexOf(userMail) > -1 ? true : false;
+
   const devGlobalKeys = getDatabaseColumn(`devGlobalKeys`);
 
   const databaseManualKeys = getDatabaseColumn(`databaseManualKeys`);
 
-  var permission = { devAreaPermission: devAreaPermission, devGlobalKeys: devGlobalKeys, formulaModPermission: formulaModPermission, databaseManualKeys: databaseManualKeys };
+  var permission = {
+    devAreaPermission: devAreaPermission,
+    devGlobalKeys: devGlobalKeys,
+    formulaModPermission: formulaModPermission,
+    databaseManualKeys: databaseManualKeys,
+    loggerModPermission: loggerModPermission
+  };
+
   Logger.log(permission);
   return permission;
 }

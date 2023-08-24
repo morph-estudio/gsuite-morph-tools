@@ -2,6 +2,48 @@
 # Change Log
 Documentación de cambios del proyecto.
 
+## [ 1.9.0 ] - 2023/08/24
+
+### Added
+
+- Nueva herramienta: Registros Morph. Es un sistema de registros y anotaciones en documentos de Google Suite para hacer apuntes a nivel de administración y gestores de documentos (el sistema de comentarios de Google está más destinado a la comunicación directa entre usuarios y resolución de problemas).
+
+### Changed
+
+- El optimizador de documentos ha pasado a la sección "Ayuda".
+- La sección Cuadros se mueve a la primera posición en la lista desplegable, para mover a primer plano el actualizador / congelador.
+- Se ha mejorado el diseño de las tablas en el "Gestor de hojas" y "Registros Morph".
+
+### Fixed
+
+- Revisión de bugs en Morph Document Studio.
+
+## [ 1.8.7 ] - 2023/08/02
+
+### Added
+
+- Función en desarrollo: Morph Internal Logger.
+
+### Changed
+
+- Optimizaciones de largo alcance en el código de Morph Document Studio (x3 reducción de tiempo de ejecución).
+
+### Fixed
+
+- Arreglos estéticos en la interfaz de Document Studio y Gestor de hojas.
+
+## [ 1.8.6 ] - 2023/07/13
+
+### Added
+
+- Función añadida al gestor de hojas: refrescar hoja de plantilla, para sustituir una hoja por otra copiada de la plantilla sin estropear las referencias a la hoja original dentro del cuadro.
+- Ahora se pueden añadir archivos .csv a la lista de archivos importados.
+- Nuevo rol de usuario (formulaMod) para administradores de tablas.
+
+### Fixed
+
+- Arreglado el bug al cambiar el color de los Tabs.
+
 ## [ 1.8.5 ] - 2023/05/24
 
 ### Fixed

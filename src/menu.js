@@ -1,12 +1,14 @@
 /** GLOBAL VARIABLES AND FUNCTIONS */
 
-const gmtVersion = '1.8.5';
+const gmtVersion = '1.9.0';
 const morphDivision = '(I+D)';
 const morphDev = '(Devs)';
 
 const titleIX = 'Gsuite Morph Tools'; const barTitleIX = `💡 ${titleIX} ${gmtVersion}`;
 const titleSM = 'Gestor de hojas'; const barTitleSM = `📋 ${titleSM} ${morphDivision}`;
 const titleDS = 'Morph Document Studio'; const barTitleDS = `✨ ${titleDS} ${morphDivision}`;
+const titleLG = 'Registros Morph'; const barTitleLG = `✨ ${titleLG} ${morphDivision}`;
+const titleWIP = 'Morph Control Panel'; const barTitleWIP = `✨ ${titleWIP} ${morphDivision}`;
 const titleCL = 'Guía de estilo'; const barTitleCL = `🎨 ${titleCL} ${morphDivision}`;
 
 const ss = function() {
@@ -23,6 +25,8 @@ function onOpen(e) {
     .addItem(titleIX, 'sidebarIndex')
     .addItem(titleSM, 'sidebarSM')
     .addItem(titleDS, 'sidebarDS')
+    .addItem(titleLG, 'sidebarLG')
+    // .addItem(titleWIP, 'sidebarWIP')
     //.addItem(titleCL, 'sidebarCL')
     .addSeparator()
     .addItem('Changelog', 'sidebarChangelog')
@@ -39,16 +43,33 @@ function onInstall(e) {
 
 function sidebarIndex() {
   let html = HtmlService.createTemplateFromFile('public/main/index');
-  html.permission = getDevPermission(); // html.navBarHEX = '#FFCCBC';
-  html.isAdapted = getDocProperty('adaptedSpreadsheet'); // html.navBarHEX = '#FFCCBC';
+  html.permission = getDevPermission();
+  //html.isAdapted = getDocProperty('adaptedSpreadsheet');
   html.wsNames = getWorksheetNamesArray();
   html = html.evaluate().setTitle(barTitleIX); ui().showSidebar(html);
 }
 
+function sidebarLG() {
+  /* Browser.msgBox('Herramienta en desarrollo', 'Esta herramienta estará disponible en la próxima versión de Gsuite Morph Tools.', Browser.Buttons.OK); */
+  
+  let html = HtmlService.createTemplateFromFile('public/main/logger-interno');
+  html.permission = getDevPermission();
+  html.loggerEntries = getLoggerEntries();
+  html = html.evaluate().setTitle(barTitleLG); ui().showSidebar(html);
+  
+}
+
+function sidebarWIP() {
+  let html = HtmlService.createTemplateFromFile('public/main/cuadroswip');
+  html.savedProperties = getDocProperties();
+  html.config = templateSheetConfigObject();
+  html.wsNames = getWorksheetNamesArray();
+  html = html.evaluate().setTitle(barTitleLG); ui().showSidebar(html);
+}
+
 function sidebarDS() {
-  // Browser.msgBox('Herramienta en desarrollo', 'Morph Document Studio estará disponible en la próxima versión de G-Suite Morph Tools.', Browser.Buttons.OK);
   let html = HtmlService.createTemplateFromFile('public/main/document-studio');
-  html.dsProperties = getDocProperties(); html.emailDropdown = emailDropdown();
+  html.dsProperties = getDocProperties(); html.headerDropdownValues = headerDropdownValues();
   html = html.evaluate().setTitle(barTitleDS); ui().showSidebar(html);
 }
 
@@ -61,14 +82,13 @@ function sidebarSM() {
 
 function sidebarCL() {
   let html = HtmlService.createTemplateFromFile('public/main/styles-front');
-  
   html.obj = cargarEstilos();
-  html = html.evaluate().setTitle(barTitleCL); ui().showSidebar(html)
+  html = html.evaluate().setTitle(barTitleWIP); ui().showSidebar(html);
 }
 
 function sidebarDSDevs() {
   let html = HtmlService.createTemplateFromFile('public/main/document-studio');
-  html.dsProperties = getDocProperties(); html.emailDropdown = emailDropdown();
+  html.dsProperties = getDocProperties(); html.headerDropdownValues = headerDropdownValues();
   html = html.evaluate().setTitle(`${barTitleDS} Devs`); ui().showSidebar(html);
 }
 
@@ -105,6 +125,9 @@ function saveSheetPropertiesWithArray(rowData, array, arrayName) {
   PropertiesService.getDocumentProperties().setProperty(arrayName, jarray);
 }
 
-function fastInit() {
+function fastInit(optional) {
   Logger.log('Fast Init makes things faster.')
+  if (optional) {
+    Logger.log(`Properties: ${JSON.stringify(optional)}`);
+  }
 }

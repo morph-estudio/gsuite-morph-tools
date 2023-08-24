@@ -8,6 +8,58 @@
   document.getElementById('test').innerHTML = "Cargando...";
 </script>
 
+        <div id="borrarFilasExcesivas" class="mt-3 mb-3">
+<!--
+          <div class="mb-4 text-center">
+            <img src='https://cdn-icons-png.flaticon.com/512/4110/4110253.png' height='auto' width='75' class="mx-auto" style="margin-bottom:15px" />
+            <h3 class="montserrat">Optimizar documento</h3>
+          </div>
+
+        
+          <div class="card">
+            <div class="card-header" style="font-weight:bold">
+              Eliminar filas innecesarias<span data-bs-toggle="tooltip" data-bs-placement="right" title="Elimina las filas sobrantes de la hoja actual hasta llegar a la fila que establezcas como fila máxima">
+          <i class="fa-regular fa-circle-question fa-questionstyle" style=""></i></span>
+            </div>
+            <div class="card-body">
+              <div class="input-group flex-nowrap update rounded-pill">
+                <span class="input-group-text prefixUpdateClassColor">Fila máxima<span data-bs-toggle="tooltip" data-bs-placement="right" title="Escribe el número de fila máxima que quieres en la hoja actual"><i class="fa-regular fa-circle-question fa-questionstyle" style="color:#c0cbd1"></i></span></span> 
+                <input type="text" class="form-control shadow-none" id="rowsDeleteInput" placeholder="ej: 100">
+              </div>
+              <button class="btn btn-primary btn-lg-gmt w-100 shadow-none centerScroll mt-1" id="rowsDeleteButton">Borrar filas</button>
+            </div>
+          </div>
+        -->
+
+          <div class="card mt-2">
+            <div class="card-header" style="font-weight:bold">
+              Optimizar documento<span data-bs-toggle="tooltip" data-bs-placement="right" title="Elimina las filas sobrantes de TODAS LAS HOJAS del documento hasta llegar a la fila máxima 1500/3000/6000, según el botón que elijas">
+          <i class="fa-regular fa-circle-question fa-questionstyle" style=""></i></span>
+            </div>
+            <div class="card-body">
+
+              <div class="d-flex">
+                <button class="btn btn-outline optGreen btn-lg-gmt w-50 shadow-none optSpr" id="optSpr1500">+1500</button>
+                <button class="btn btn-outline optYellow btn-lg-gmt w-50 shadow-none ms-1 optSpr" id="optSpr3000">+3000</button>
+                <button class="btn btn-outline optRed btn-lg-gmt w-50 shadow-none ms-1 optSpr" id="optSpr6000">+6000</button>
+              </div>
+
+              <div class="container mt-3">
+                <div class="row">
+                  <div class="col text-center">
+                    <button type="button" class="cache-btn centerScroll" data-toggle="tooltip" data-placement="bottom" title="Borrar caché del documento" onclick="swalConfirm('purgeDocumentCache', 'La caché se ha purgado correctamente.', 'Se borrará la memoria caché del documento. Confirma antes de continuar.')">
+                      <img src="https://cdn-icons-png.flaticon.com/512/4459/4459985.png" alt="Icono de borrar caché">
+                    </button>
+                    
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
 <p>💊 Accede a documentación acerca de las herramientas en la página de <a href="https://sites.google.com/morphestudio.es/morph-pills/gsuite/flujo-de-trabajo-gsuite/gsuite-morph-tools" target="_blank"><b>Morph Pills</b></a>.</p>
 <p>👩‍🔬 Si tienes cualquier duda, consulta al departamento I+D.</p>
 <p><b>asanchez@morphestudio.es</b></p>

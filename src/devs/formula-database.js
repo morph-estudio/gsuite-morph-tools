@@ -535,3 +535,154 @@ function formulaDropper() {
   Logger.log(formula)
   return formula;
 }
+
+/**
+ * formulaLogger v2
+ * Script that logs changes made to formulas in a Google Spreadsheet and records details like user, date, and file/cell location in a "Formula Changelog" sheet
+ * 
+ * @param {Object} rowData - objeto que contiene los datos necesarios para realizar la función
+ */
+function morphDataLogger(rowData) {
+
+  var ss = SpreadsheetApp.getActive();
+
+  var formData = [
+    rowData.dataLogText,
+    rowData.dataLogIsPublic,
+    rowData.dataLogCategory
+  ];
+  var [dataLogText, dataLogIsPublic, dataLogCategory] = formData;
+
+  Logger.log(`Prioridad: ${dataLogCategory}`)
+
+  //let dateNow = Utilities.formatDate(new Date(), 'GMT+1', 'dd/MM/yyyy - HH:mm');
+
+  let uniqueID = Utilities.getUuid();
+  let fileName = ss.getName();
+  let fileID = ss.getId();
+  let fileURL = ss.getUrl();
+  // let sheetURL = `${ss.getUrl()}#gid=${sh.getSheetId()}`;
+
+  var fechaHoraGMT = obtenerFechaHoraGMT();
+  var fecha = fechaHoraGMT.fecha;
+  var hora = fechaHoraGMT.hora;
+
+  let user = Session.getActiveUser().getEmail();
+  let isPublic = dataLogIsPublic;
+  let log = dataLogText;
+
+  let dataList = [];
+  dataList.push(uniqueID, null, fileName, null, fileID, fileURL, fecha, hora, user, dataLogCategory, isPublic, log);
+
+  let controlPanel = SpreadsheetApp.openById('1DPkvuxudF10L8mjLPLVzLa3Ye1KLuTRVe5gYDd84BNQ');
+  let controlPanelSheet = controlPanel.getSheetByName('Logger');
+
+  controlPanelSheet.getRange(controlPanelSheet.getLastRow() + 1, 1, 1, dataList.length).setValues([dataList]);
+
+}
+
+function obtenerFechaHoraGMT() {
+  // Obtener la fecha y hora actual en GMT
+  var dateNow = new Date();
+  var dateFormatted = Utilities.formatDate(dateNow, Session.getScriptTimeZone(), 'dd/MM/yyyy');
+
+  // Obtener la hora en GMT
+  var hour = dateNow.getUTCHours();
+  var minute = dateNow.getUTCMinutes();
+  var second = dateNow.getUTCSeconds();
+
+  // Devolver los resultados
+  return {
+    fecha: dateFormatted,
+    hora: hour + ':' + minute + ':' + second
+  };
+}
+
+function getLoggerEntries() {
+  let archiveID = SpreadsheetApp.getActive().getId().toString();
+  let loggerEntries = new Array();
+
+  let params = {
+    muteHttpExceptions: true,
+  };
+  const parsedDB = JSON.parse(UrlFetchApp.fetch('https://opensheet.elk.sh/1DPkvuxudF10L8mjLPLVzLa3Ye1KLuTRVe5gYDd84BNQ/Logger', params).getContentText());
+
+  for (let i = 0; i < parsedDB.length; i++) {
+    if (parsedDB[i].FileID === archiveID) {
+      const entry = {
+        'id': parsedDB[i].ID,
+        'color': parsedDB[i].Color,
+        'public': parsedDB[i].Public,
+        'user': parsedDB[i].User,
+        'date': parsedDB[i].Date,
+        'data': parsedDB[i].Data
+      };
+      loggerEntries.push(entry);
+    }
+  }
+
+  Logger.log(loggerEntries)
+
+  return loggerEntries;
+}
+
+
+function getLoggerEntries2() {
+  let loggerEntries = new Array();
+
+  let params = {
+    muteHttpExceptions: true,
+  };
+  const parsedDB = JSON.parse(UrlFetchApp.fetch('https://opensheet.elk.sh/1DPkvuxudF10L8mjLPLVzLa3Ye1KLuTRVe5gYDd84BNQ/Logger', params).getContentText());
+
+  for (let i = 0; i < parsedDB.length; i++) {
+    const entry = {
+      'id': parsedDB[i].ID,
+      'date': parsedDB[i].Date,
+      'data': parsedDB[i].Data,
+      'public': parsedDB[i].Public === 'TRUE',
+    };
+    loggerEntries.push(entry);
+  }
+
+  Logger.log(loggerEntries)
+
+  return loggerEntries;
+}
+
+
+
+/**
+ * worksheetManagement
+ * Main function of Worksheet Manager; responds to execute button.
+ */
+function loggerManagement(entriesIdsAsString, rowData) {
+
+  let formData = [rowData.sdAction];
+  let [sdAction] = formData;
+  let entriesToManage = [];
+  let shtm;
+
+  let entriesIdsParsed = JSON.parse(entriesIdsAsString);
+  entriesIdsParsed.forEach((obj) => { entriesToManage.push(obj.id) });
+
+  Logger.log(`Selected entries: ${entriesToManage}`);
+
+  let controlPanel = SpreadsheetApp.openById('1DPkvuxudF10L8mjLPLVzLa3Ye1KLuTRVe5gYDd84BNQ');
+  let controlPanelSheet = controlPanel.getSheetByName('Logger');
+
+  let dataRange = controlPanelSheet.getDataRange();
+  let data = dataRange.getValues();
+  let rowsToDelete = [];
+
+  for (let i = data.length - 1; i >= 1; i--) {
+    let idCell = data[i][0];
+    if (entriesToManage.includes(idCell)) {
+      rowsToDelete.push(i + 1); // Sumamos 1 porque los índices de filas comienzan en 1
+    }
+  }
+
+    rowsToDelete.forEach(row => controlPanelSheet.deleteRow(row));
+
+}
+

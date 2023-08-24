@@ -1,0 +1,378 @@
+<html>
+<head>
+  <base target="_top">
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <?!= HtmlService.createHtmlOutputFromFile('public/helpers/header').getContent(); ?>
+  <?!= HtmlService.createHtmlOutputFromFile('public/main/stylesheet').getContent(); ?>
+
+
+</head>
+
+<body>
+
+<?!= HtmlService.createHtmlOutputFromFile('public/helpers/navbar').getContent(); ?>
+
+<div class="ps-2 pe-2 mt-2">
+
+
+  <button id="addLoggerEntry" class="btn btn-primary btn-xl shadow-none border-0 w-100 centerScroll mb-1 font-weight-bold">Nuevo registro</button>
+  
+
+  <div class="collapse mb-2" id="addNewLoggerEntry" > 
+    <div class="card">
+      <div class="card-header font-weight-bold" style="font-weight:bold">
+        Añadir registro<span data-bs-toggle="tooltip" data-bs-placement="right" title="Crea un registro manual asociado a este documento">
+        <i class="fa-regular fa-circle-question fa-questionstyle" style=""></i></span>
+      </div>
+      <div class="card-body">
+
+
+        <div class="form-check form-check-inline me-1">
+          <input class="form-check-input shadow-none" type="radio" name="inlineRadioOptions" id="inlineRadioN" value="" title="Sin etiqueta" checked>
+        </div>
+
+        <div class="form-check form-check-inline ms-1 me-0">
+          <input class="form-check-input shadow-none" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="GREEN" title="Aplicar etiqueta verde">
+        </div>
+        <div class="form-check form-check-inline ms-1 me-0">
+          <input class="form-check-input shadow-none" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="YELLOW" title="Aplicar etiqueta amarilla">
+        </div>
+        <div class="form-check form-check-inline ms-1 me-0">
+          <input class="form-check-input shadow-none" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="RED" title="Aplicar etiqueta roja">
+        </div>
+
+        <div class="form-group">
+          <textarea class="form-control shadow-none me-1" id="dataLogText" rows="7" placeholder="Escribe aquí el texto..." data-placeholder="placeholderFormula"></textarea>
+        </div>
+
+        <div id="errorNotSheets" class="toast fade hide shadow-sm w-100 mt-2 mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="toast-header">
+            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+            <strong class="me-auto">Advertencia</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+          <div class="toast-body">
+          </div>
+        </div>
+
+        <div class="form-check form-switch mt-1 d-flex align-items-center">
+          <div><input class="form-check-input robotoSwitch shadow-none" type="checkbox" role="switch" id="dataLogIsPublic"></div>
+          <label class="form-check-label robotoLabel" for="dataLogIsPublic">Registro público<span data-bs-toggle="tooltip" data-bs-placement="right" title="Si marcas esta casilla, el registro aparecerá a todos los usuarios de Morph. Por defecto, solo los administradores pueden leer los registros">
+          <i class="fa-regular fa-circle-question fa-questionstyle roboto"></i></span></label>
+        </div>
+
+        <button class="btn btn-success w-100 shadow-none centerScroll mt-1" id="dataLogSendButton">Enviar registro</button>
+      </div>
+
+    </div>
+  </div>
+  <button id="dataLogDeleteButton" class="btn btn-danger btn-xl shadow-none border-0 w-100 centerScroll mb-1">Eliminar seleccionados</button>
+
+  <div id="errorNotSelected" class="toast fade hide shadow-sm w-100 mt-2 mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+      <strong class="me-auto">Advertencia</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+    </div>
+  </div>
+
+</div>
+
+<div class="w-100">
+
+  <input type="text" class="form-control form-control-lg border-0 rounded-0 mt-1 shadow-none" id="logger-search" placeholder="Buscar registro..." aria-describedby="destination-folder-help">
+
+  <table class="borderless table-2 table-hover"
+    id="tablelog"
+    data-toolbar="false"
+    data-pagination="true"
+    data-pagination-h-align="right"
+    data-search="true"
+    data-search-selector="#logger-search"
+    data-click-to-select="false"
+    data-page-list="[7, 15, 20, all]"
+    data-page-size="10"
+    data-pagination-pages-by-side="1"
+    data-pagination-successively-size="1"
+    data-maintain-meta-data="true"
+    data-use-row-attr-func="true"
+    >
+    <thead>
+      <tr>
+        <th data-field="state" data-checkbox="true" class="col-2 notoverflow"></th>
+        <th data-field="data" data-formatter="rowDataFormatter" class="col-10">Registros</th>
+      </tr>
+    </thead>
+
+  </table>
+</div>
+
+<style>
+.loggerRowUser{
+  color: #546E7A;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+.loggerRowDate{
+  color: #B0BEC5;
+  font-weight: bold;
+  font-size: 0.75em;
+}
+
+#tablelog input[type="checkbox"] {
+  transform: scale(1.4, 1.4);
+}
+
+/* Contenedor principal de la fila */
+.loggerRowContainer {
+  display: flex;
+  align-items: center; /* Centrar verticalmente el contenido */
+}
+
+/* Estilos para el icono */
+.loggerRowIcon {
+  margin-right: 8px; /* Margen derecho entre el icono y el texto */
+  font-size: 16px; /* Tamaño del icono */
+  color: #000; /* Color del icono */
+  display: flex;
+  align-items: center; /* Centrar verticalmente el icono */
+  position: relative;
+  bottom: 5px;
+}
+
+/* Contenedor para el texto */
+.loggerRowText {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Estilos para el usuario y la fecha */
+.loggerRowUser,
+.loggerRowDate {
+  margin: 0; /* Eliminar margenes por defecto */
+}
+</style>
+
+<script> // Basic Loading...
+  const MorphLoggerApp = {};
+  var $table = $('#tablelog')
+  var wsNamesParsed = JSON.parse("<?=JSON.stringify(loggerEntries)?>");
+  var permission = JSON.parse("<?=JSON.stringify(permission)?>").loggerModPermission;
+  var data = [];
+
+  MorphLoggerApp.loadDocumentLogs = function() {
+
+    Object.keys(wsNamesParsed).forEach(function(key){
+      var value = wsNamesParsed[key];
+      if (permission === true || value.public === true || value.public === "TRUE") {
+        data.push(value);
+      }
+    });
+
+    //alert(JSON.stringify(data))
+
+    $table.bootstrapTable({data: data});
+
+    MorphLoggerApp.updateSheetSelectors(data);
+    //MorphLoggerApp.updateRowColors(data);
+
+    setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 250);
+  }
+
+function rowDataFormatter(value, row) {
+  var color;
+  if (row.color === "YELLOW") {
+    color = 'logY'
+  } else if(row.color === "GREEN") {
+     color = 'logG'
+  } else if(row.color === "RED") {
+     color = 'logR'
+  } else {
+     color = 'logN'
+  }
+
+  return '<div class="loggerRowContainer">' +
+    '<div class="loggerRowIcon"><i class="fas fa-circle ' + color + '"></i></div>' +
+    '<div class="loggerRowText">' +
+    '<div class="loggerRowUser">' + row.user + '</div>' + 
+    '<div class="loggerRowDate mb-2">' + row.date + '</div>' + '</div>' + '</div>' +
+    '<div>' + value + '</div>' 
+    ;
+}
+
+/*
+  MorphLoggerApp.updateRowColors = function(data) {
+    function applyRowClasses() {
+      $("#tablelog tr:not(:has(th))").each(function(i) {
+        let logColor = data[i].color;
+
+        if (logColor == "YELLOW") {
+          $(this).find("td").addClass('logY');
+        } else if(logColor == "GREEN") {
+          $(this).find("td").addClass('logG');
+        } else if(logColor == "RED") {
+          $(this).find("td").addClass('logR');
+        } else {
+          $(this).find("td").addClass('logN');
+        }
+      });
+    }
+
+    applyRowClasses();
+  }
+*/
+
+  MorphLoggerApp.updateSheetSelectors = function(sheetData) {
+    $('.sheetSelect').empty();
+    let optionDefault = document.createElement("option");
+    optionDefault.textContent = '📄';
+    $('.sheetSelect').append(optionDefault);
+    for (i = 0; i < sheetData.length; i++){
+      let option = document.createElement("option");
+      option.textContent = sheetData[i]["name"];
+      $('.sheetSelect').append(option)
+    }
+    
+  }
+
+</script>
+
+<script> // Button Responses
+
+/**/
+MorphLoggerApp.openDialogActions = function(){
+  let selectedItemsLenght = $table.bootstrapTable('getSelections').length;
+
+  if (selectedItemsLenght < 1) {
+    $('.toast-body').html('Selecciona primero algún registro.'); $('#errorNotSelected').toast({delay: 3500}).toast("show");
+    return;
+  }
+  
+  let optionSelected = "deleteLog";
+  var singularPlural;
+ 
+  if (selectedItemsLenght > 1) { singularPlural = `registros` } else { singularPlural = `registro` }
+
+  let swalFireText = `Vas a eliminar ${selectedItemsLenght} ${singularPlural}.`
+
+  Swal.fire({
+    text: swalFireText,
+    icon: 'info',
+    allowOutsideClick: false,
+    showLoaderOnConfirm: true,
+    showDenyButton: false,
+    showCancelButton: true,
+    cancelButtonText: `Cancelar`,
+    confirmButtonText: `Continuar`,
+    confirmButtonColor: '#0D6EFD',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      MorphLoggerApp.deleteLogs(optionSelected);
+    } else if (result.isDenied) {
+      return;
+    }
+  })
+}
+
+
+MorphLoggerApp.dataLogSend = function(){
+  var dataLogText = document.getElementById("dataLogText").value;
+
+  if (dataLogText.length < 1) {
+    $('.toast-body').html('¡No has escrito nada!'); $('#errorNotSheets').toast({delay: 3500}).toast("show");
+    return;
+  } else if (dataLogText.length < 10) {
+    $('.toast-body').html('El registro debe tener al menos 10 caracteres.'); $('#errorNotSheets').toast({delay: 3500}).toast("show");
+    return;
+  }
+
+  var dataLogIsPublic = document.getElementById("dataLogIsPublic").checked;
+  var dataLogCategory = document.querySelector('input[name="inlineRadioOptions"]:checked').value;
+
+  var rowData = {
+        dataLogText,
+        dataLogIsPublic,
+        dataLogCategory
+      }
+
+  swalConfirm2(
+    'morphDataLogger',
+    'El registro se ha agregado a la base de datos.',
+    '¿Seguro que quieres enviar esta entrada al registro general?',
+    rowData,
+    null,
+    null,
+    function() {
+      MorphLoggerApp.refreshTable();
+    }
+  );
+}
+
+/**/
+MorphLoggerApp.deleteLogs = function(option){
+  let logsToDelete = JSON.stringify($table.bootstrapTable('getSelections'));
+
+  let sdAction = "deleteLog";
+  let rowData = {
+    sdAction: sdAction,
+  };
+
+  swaload();
+  google.script.run.withSuccessHandler(e => {MorphLoggerApp.refreshTable(), swalsuccess('El registro se ha eliminado correctamente.')}).withFailureHandler(swalerror).loggerManagement(logsToDelete, rowData);
+}
+
+
+MorphLoggerApp.refreshTable = function(){
+  
+  google.script.run.withSuccessHandler(sheetNames => {
+      $table.bootstrapTable('removeAll');
+      $table.bootstrapTable('append', sheetNames);
+      MorphLoggerApp.updateSheetSelectors(sheetNames);
+  }).getLoggerEntries()
+
+  //$('.collapse').collapse();
+}
+
+/*
+$table.on('post-body.bs.table', function (t){
+  MorphLoggerApp.updateRowColors(data);
+});
+*/
+
+</script>
+
+<script> // DOM Init
+
+  $(document).ready(function() {
+    google.script.run.fastInit();
+
+    MorphLoggerApp.loadDocumentLogs();
+
+    //alert(`Permisos de usuario: ${permission}`)
+
+    $('#addLoggerEntry').on('click', function () {
+      $('#addNewLoggerEntry').collapse('toggle');
+    });
+    $('#dataLogSendButton').on('click', function () {
+      MorphLoggerApp.dataLogSend();
+    });
+    
+    $('#dataLogDeleteButton').on('click', function () {
+      MorphLoggerApp.openDialogActions();
+    });
+    /**/
+
+  });
+
+</script>
+
+<?!= HtmlService.createHtmlOutputFromFile('public/helpers/swal').getContent(); ?>
+<?!= HtmlService.createHtmlOutputFromFile('public/helpers/footer').getContent(); ?>
+
+</body>
+</html>

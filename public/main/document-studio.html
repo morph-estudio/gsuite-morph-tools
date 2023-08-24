@@ -22,6 +22,12 @@
       menubar: false,
       entity_encoding: "raw",
       placeholder_attrs: "color: #888",
+      setup: function (editor) {
+          editor.on('init', function (e) {
+              if (typeof dataExtracted['Email Message'] !== 'undefined') var emailMessage = dataExtracted['Email Message'];
+              editor.setContent(emailMessage);
+          });
+      }
       });
   </script>
 
@@ -71,7 +77,47 @@
           <i class="fa-solid fa-wand-magic-sparkles fa-compatible"></i>
         </div>-->
 
-        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/form-ds-1').getContent(); ?>
+
+
+        <div>
+          <!--<form autocomplete="off"> QUITAR FORM-->
+          <form novalidate>
+            <div id="userform2">
+            
+              <div class="mb-4 mt-2">
+                <label for="template-id" class="form-label"><i class="fa-regular fa-margin fa-note-sticky"></i>URL/ID Plantilla</label>
+                <input type="text" class="form-control shadow-none" id="template-id" placeholder="ej: https://docs.google.com/document/d/1Gs4Gd4JtVMrI-nu6ELZtS71kebUU9CN3II2Xz5-Q2F8/edit?usp=sharing" aria-describedby="template-id-help" required>
+                  <div class="invalid-feedback">
+                  Introduce una URL/ID correcta.
+                  </div>
+                  <div id="template-id-help" class="form-text mt-2">Debe ser un archivo <b>docs</b> o <b>slides</b> y contener marcadores <b>{{marker}}</b>.</div>
+              
+                  <div class="form-check form-switch mt-3">
+                    <input class="form-check-input shadow-none" type="checkbox" onclick="document.getElementById('template-id').disabled = this.checked;document.getElementById('destination-folder').disabled = this.checked" role="switch" id="green-cells" >
+                    <label class="form-check-label" for="green-cells">Usar celdas verdes</label>
+                  </div>
+
+                  <div class="mt-4 mb-3">
+                  <h3 class="menu-h3">Marcadores</h3>
+                  <p>Obtener o actualizar en un clic los marcadores de la plantilla.</p>
+                  </div>
+
+                  <div class="form-check form-switch">
+                    <input class="form-check-input shadow-none" type="checkbox" role="switch" id="purge-markers" >
+                    <label class="form-check-label" for="purge-markers">Purgar marcadores obsoletos</label>
+                  </div>
+
+                  <button class="btn btn-secondary btn-lg-gmt w-100 mt-2" id="markerButton">Actualizar marcadores</button>
+
+              </div>
+
+
+            
+            </div>
+          </form>
+        </div>
+
+
 
       </div>
     </div>
@@ -84,9 +130,91 @@
       </button>
     </h2>
     <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
-      <div class="accordion-body">
+      <div class="accordion-body mb-2">
 
-      <?!= HtmlService.createHtmlOutputFromFile('public/helpers/form-ds-2').getContent(); ?>
+
+
+        <div>
+            <!--<form autocomplete="off"> QUITAR FORM-->
+          <form novalidate>
+            
+            <div id="userform">
+              <div class="hideWhenBothSwitchOff">
+                <label class="switch mt-2">
+                <input class="form-check-input" type="checkbox" role="switch" id="ds-activate" data-bs-toggle='collapse' data-bs-target='#dsForm, #all-documents-div' aria-expanded="false" aria-controls="dsForm">
+                <div class="slider round">
+                  <span class="on">ACTIVADO</span>
+                  <span class="off">DESACTIVADO</span>
+                </div>
+                </label>
+              </div>
+
+              <div id="dsForm" aria-expanded="false" class="collapse" >
+              
+                <div class="mb-3 mt-4">
+                  <label for="destination-folder" class="form-label"><i class="fa-regular fa-folder fa-margin fa-fw"></i>URL/ID Carpeta de destino</label>
+                  <input type="text" class="form-control shadow-none" id="destination-folder" placeholder="ej: https://drive.google.com/drive/folders/1DHirb56iLf-T_n6Idq2MP8f8Ok765JuZ?usp=sharing" aria-describedby="destination-folder-help">
+                    <div class="invalid-feedback">
+                    Introduce una URL/ID correcta.
+                    </div>
+                  <div id="destination-folder-help" class="form-text mt-2">Si dejas el campo en blanco se creará una nueva carpeta en <b>Mi Unidad</b>.</div>
+                </div>
+                
+                <div class="mb-4 mt-4">
+                  <label for="file-name" class="form-label"><i class="fa-regular fa-pen-to-square fa-margin fa-fw"></i>Nombre de archivo</label>
+                  <input type="text" class="form-control shadow-none" id="file-name" required>
+                    <div class="invalid-feedback">
+                    Introduce un nombre válido.
+                    </div>
+                  <div id="destination-folder-help" class="form-text mt-2">Puedes incluir cualquiera de los <b>{{marcadores}}</b> disponibles.</div>
+                
+                  <div class="form-check form-switch mt-3">
+                    <input class="form-check-input shadow-none" type="checkbox" role="switch" id="numeration-switch">
+                    <label class="form-check-label" for="numeration-switch">Añadir autonumeración</label>
+                  </div>
+                </div>
+                
+                <div class="mb-4">
+                  <label for="export-select" class="form-label"><i class="fa-solid fa-file-export fa-margin fa-fw"></i>Formato de exportación</label>
+                  <select class="form-select shadow-none" id="export-format" >
+                    <option value="PDF">PDF</option>
+                    <option value="KEEP">Mantener formato</option>
+                  </select>
+                </div>
+                
+                <div class="mb-3">
+
+                  <label for="destination-folder" class="form-label"><i class="fa-solid fa-share-from-square fa-margin fa-fw"></i>Permisos de archivo</label>
+                  <div class="form-check mt-2">
+                    <input class="form-check-input shadow-none" type="radio" name="file_permission" id="permission-1" checked>
+                    <label class="form-check-label" for="permission-1">
+                      Restringido
+                    </label>
+                  </div>
+
+                  <div class="form-check">
+                    <input class="form-check-input shadow-none" type="radio" name="file_permission" id="permission-2" >
+                    <label class="form-check-label"  for="permission-2">
+                      Architecture Meets Engineering SL
+                    </label>
+                  </div>
+
+                  <div class="form-check mt-2">
+                    <input class="form-check-input shadow-none" type="radio" name="file_permission" id="permission-3" >
+                    <label class="form-check-label"  for="permission-3">
+                      Cualquier persona con el enlace
+                    </label>
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+          
+          </form>
+        </div>
+
+
 
       </div>
     </div>
@@ -99,15 +227,118 @@
       </button>
     </h2>
     <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
-      <div class="accordion-body">
+      <div class="accordion-body mb-2">
 
-      <?!= HtmlService.createHtmlOutputFromFile('public/helpers/form-ds-3').getContent(); ?>
+
+        <div>
+
+        <!--<form autocomplete="off"> QUITAR-->
+          <form novalidate>
+
+            <div id="userform3">
+
+              <div class="hideWhenBothSwitchOff">
+                <label class="switch mt-2">
+                <input class="form-check-input" type="checkbox" role="switch" id="email-activate" data-bs-toggle='collapse' data-bs-target='#emailForm, #all-emails-div' aria-expanded="true" aria-controls="emailForm">
+                <div class="slider round">
+                  <span class="on">ACTIVADO</span>
+                  <span class="off">DESACTIVADO</span>
+                </div>
+                </label>
+              </div>
+
+                <div id="emailForm" aria-expanded="false" class="collapse">
+
+                  <!-- Basic fields -->
+
+                  <label for="email-field" class="form-label mt-4">Columna de emails</label>
+                  <div class="d-flex flex-row align-items-baseline">
+                    <select id="email-field" class="form-select shadow-none" aria-describedby="email-field-help"></select>
+                    <button id="btn-refresh-1" type="button" class="btn-refresh" onclick="refreshButtonPush()"><i id="fa-sync-1" class="fa-solid fa-rotate-right"></i></button>
+                  </div>
+                    <div id="email-field-help" class="form-text mt-2">Selecciona la columna donde se encuentran las direcciones email.</div>
+
+                  <label for="email-specific" class="form-label mt-3">CC (enviar copias del email)</label>
+                  <input type="text" class="form-control shadow-none" id="email-specific" placeholder="ej: gestoria@morphestudio.es" aria-describedby="email-specific-help">
+                    <div id="email-specific-help" class="form-text mt-2">Para enviar copias a varias personas separa los emails con comas.</div>
+                    <div class="invalid-feedback">Introduce un email correcto.</div>
+
+                  <label for="email-sender" class="form-label mt-3">Nombre del remitente</label>
+                  <input type="text" class="form-control shadow-none" id="email-sender" placeholder="ej: Érika Sánchez">
+                    <div class="invalid-feedback">El nombre no tiene un formato válido.</div>
+
+                  <label for="email-subject" class="form-label mt-3">Asunto</label>
+                  <input type="text" class="form-control shadow-none" id="email-subject">
+                    <div class="invalid-feedback">El asunto no tiene un formato válido.</div>
+
+                  <!-- More fields -->
+
+                  <div class="form-check form-switch mt-3 mb-1">
+                    <label class="form-check-label shadow-none" for="email-more">Rellenar otros campos</label>
+                    <input class="form-check-input" type="checkbox" role="switch" id="email-more" data-bs-toggle='collapse' data-bs-target='#emailMore' aria-expanded="false" aria-controls="emailMore">
+                  </div>
+
+                  <div id="emailMore" aria-expanded="false" class="collapse">
+
+                    <label for="email-bcc" class="form-label mt-3">BCC (copias ocultas)</label>
+                    <input type="text" class="form-control shadow-none" id="email-bcc" aria-describedby="email-bcc-help">
+                      <div id="email-bcc-help" class="form-text mt-2">Blind Carbon Copy (BCC) es una copia que se envía a destinatarios ocultos.</div>
+                      <div class="invalid-feedback">Introduce una ID correcta.</div>
+
+                    <label for="email-replyto" class="form-label mt-3">Reply-to Address</label>
+                    <input type="text" class="form-control shadow-none" id="email-replyto" aria-describedby="email-replyto-help">
+                      <div id="email-replyto-help" class="form-text mt-2">Correo personalizado al que responderán los destinatarios.</div>
+                      <div class="invalid-feedback">Introduce una ID correcta.</div>
+
+                  </div>
+
+                  <!-- Tinymce -->
+
+                  <div class="mb-4">
+                    <!--Bootstrap classes arrange web page components into columns and rows in a grid -->
+                    <div class="row justify-content-md-center">
+                      <label for="editor" class="form-label mt-3">Mensaje</label>
+                      <div class="col-md-12 col-lg-8">
+                          <div class="form-group">
+                              <textarea id="editor" type="textarea#editor" ></textarea>
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Add Attachment -->
+
+                  <div class="form-check form-switch mt-3">
+                    <input class="form-check-input shadow-none" type="checkbox" role="switch" id="email-addblob" data-bs-toggle='collapse' data-bs-target='#emailBlob' aria-controls="emailBlob">
+                    <label class="form-check-label" for="email-addblob">Añadir documento adjunto</label>
+                  </div>
+
+                  <div id="emailBlob" class="collapse" >
+
+                    
+
+                  <div class="d-flex flex-row align-items-baseline">
+                    <select id="email-blob-field" class="form-select shadow-none mt-3" aria-describedby="email-blob-field-help"></select>
+                    <button id="btn-refresh-2" type="button" class="btn-refresh" onclick="refreshButtonPush()"><i id="fa-sync-2" class="fa-solid fa-rotate-right"></i></button>
+                  </div>
+
+                    <div id="email-blob-field-help" class="form-text mt-2">Selecciona la columna donde se encuentran los LINKS de archivos.</div>
+
+                </div>
+
+              </div>
+
+            </div>
+          </form>
+
+        </div>
+
 
       </div>
     </div>
   </div>
 
-  <div class="accordion-item">
+  <div class="accordion-item last">
     <h2 class="accordion-header" id="headingFour">
       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
         Finalizar
@@ -122,9 +353,15 @@
           <form novalidate> <!--<form autocomplete="off"> QUITAR -->
             <div id="userform3">
 
+
+              <div class="mb-4">
+                <label class="form-label mt-2">Finalizar configuración</label>
+                <p>Revisa que toda la configuración esté correcta y presiona el botón <b>Ejecutar</b>. El tiempo de ejecución dependerá del la cantidad de filas y marcadores. La herramienta está en fase de pruebas, por lo que se podrían generar errores.</p>
+              </div>
+
               <div class="hideWhenBothSwitchOff mb-4">
                 <div id="hideWhenBothSwitchOff" aria-expanded="false" class="collapse">
-                  <label class="form-label mt-2">Más opciones</label>
+                  <label class="form-label mt-1">Más opciones</label>
                   <p>Ejecutar en todas las filas o solo cuando estén vacías las celdas en <b>[DS] File-links</b> o <b>[DS] Email-links</b>.</p>
                 </div>
                 
@@ -133,7 +370,7 @@
                   <div class="form-check mt-2 mb-2">
                     <input class="form-check-input shadow-none" id="all-documents" type="checkbox" >
                     <label class="form-check-label" for="all-documents">
-                      Generar todos los documentos.
+                      Generar todos los documentos
                     </label>
                   </div>
                 </div>
@@ -142,7 +379,7 @@
                   <div class="form-check">
                     <input class="form-check-input shadow-none" id="all-emails" type="checkbox">
                     <label class="form-check-label" for="all-emails">
-                      Enviar todos los emails.
+                      Enviar todos los emails
                     </label>
                   </div>
                 </div>
@@ -151,7 +388,7 @@
               <div id="finalButtons">
                 <div class="d-flex">
                   <button class="btn btn-outline-secondary btn-lg-gmt w-65 shadow-none pb-1" id="saveButton">Guardar</button>
-                  <button class="btn btn-outline-danger btn-lg-gmt w-35 shadow-none ms-1 pt-1 pb-1" id="deleteButton" onclick="swalConfirm('deleteProperties', 'Se ha eliminado la configuración', 'Se eliminará la configuración guardada.')">Borrar</button>
+                  <button class="btn btn-outline-danger btn-lg-gmt w-35 shadow-none ms-1 pt-1 pb-1" id="deleteButton" onclick="swalConfirm('deleteDsConfiguration', 'Se ha eliminado la configuración', 'Se eliminará la configuración guardada.')">Borrar</button>
                 </div>
                   <button class="btn btn-primary btn-xl w-100 shadow-none mt-1" id="mainButton">Ejecutar</button>
               </div>
@@ -187,37 +424,24 @@
     </div>
   </div>
 
-  <div class="accordion-item last">
-    <h2 class="accordion-header" id="headingFive">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
-        Ayuda
-      </button>
-    </h2>
-    <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionExample">
-      <div class="accordion-body">
-
-        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/help').getContent(); ?>
-
-      </div>
-    </div>
-  </div>
 </div>
 
 
 <script>
   let data = JSON.parse("<?=JSON.stringify(dsProperties)?>");
-  let emailDropdown = JSON.parse("<?=JSON.stringify(emailDropdown)?>");
+  let headerDropdownValues = JSON.parse("<?=JSON.stringify(headerDropdownValues)?>");
   let dataExtracted = data;
+  //alert(JSON.stringify(dataExtracted))
 </script>
 
 <script type="text/javascript">
 
 function afterSidebarLoads(){
-  afterDropDrownArrayReturned(emailDropdown);
+  afterDropDrownArrayReturned(headerDropdownValues);
 }
 
 function refreshButtonPush(){
-  google.script.run.withSuccessHandler(afterDropDrownArrayReturned).emailDropdown();
+  google.script.run.withSuccessHandler(afterDropDrownArrayReturned).headerDropdownValues();
 }
 
 function addDropdownElements(arrayOfArrays, field) {
@@ -233,11 +457,11 @@ function addDropdownElements(arrayOfArrays, field) {
 }
 
 function afterDropDrownArrayReturned(arrayOfArrays){
-  //alert(emailDropdown)
+  //alert(headerDropdownValues)
   let emailField = document.getElementById("email-field");
   emailField.innerHTML = "";
   addDefaultChild(emailField, 'Selecciona campo email');
-  addDropdownElements(arrayOfArrays, emailField)
+  addDropdownElements(filterDropdownValues(arrayOfArrays, 'email'), emailField)
   let emailBlobField = document.getElementById("email-blob-field");
   emailBlobField.innerHTML = "";
   addDefaultChild(emailBlobField, 'Selecciona campo adjuntos');
@@ -253,7 +477,22 @@ function addDefaultChild(field, text) {
 }
 
 function getDropdownSavedFields() {
+}
 
+function filterDropdownValues(filterHeaderValues, filter) {
+  if (filter) {
+    // Filtrar los valores que contienen la palabra "email" (case insensitive)
+    const filteredValues = filterHeaderValues.filter(row => {
+      return row.some(cell => {
+        return cell.toString().toLowerCase().includes(filter);
+      });
+    });
+
+    return filteredValues;
+  } else {
+    // Si no se proporciona un filtro, devolver los valores originales sin filtrar
+    return filterHeaderValues;
+  }
 }
 
 function getSavedProperties() {
@@ -327,7 +566,8 @@ function getSavedProperties() {
   if (typeof dataExtracted['All Documents'] !== 'undefined') var allDocuments = document.getElementById("all-documents").checked = checkReturn(dataExtracted['All Documents']);
   if (typeof dataExtracted['All Emails'] !== 'undefined') var allEmails = document.getElementById("all-emails").checked = checkReturn(dataExtracted['All Emails']);
 
-  if (typeof dataExtracted['Email Message'] !== 'undefined') var emailMessage = tinyMCE.activeEditor.setContent(dataExtracted['Email Message']);
+  
+
 }
 
 function checkReturn(arg) {
@@ -394,7 +634,7 @@ function afterButtonClickedSave() {
         allEmails: allEmails,
       };
 
-  execFunction('setDocProperties', 'Se ha guardado la configuración.', rowData);
+  execFunction('saveDsConfiguration', 'Se ha guardado la configuración.', rowData);
 }
 
 </script>
@@ -471,7 +711,7 @@ function afterButtonClicked() {
             allEmails: allEmails,
           };
 
-      swalConfirm('documentStudio', 'Los documentos se han generado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', rowData);
+      swalConfirm('documentStudio', 'Morph Document Studio se ha ejecutado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', rowData);
 
     } else{ $('#errorNotFields').toast({delay: 4000}).toast("show");  }
   } else{ $('#errorNotFunctions').toast({delay: 4000}).toast("show"); }

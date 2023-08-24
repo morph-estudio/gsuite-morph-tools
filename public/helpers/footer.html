@@ -1,27 +1,3 @@
-<!-- Loading -->
-
-<script>
-
-function removeFadeOut( el, speed ) {
-  var seconds = speed/1000;
-  el.style.transition = "opacity "+seconds+"s ease";
-
-  el.style.opacity = 0;
-  setTimeout(function() {
-      el.parentNode.removeChild(el);
-  }, speed);
-}
-
-function wait(ms){
-  var start = new Date().getTime();
-  var end = start;
-  while(end < start + ms) {
-    end = new Date().getTime();
-  }
-}
-
-</script>
-
 <!-- Toast -->
 
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">

@@ -67,6 +67,18 @@ function worksheetManagement(sheetNamesToDeleteAsString, rowData) {
         shtm.copyTo(ss).activate();
         ss.moveActiveSheet(shIndex + 1);
         break;
+      case 'refreshTemplate':
+
+        var originalSheetName = sheet;
+        var nuevaSheetName = `Copia de ${originalSheetName}`;
+        var copiaSheet = ss.getSheetByName(nuevaSheetName);
+
+        if (copiaSheet) {
+          ss.deleteSheet(shtm);
+          copiaSheet.setName(originalSheetName);
+        }
+
+        break;
       default:
     }
   });
@@ -80,6 +92,8 @@ function worksheetManagement(sheetNamesToDeleteAsString, rowData) {
   }
 
 }
+
+
 
 /**
  * rearrangeSheets

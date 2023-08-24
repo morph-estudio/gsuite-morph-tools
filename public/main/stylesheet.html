@@ -2,7 +2,6 @@
 
 :root {
   --primary-color: #22313f;
-  //--primary-color: #e40078;
   --secondary-color: #fff;
   --link-color: #0D6EFD;
   --morph-color: #f1cb50;
@@ -49,16 +48,18 @@ body {
   // -moz-osx-font-smoothing: grayscale !important;
   text-rendering: optimizeLegibility !important;
 }
-.body-padding {
-  padding-left: var(--primary-padding);
-  padding-right: var(--primary-padding);
-}
+
 p {
   font-size: var(--fontsize-15);
   font-weight: var(--fontweight-regular);
   line-height: var(--primary-lineheight);
   position: relative;
   margin-top: 5px;
+}
+
+.body-padding {
+  padding-left: var(--primary-padding);
+  padding-right: var(--primary-padding);
 }
 .font-xl { font-size: var(--fontsize-16) }
 a {
@@ -75,7 +76,7 @@ a:hover{
   padding: 18px 5px 10px 15px;
 }
 .lightNavbar:hover {
-    color: #616161 !important;
+
 }
 h3 {
   font-size:18px;
@@ -89,10 +90,16 @@ table {
   max-width: 100%; /* o cualquier otro ancho máximo */
 }
 td {
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  //text-overflow: ellipsis;
+  //white-space: nowrap;
   overflow: hidden;
 }
+.notoverflow{
+  text-overflow: fade;
+  overflow: hidden;
+white-space: nowrap;
+}
+
 .btn textarea {
   pointer-events: none;
 }
@@ -163,17 +170,116 @@ img {
   margin-left: 5px;
   color: #B0BEC5;
 }
-.fa-questionstyle.roboto {
+.fa-questionstyle2 {
   margin-left: 0px;
+  margin-right: 0px;
+  font-size: 0.4em;
+  color: #B0BEC5;
+  position: relative;
+  bottom: 3px;
 }
 .fa-sizing {
   font-size: 75%;
   vertical-align: middle;
 }
-
+.buttonRepadding {
+  padding: 4px 3px;
+}
 
 
 // Buttons
+
+
+/* Checkbox Styles */
+
+
+/* Estilo del contenedor de los checkboxes 
+.form-check-input {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+*/
+/* Estilo específico para el caso de "N/A" */
+#inlineRadioN.form-check-input {
+  border-width: 2px;
+  border-color: #6c757d; /* Color del borde del checkbox "N/A" */
+}
+#inlineRadioN.form-check-input:checked {
+  background-color: #6c757d; /* Color del borde del checkbox "optionG" */
+}
+
+/* Estilo específico para el caso de "optionG" */
+#inlineRadio1.form-check-input {
+  border-width: 2px;
+  border-color: #28a745; /* Color del borde del checkbox "optionG" */
+}
+#inlineRadio1.form-check-input:checked {
+  background-color: #28a745; /* Color del borde del checkbox "optionG" */
+}
+.logG {
+  //border-top: 4px solid #28a745 !important;
+  color: #28a745 !important;
+}
+.logY {
+  //border-top: 4px solid #ffc107 !important;
+  color: #ffc107 !important;
+}
+.logR {
+  //border-top: 4px solid #dc3545 !important;
+  color: #dc3545 !important;
+}
+.logN {
+  //border-top: 4px solid #9e9e9e !important;
+  color: #CFD8DC !important;
+}
+
+/* Estilo específico para el caso de "optionY" */
+#inlineRadio2.form-check-input {
+  border-width: 2px;
+  border-color: #ffc107; /* Color del borde del checkbox "optionY" */
+}
+#inlineRadio2.form-check-input:checked {
+  background-color: #ffc107; /* Color del borde del checkbox "optionG" */
+}
+
+/* Estilo específico para el caso de "optionR" */
+#inlineRadio3.form-check-input {
+  border-width: 2px;
+  border-color: #dc3545; /* Color del borde del checkbox "optionR" */
+}
+#inlineRadio3.form-check-input:checked {
+  background-color: #dc3545; /* Color del borde del checkbox "optionG" */
+}
+
+
+
+
+.pagination-info {
+  display: none;
+}
+.fixed-table-pagination {
+  margin-top: 10px;
+  display: flex; /* Establecemos el contenedor como flex para alinear horizontalmente */
+  justify-content: center; /* Alineamos horizontalmente al centro */
+}
+
+.color-group .btn {
+  border-width: 2px;
+  background-color: #fff; /* Fondo blanco */
+  width: 24px; /* Ancho */
+  height: 24px; /* Altura */
+  font-size: 0; /* Tamaño de fuente a 0 para eliminar espacio adicional */
+}
+
+.color-group .btn.red-color-btn { border-color: #dc3545; background-color: #fff; }
+    .color-group .btn.yellow-color-btn { border-color: #ffc107; background-color: #fff; }
+    .color-group .btn.green-color-btn { border-color: #28a745; background-color: #fff; }
+    .color-group .btn.no-color-btn { border-color: #6c757d; background-color: #fff; }
+
+    .color-group .btn.active {
+      background-color: inherit; /* Fondo igual al color de borde del botón */
+    }
 
 .btn-xl {
   font-size: var(--fontsize-18);
@@ -270,7 +376,9 @@ img {
   padding-bottom: 8px !important;
 }
 
-
+.last-button {
+  border-bottom: none;
+}
 
 .form-control.update {
   background-color: #FFF8E1;
@@ -283,6 +391,10 @@ img {
 .form-control.update::placeholder {
   color: #fdba66;
   font-weight: bold;
+}
+textarea{
+  font-size: 13px !important;
+  font-family: "Roboto Mono", monospace;
 }
 textarea[data-placeholder="placeholderFormula"]::placeholder {
   font-size: 13px;
@@ -512,6 +624,11 @@ textarea[data-placeholder="placeholderFormula"]::placeholder {
   font-weight: bold;
 }
 
+.btn-outline-secondary, .btn-outline-danger{
+  border-width: 2px;
+  font-weight: bold;
+}
+
 input[type="checkbox"].btn-check:checked + label.btn-outline-secondary {
   background-color: #6c757d;
   color: #fff;
@@ -577,7 +694,7 @@ border: none;
   border:none;
 }
 .accordion-body {
-  padding: 0px 12px 25px 12px;
+  padding: 0px 12px 10px 12px;
   font-size: var(--fontsize-15);
   color: var(--primary-color);
   font-weight: 500;
@@ -596,7 +713,7 @@ border: none;
 }
 .form-check-label {
   position:relative;
-  top: 1px;
+  top: 2px;
   font-size: var(--fontsize-16);
 }
 .robotoSwitch {
@@ -658,30 +775,8 @@ border: none;
   animation: fa-spin 0.5s infinite linear;
 }
 
-.table-striped>tbody>tr:nth-child(odd)>td,
-.table-striped>tbody>tr:nth-child(odd)>th {
-  background-color: #FAFAFA;
-}
-.table-striped>tbody>tr:nth-child(even)>td,
-.table-striped>tbody>tr:nth-child(even)>th {
-  background-color: #F5F5F5;
-}
-.table-striped>tbody>tr.selected{
-  background-color: #E0E0E0;
-  opacity: 1.0 !important;
-}
-table th:first-child{
-  border-radius: 10px 0 0 0;
-}
-table th:last-child{
-  border-radius: 0 10px 0 0;
-}
-.table-striped>tbody>tr:last-child>td:last-child{
-  border-radius: 0 0 10px 0;
-}
-.table-striped>tbody>tr:last-child>td:first-child{
-  border-radius: 0 0 0 10px;
-}
+
+
 .table tr {
   border: none;
 }
@@ -689,17 +784,132 @@ table th:last-child{
   padding: 4px 5px;
 }
 
+
+.table-striped td {
+  box-shadow: none !important;
+}
+
+.table-striped {
+  border-radius: 0 !important;
+}
+
+.table-striped>tbody>tr:nth-child(odd)>td, 
+.table-striped>tbody>tr:nth-child(odd)>th {
+   background-color: #f8fafa; // Choose your own color here
+   background-image: none !important;
+   box-shadow: none !important;
+}
+
+.table-striped>tbody>tr:nth-child(even)>td, 
+.table-striped>tbody>tr:nth-child(even)>th {
+   background-color: #fdfdfd; // Choose your own color here
+   box-shadow: none !important;
+}
+
+.table-striped>tbody>tr:nth-child(odd):hover>td,
+.table-striped>tbody>tr:nth-child(odd):hover>th {
+  background-color: #f8fafa; // Choose your own color here
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+/* Estilos para hover en filas pares */
+.table-striped>tbody>tr:nth-child(even):hover>td,
+.table-striped>tbody>tr:nth-child(even):hover>th {
+  background-color: #fdfdfd; // Choose your own color here
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.table-striped tbody tr:hover td, .table-2 tbody tr:hover th {
+    //background-color: none !important;
+}
+
 .table-striped>thead th {
-  background-color: #9E9E9E;
+  background-color: #95a5a6;
   color: white;
 }
+
+.table-striped>tbody>tr.selected {
+  background-color: #dcdddd;
+}
+
+.table-striped-radius th:first-child{
+  border-radius: 10px 0 0 0;
+}
+.table-striped-radius th:last-child{
+  border-radius: 0 10px 0 0;
+}
+.table-striped-radius>tbody>tr:last-child>td:last-child{
+  border-radius: 0 0 10px 0;
+}
+.table-striped-radius>tbody>tr:last-child>td:first-child{
+  border-radius: 0 0 0 10px;
+}
+
+
+
+
+
+
+
+
+
+
+.table-2 {
+  border-radius: 0 !important;
+}
+
+.table-2 td {
+  padding: 10px 5px !important;
+  font-size: 13px !important;
+  box-shadow: none !important;
+}
+.table-2>tbody>tr:nth-child(odd)>td, 
+.table-2>tbody>tr:nth-child(odd)>th {
+   background-color: #f8fafa; // Choose your own color here
+   background-image: none !important;
+   box-shadow: none !important;
+}
+
+.table-2>tbody>tr:nth-child(even)>td, 
+.table-2>tbody>tr:nth-child(even)>th {
+   background-color: #fdfdfd; // Choose your own color here
+   box-shadow: none !important;
+}
+
+.table-2>tbody>tr:nth-child(odd):hover>td,
+.table-2>tbody>tr:nth-child(odd):hover>th {
+  background-color: #f8fafa; // Choose your own color here
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+/* Estilos para hover en filas pares */
+.table-2>tbody>tr:nth-child(even):hover>td,
+.table-2>tbody>tr:nth-child(even):hover>th {
+  background-color: #fdfdfd; // Choose your own color here
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.table-2 tbody tr:hover td, .table-2 tbody tr:hover th {
+    //background-color: none !important;
+}
+
+.table-2>thead th {
+  background-color: #95a5a6;
+  color: white;
+}
+
+.table-2>tbody>tr.selected {
+  background-color: #dcdddd;
+}
+
 .borderless td, .borderless th {
     border: none;
 }
-.table-striped>tr:hover td { 
-   background-color: inherit;     
-   opacity: 1.0;
-}
+
 
 // Counter Animated Bar
 

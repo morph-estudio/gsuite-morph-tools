@@ -60,14 +60,14 @@ function swalerror(err) {
 function swalinfo(e) {
   Swal.fire({
     title: 'Atención',
-    text: 'Esta función aún está en desarrollo...',
+    text: e,
     icon: 'info',
     confirmButtonColor: '#0D6EFD',
     confirmButtonText: 'Continuar'
   });
 }
 
-function swalConfirm(fa, sc, tx, rw, rw2) {
+function swalConfirm(fa, sc, tx, rw, rw2, rw3, onSuccessFunction) {
   Swal.fire({
     text: tx,
     icon: 'info',
@@ -85,7 +85,11 @@ function swalConfirm(fa, sc, tx, rw, rw2) {
     if (result.isConfirmed) {
       swaload()
       google.script.run
-      .withSuccessHandler(e => {swalsuccess(sc)})
+      .withSuccessHandler(e => {swalsuccess(sc);
+        if (onSuccessFunction && typeof onSuccessFunction === "function") {
+          onSuccessFunction();
+        }
+        })
       .withFailureHandler(swalerror)
       [fa](rw, rw2);
     } else if (result.isDenied) {
@@ -93,6 +97,38 @@ function swalConfirm(fa, sc, tx, rw, rw2) {
     }
   })
 
+}
+/**/
+function swalConfirm2(fa, sc, tx, rw, rw2, rw3, onSuccessFunction) {
+  Swal.fire({
+    text: tx,
+    icon: 'info',
+    allowOutsideClick: false,
+    showLoaderOnConfirm: true,
+    showDenyButton: false,
+    showCancelButton: true,
+    cancelButtonText: `Cancelar`,
+    confirmButtonText: `Continuar`,
+    confirmButtonColor: '#0D6EFD',
+    customClass: {
+      popup: 'swalconfirming',
+    }
+  }).then((result) => {
+    if (result.isConfirmed) {
+      swaload();
+      google.script.run
+        .withSuccessHandler(e => {
+          swalsuccess(sc);
+          if (onSuccessFunction && typeof onSuccessFunction === 'function') {
+            onSuccessFunction(); // Llama a la función de éxito proporcionada
+          }
+        })
+        .withFailureHandler(swalerror)
+        [fa](rw, rw2);
+    } else if (result.isDenied) {
+      return;
+    }
+  });
 }
 
 function swalConfirmAdv(fa, sc, tx, rw, rw2) {

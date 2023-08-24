@@ -46,13 +46,30 @@
 </script>
 
 <div class="accordion" id="accordionExample">
+
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingCuadros">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCuadros" aria-expanded="true" aria-controls="collapseCuadros">
+        Cuadros
+      </button>
+    </h2>
+    <div id="collapseCuadros" class="accordion-collapse collapse show" aria-labelledby="headingCuadros" data-bs-parent="#accordionExample">
+      <div class="accordion-body mt-2">
+
+        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/helpCuadros').getContent(); ?>
+        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/cuadros').getContent(); ?>
+
+      </div>
+    </div>
+  </div>
+
   <div class="accordion-item">
     <h2 class="accordion-header" id="headingSheets">
-      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSheets" aria-expanded="true" aria-controls="collapseSheets">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSheets" aria-expanded="false" aria-controls="collapseSheets">
         Google Sheets
       </button>
     </h2>
-    <div id="collapseSheets" class="accordion-collapse collapse show" aria-labelledby="headingSheets" data-bs-parent="#accordionExample">
+    <div id="collapseSheets" class="accordion-collapse collapse" aria-labelledby="headingSheets" data-bs-parent="#accordionExample">
       <div class="accordion-body pb-0 mt-2">
 
         <!-- <div class="mt-1 pb-0">
@@ -94,22 +111,6 @@
         <button class="btn btn-primary index shadow-none w-50" title="Ajusta las columnas al texto existente" onclick="execNoSuccess('autoResizeAllCols')"><i class="fa-solid fa-margin fa-fw fa-sliders"></i>Fit Colms</button>
         <button class="btn btn-primary index shadow-none w-100" onclick="execNoSuccess('postLessons')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Enviar mensajes de Chat</button>
         -->
-
-      </div>
-    </div>
-  </div>
-
-  <div class="accordion-item">
-    <h2 class="accordion-header" id="headingCuadros">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCuadros" aria-expanded="false" aria-controls="collapseCuadros">
-        Cuadros
-      </button>
-    </h2>
-    <div id="collapseCuadros" class="accordion-collapse collapse" aria-labelledby="headingCuadros" data-bs-parent="#accordionExample">
-      <div class="accordion-body mt-2">
-
-        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/helpCuadros').getContent(); ?>
-        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/cuadros').getContent(); ?>
 
       </div>
     </div>
@@ -215,15 +216,9 @@
 
 <!-- SCRIPT AREA DIVISION -->
 
-<script>
-
-function afterSidebarLoads(){
-  setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 300);
-}
-
-</script>
-
 <script> // Funciones relacionadas con el área de desarrollo y validación de contraseñas
+
+var wsNames = JSON.parse("<?=JSON.stringify(wsNames)?>");
 
 function userRolePermission() {
   var permission = JSON.parse("<?=JSON.stringify(permission)?>");
@@ -233,10 +228,21 @@ function userRolePermission() {
     var property = keysToIterate[i];
     let x = document.getElementsByClassName(property);
     for (var j = 0; j < x.length; j++) {
-      permission[property] ? x[j].style.display = 'block' : x[j].style.display = 'none';
+      var classNames = x[j].className.split(' ');
+      var showBlock = false;
+      for (var k = 0; k < classNames.length; k++) {
+        if (keysToIterate.includes(classNames[k]) && permission[classNames[k]]) {
+          showBlock = true;
+          break;
+        }
+      }
+      x[j].style.display = showBlock ? 'block' : 'none';
     }
   }
+  
 }
+
+
 
 function check_password () {
   btnLoading('#hideSectionButton', 'Validando...');
@@ -386,6 +392,7 @@ $(document).ready(function() {
   $('.prefixUpdateClass').attr("disabled", true);
   $('.prefixUpdateClassColor').css('color', '#B0BEC5');
   $('.fittext').fitText();
+
 });
 
 $('#update-linkpage').change(function() {
@@ -409,10 +416,7 @@ $('#prefix-all-switch').change(function() {
     }
 });
 
-function adaptButtonDisable() {
-  $('#adaptButton').prop('disabled', true);
-  $('#adaptButton').html('<i class="fa-solid fa-margin fa-fw fa-triangle-exclamation"></i>Este cuadro ya se ha adaptado');
-}
+
 
 $('#rowsDeleteButton').click(function() {
   let rowValue = document.getElementById("rowsDeleteInput").value;
@@ -471,15 +475,10 @@ $("#button-container").children().last().addClass("ult");
 
 <script>
 
-var wsNames = JSON.parse("<?=JSON.stringify(wsNames)?>");
 
-function getSavedProperties() {
-  let data = JSON.parse("<?=JSON.stringify(isAdapted)?>");
-  let dataExtracted = data;
-  if (data == 'true') {
-    adaptButtonDisable()
-  }
-}
+
+
+
 function checkReturn(arg) {
   if(arg === 'true') { return true; } else { return false; }
 }
@@ -488,59 +487,46 @@ function checkReturn(arg) {
 
 <script>
 
-// Eventos de elementos
-
-document.getElementById('hideSectionButton').addEventListener("click", check_password);
-document.getElementById('csUpdater').addEventListener("click", updateButtonClicked);
-document.getElementById('formulaLogButton').addEventListener("click", formulaLogButtonClicked);
-//document.getElementById('historicoSupButton').addEventListener("click", historicoButtonClicked);
-
-document.addEventListener('DOMContentLoaded', () => {
+$(document).ready(function() {
+  setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 300);
   userRolePermission();
-  afterSidebarLoads();
   getSavedProperties();
   getSavedCSVImport();
   sctGetDropdownSheetnames(wsNames);
   sctGetSavedData();
-});
+})
 
-
+document.getElementById('hideSectionButton').addEventListener("click", check_password);
+document.getElementById('csUpdater').addEventListener("click", updateButtonClicked);
 
 document.addEventListener('DOMContentLoaded',function(){
-    const tooltips = document.querySelectorAll('[data-tooltip]');
-    tooltips.forEach((item)=>{
-        const text =item.dataset.tooltip;
-        const title =item.dataset.tooltipTitle;
-        const tooltip = document.createElement('div');
-        item.addEventListener('mouseenter',(evt)=>{
-            const cords = evt.target.getBoundingClientRect();
-            tooltip.className= 'tooltip';
-            tooltip.innerHTML=`<p>${text}</p>`; 
-            document.body.appendChild(tooltip);
-            tooltip.style.top=`${cords.y + cords.height + 10}px`;
-            tooltip.style.left=`${cords.x + cords.width / 40}px`;
-            
-            setTimeout(() => {
-               tooltip.classList.add('active')
-            },20);
+  const tooltips = document.querySelectorAll('[data-tooltip]');
+  tooltips.forEach((item)=>{
+      const text =item.dataset.tooltip;
+      const title =item.dataset.tooltipTitle;
+      const tooltip = document.createElement('div');
+      item.addEventListener('mouseenter',(evt)=>{
+          const cords = evt.target.getBoundingClientRect();
+          tooltip.className= 'tooltip';
+          tooltip.innerHTML=`<p>${text}</p>`; 
+          document.body.appendChild(tooltip);
+          tooltip.style.top=`${cords.y + cords.height + 10}px`;
+          tooltip.style.left=`${cords.x + cords.width / 40}px`;
           
-        });
+          setTimeout(() => {
+              tooltip.classList.add('active')
+          },20);
         
-        item.addEventListener('mouseleave',()=>{
-            tooltip.classList.remove('active');
-            setTimeout(() => {
-              document.body.removeChild(tooltip)
-            },250);
-        });
-           
-    });
-     
-    
-    
-    });
-
-
-
+      });
+      
+      item.addEventListener('mouseleave',()=>{
+          tooltip.classList.remove('active');
+          setTimeout(() => {
+            document.body.removeChild(tooltip)
+          },250);
+      });
+  });
+});
 
 </script>
 
