@@ -1,0 +1,842 @@
+<html>
+<head>
+  <base target="_top">
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <?!= HtmlService.createHtmlOutputFromFile('public/helpers/header').getContent(); ?>
+  <?!= HtmlService.createHtmlOutputFromFile('public/main/stylesheet').getContent(); ?>
+
+</head>
+
+<body>
+
+<?!= HtmlService.createHtmlOutputFromFile('public/helpers/navbar').getContent(); ?>
+
+<div class="accordion-body mt-2">
+
+<!--
+<div class="text-center mb-3">
+  <img src='https://cdn-icons-png.flaticon.com/512/2457/2457902.png' height='auto' width='75' class="mx-auto" style="margin-bottom:15px" />
+  <h3 class="montserrat">Manejo de cuadros</h3>
+</div>
+-->
+
+<div class="card mt-3">
+  <div class="card-header font-weight-bold" style="font-weight:bold">
+    Actualización del cuadro
+  </div>
+  <div class="card-body">
+
+    <div class="mb-3">
+
+      <div class="form-check form-switch">
+        <input class="form-check-input shadow-none" type="checkbox" role="switch" id="update-linkpage">
+        <label class="form-check-label" style="position:relative;top:1px" for="update-linkpage">Actualizar hoja LINK </label>
+        <span data-bs-toggle="tooltip" data-bs-placement="right" title="Marcar esta casilla en la primera actualización del cuadro o cuando haya nuevos archivos .txt de exportación. Se buscarán de nuevo los archivos y carpetas y se formateará la hoja LINK">
+        <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:1px"></i>
+        </span>
+      </div>
+
+      <div class="mt-2 updateLinkPageCollapse collapse">
+
+        <div style="margin-left: 20px; margin-bottom: 20px;">
+          <div class="form-check">
+            <input class="form-check-input shadow-none" type="checkbox" value="" id="update-maindata" checked>
+            <label class="form-check-label" for="update-maindata">
+              Datos principales
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input shadow-none" type="checkbox" value="" id="update-ai" checked>
+            <label class="form-check-label" for="update-ai">
+              Archivos importados
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input shadow-none" type="checkbox" value="" id="update-ac" disabled>
+            <label class="form-check-label" for="update-ac" title="Esta opción aún no está disponible...">
+              Archivos conectados
+            </label>
+          </div>
+        </div>
+
+        <div class="input-group flex-nowrap update rounded-pill mb-2">
+          <span class="input-group-text prefixUpdateClassColor">Prefijo<span data-bs-toggle="tooltip" data-bs-placement="right" title="Por defecto se importarán los archivos con prefijo TXT (por ejemplo, TXT Sheets Ventanas), pero si usas un paquete de archivos con otro identificativo escribe aquí el prefijo"><i class="fa-regular fa-circle-question fa-questionstyle" style="color:#c0cbd1"></i></span></span> 
+          <input type="text" class="form-control shadow-none prefixUpdateClass" id="updatePrefixID" placeholder="TXT">
+        </div>
+
+        <div class="form-check form-switch">
+          <input class="form-check-input shadow-none prefixUpdateClass" type="checkbox" role="switch" id="prefix-all-switch" onclick="document.getElementById('updatePrefixID').disabled = this.checked">
+          <label class="form-check-label" style="position:relative;top:1px" for="prefix-all-switch">Ignorar prefijos</label> <span data-bs-toggle="tooltip" data-bs-placement="right" title="Añade todos los archivos de la carpeta 'ExpTXT' sin importar el prefijo.">
+          <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:2px"></i>
+        </div>
+
+        <div class="form-check form-switch">
+          <input class="form-check-input shadow-none prefixUpdateClass" type="checkbox" role="switch" id="update-keepVisibility">
+          <label class="form-check-label" style="position:relative;top:1px" for="update-keepVisibility">Mantener visibilidad</label>
+          <span data-bs-toggle="tooltip" data-bs-placement="right" title="Por defecto las hojas importadas se ocultan, marca esta opción para mantenerlas visibles">
+          <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:2px"></i>
+        </div>
+
+      </div>
+
+      <div class="form-check form-switch">
+        <input class="form-check-input shadow-none" type="checkbox" role="switch" id="update-historico">
+        <label class="form-check-label" style="position:relative;top:1px" for="update-historico">Crear punto en histórico de superficies
+        <span data-bs-toggle="tooltip" data-bs-placement="right" title="Todos los cuadros de superficies cuentan con una hoja HISTÓRICO Construidas donde registrar los cambios en el desarrollo del proyecto">
+        <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:2px"></i></label>
+      </div>
+
+      <div id="" style="display: none;" class="formulaModPermission">
+        <div class="form-check form-switch mt-2">
+          <input class="form-check-input shadow-none" type="checkbox" role="switch" id="update-debugReport">
+          <label class="form-check-label" style="position:relative;top:1px" for="update-debugReport">Debug Report</label>
+          <span data-bs-toggle="tooltip" data-bs-placement="right" title="Opción para desarrolladores: incluye datos adicionales al logger que pueden ayudar a resolver problemas">
+          <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:2px"></i>
+        </div>
+      </div>
+
+    </div>
+
+    <div>
+      <button id="csUpdater" class="btn btn-primary gmt sup yellow w-100 shadow-none mt-1 mb-1 centerScroll" style="font-size:20px">Actualizar</button>
+      <button id="csFreezer" class="btn btn-primary gmt inf blue w-100 shadow-none centerScroll" style="font-size:20px" onclick="swalConfirm('morphFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">Congelar</button>
+    </div>
+
+  </div>
+</div>
+
+<style>
+.whiteText{
+  color: #455A64;
+}
+</style>
+
+  <button id="newCuadroButton" class="btn btn-secondary btn-xl shadow-none border-0 w-100 mt-3 mb-2 font-weight-bold">Crear nuevo cuadro o panel de control</button>
+  
+
+  <div class="collapse" id="newCuadroDiv" > 
+
+    <div class="card mb-3" style="border: 3px solid #CFD8DC; background-color: #f2f4f5">
+
+      <div class="card-body ps-3 pe-3 pt-4 pb-4" >
+
+      <div class="">
+        <label for="cuadroType" class="form-label whiteText"><i class="fa-solid fa-rectangle-list fa-margin fa-fw whiteText"></i>Tipo de cuadro</label>
+        <select class="form-select shadow-none" id="cuadroType" >
+          <option value="selectCuadroSuperficies">Cuadro Superficies</option>
+          <option value="selectPanelControl">Panel de control</option>
+          <option value="selectCuadroExportacion">Cuadro de exportación</option>
+          <option value="selectExpedienteCompleto">Panel de control + Superficies + Exportación</option>
+          <option value="selectCuadroMediciones">Cuadro de mediciones</option>
+        </select>
+      </div>
+
+      <div class="mt-3">
+        <label for="projectCategory" class="form-label whiteText"><i class="fa-solid fa-tree-city fa-margin fa-fw whiteText"></i>Tipo de proyecto</label>
+        <select class="form-select shadow-none" id="projectCategory" >
+        </select>
+      </div>
+
+      <div class="mt-3">
+        <label for="projectCode" class="form-label whiteText"><i class="fa-solid fa-p fa-margin fa-fw whiteText"></i>Código expediente</label>
+        <input type="text" class="form-control shadow-none" id="projectCode" placeholder="ej: P11350">
+      </div>
+
+      <div class="mt-3">
+        <label for="projectShortname" class="form-label whiteText"><i class="fa-solid fa-file fa-margin fa-fw whiteText"></i>Nombre abreviado del proyecto</label>
+        <input type="text" class="form-control shadow-none" id="projectShortname" placeholder="ej: Sotogrande, Cortijo Merino">
+      </div>
+
+      <div id="projectLocalidadDiv" class="mt-3">
+        <label for="projectLocalidad" class="form-label whiteText"><i class="fa-solid fa-location-dot fa-margin fa-fw whiteText"></i>Localidad</label>
+        <input type="text" class="form-control shadow-none" id="projectLocalidad" placeholder="ej: Madrid, Málaga...">
+      </div>
+
+      <div id="folderURLdiv" class="mt-3">
+        <label for="folderURL" class="form-label whiteText"><i class="fa-solid fa-folder fa-margin fa-fw whiteText"></i>Carpeta del cuadro</label>
+        <input type="text" class="form-control shadow-none" id="folderURL" placeholder="ej: https://drive.google.com/drive/folders/1TTgZai7-kcIjxnEfLvZsMmmudHErxEFD" required>
+      </div>
+
+      <div id="folderURLPCdiv" class="mt-3">
+        <label for="folderURLPC" class="form-label whiteText"><i class="fa-solid fa-folder fa-margin fa-fw whiteText"></i>Carpeta del panel de control</label>
+        <input type="text" class="form-control shadow-none" id="folderURLPC" placeholder="ej: https://drive.google.com/drive/folders/1TTgZai7-kcIjxnEfLvZsMmmudHErxEFD" required>
+      </div>
+
+      <div id="folderURLCSdiv" class="mt-3">
+        <label for="folderURLCS" class="form-label whiteText"><i class="fa-solid fa-folder fa-margin fa-fw whiteText"></i>Carpeta del cuadro de superficies</label>
+        <input type="text" class="form-control shadow-none" id="folderURLCS" placeholder="ej: https://drive.google.com/drive/folders/1TTgZai7-kcIjxnEfLvZsMmmudHErxEFD" required>
+      </div>
+
+      <button id="cuadrosConfigCopyTemplate" class="btn btn-primary btn-xl shadow-none w-100 mt-3 centerScroll">Crear cuadro nuevo</button>
+
+      </div>
+    </div>
+
+  </div>
+
+
+
+
+<div class="exportacionVisibilityControl" style="display: none;">
+  <div class="card mt-2 mb-1 ">
+    <div class="card-header font-weight-bold" style="font-weight:bold">
+      Vincular hojas
+    </div>
+
+        <select id="selectPanelType" class="form-select form-select-lg border-0 border-bottom rounded-0 mt-0 shadow-none">
+          <option value="Cuadro Superficies">Cuadro Superficies</option>
+          <option value="Panel de control">Panel de control</option>
+          <!-- Agrega más opciones según sea necesario -->
+        </select>
+
+        <select class="form-select form-select-lg border-0 border-bottom rounded-0 mt-0 shadow-none" id="selectPanelTypeSheets" ></select>
+
+        <div class="card-body ps-2 pe-2 pt-2 pb-2"><button id="cuadrosConfigVincular" class="btn btn-primary btn-xl shadow-none border-0 w-100 centerScroll">Vincular hoja al cuadro de exportación</button></div>
+      
+  </div>
+</div>  
+
+
+
+
+
+
+
+
+
+
+  <div class="card mt-3 mb-1">
+    <div class="card-header font-weight-bold" style="font-weight:bold">
+      Control de hojas del cuadro
+    </div>
+
+    <div id="noContentHideTable" class="" style="">
+
+      <select id="selectOptions" class="form-select form-select-lg border-0 border-bottom rounded-0 mt-0 shadow-none">
+        <option value="option1">Generar hojas secundarias</option>
+        <option value="option2">Traer hoja maestra desde plantilla</option>
+        <!-- Agrega más opciones según sea necesario -->
+      </select>
+
+      <div class="ps-2 pe-2 pt-2 pb-1" style="border-bottom: 1px solid lightgray">
+        <div class="form-check form-switch" >
+          <input class="form-check-input shadow-none" type="checkbox" role="switch" id="overwrite-switch">
+          <label class="form-check-label" for="overwrite-switch">Sobrescribir hojas<span data-bs-toggle="tooltip" data-bs-placement="right" title="Si existen hojas con el mismo nombre que la hoja de plantilla, ésta se sustituirá por la nueva. No selecciones esta opción si quieres mantener la hoja original"><i class="fa-regular fa-circle-question fa-questionstyle" style=""></i></span></label>
+        </div>
+      </div>
+
+      <div class="card-body ps-2 pe-2 pt-2">
+
+      <div class="mb-3">
+        <div class="gen-container mb-1">
+
+          <button id="cuadrosConfigSend" class="btn btn-primary btn-xl shadow-none border-0 w-100 centerScroll">Ejecutar</button>
+        </div>
+
+        <div class="d-flex">
+          <button class="btn btn-outline-secondary btn-lg-gmt w-65 shadow-none buttonRepadding centerScroll" id="cuadrosConfigSave">Guardar</button>
+          <button class="btn btn-outline-danger btn-lg-gmt w-35 shadow-none buttonRepadding ms-1 centerScroll" id="cuadrosConfigDelete">Borrar</button>
+        </div>
+      </div>
+
+      <form id="configForm">
+        <div class="form-group">
+          <!-- Aquí se generan los switches y checkboxes para las hojas maestras y secundarias -->
+          <div id="hojasConfig"></div>
+        </div>
+      </form>
+
+
+      </div>
+
+    </div>
+
+
+
+    <div id="noContentMessage" class="card-body p-3" style="display: none;">
+      <p>Este archivo no se corresponde a ninguno de los cuadros automáticos de Morph. Si crees que se trata de un error, revisa que el nombre del archivo contenga el texto identificador correspondiente (Cuadro Superficies, Panel de control, Exportación Superficies, etc.) y vuelve a abrir la aplicación.</p>
+    </div>
+
+  </div>
+
+  <div class="card mt-3 mb-1 herramientasAdicionales ">
+    <div class="card-header font-weight-bold" style="font-weight:bold">
+      Herramientas adicionales
+    </div>
+    <div class="card-body p-0">
+
+      <button class="btn btn-primary index i2 shadow-none w-100 centerScroll exportacionVisibilityControl" onclick="swalConfirm('agruparColumnasDeExportacion', 'Las columnas se han ocultado correctamente.', 'Se agruparán las columnas con valor cero, de modo que no aparecerán después en el archivo congelado.')"><i class="fa-solid fa-eye-slash fa-margin fa-fw"></i>Ocultar columnas con valor cero en cuadro de exportación</button>
+      <button class="btn btn-primary index i2 shadow-none w-100 centerScroll superficiesVisibilityControl" onclick="swalConfirm('refreshNamedRanges', 'Los rangos se han actualizado correctamente.', 'Se actualizarán los rangos nombrados. Por favor, no continúes si no sabes lo que estás haciendo...')"><i class="fa-solid fa-registered fa-margin fa-fw"></i>Actualizar rangos nombrados</button>
+      <button class="btn btn-primary index i2 shadow-none w-100 centerScroll superficiesVisibilityControl" onclick="swalConfirm('historicoDeSuperficies', 'El punto histórico se ha añadido correctamente.', 'Se creará un punto temporal en el histórico de superficies. Confirma para continuar.')"><i class="fa-solid fa-clock-rotate-left fa-margin fa-fw"></i>Crear punto manual en el histórico de superficies</button>
+      <button class="btn btn-primary index i2 shadow-none w-100 centerScroll medicionesVisibilityControl" onclick="swalConfirm('generarArchivoBC3', 'El archivo se ha generado correctamente.', 'Se generará un archivo BC3 con la información del proyecto. Confirma para continuar.')"><i class="fa-solid fa-filter-circle-dollar fa-margin fa-fw"></i>Generar archivo BC3 de importación para Presto</button>
+      <button class="btn btn-primary index i2 shadow-none w-100 centerScroll medicionesVisibilityControl" onclick="swalConfirm('formatearHojaBC3', 'El archivo se ha generado correctamente.', 'Se generará un archivo EXCEL con la hoja formateada. Confirma para continuar.')"><i class="fa-regular fa-paste fa-margin fa-fw"></i>Congelar hoja BC3</button>
+
+      <!--
+      <button class="btn btn-primary index i2  shadow-none w-100 centerScroll" onclick="execNoSuccess('getConectedSheetList', 0, 6, 'LINK')"><i class="fa-solid fa-network-wired fa-margin fa-fw"></i>Generar lista de archivos conectados</button>
+      <button class="btn btn-primary index i2 shadow-none w-100 centerScroll" onclick="execNoSuccess('getConectedSheetList', 0, 0)"><i class="fa-solid fa-network-wired fa-margin fa-fw"></i>Generar lista de archivos conectados en hoja vacía</button>
+      -->
+
+    </div>
+  </div>
+  
+
+</div>
+
+<script>
+
+const CuadrosConfig = {};
+
+var templateSheetConfigObject = JSON.parse("<?=JSON.stringify(config)?>");
+var savedConfiguration = JSON.parse("<?=JSON.stringify(savedProperties)?>");
+var wsNames = JSON.parse("<?=JSON.stringify(wsNames)?>");
+
+</script>
+
+<script> // DOM Init
+
+$(document).ready(function() {
+  var hojasConfig = $("#hojasConfig");
+
+  var cuadroChecker;
+
+  // Checkea si el archivo es un cuadro Morph y, de ser así, muestra el contenido
+
+  if (templateSheetConfigObject.fileType != "none") {
+
+    cuadroChecker = true;
+
+    // Generación dinámica de switches y checkboxes para las hojas maestras y secundarias
+    templateSheetConfigObject.masterSheets.forEach(function(masterSheet) {
+      var switchDivMaestra = $("<div></div>").addClass("form-check form-check-mae form-switch");
+      var switchInputMaestra = $("<input>")
+        .attr("type", "checkbox")
+        .attr("id", "switch_" + masterSheet.name.replace(/ /g, "_"))
+        .addClass("form-check-input form-check-input-mae shadow-none");
+
+      var iconColor = getColorForIcon(masterSheet.name);
+
+      var switchLabelMaestra = $("<label></label>")
+        .attr("for", "switch_" + masterSheet.name.replace(/ /g, "_"))
+        .addClass("form-check-label form-check-label-mae")
+        .html(`<span data-bs-toggle="tooltip" data-bs-placement="right" title="${masterSheet.description}" >
+        <i class="fa-solid fa-circle fa-questionstyle2" style="color: ${iconColor};"></i>
+        </span><span>${masterSheet.name}</span>`)
+      
+      switchDivMaestra.append(switchLabelMaestra);
+      switchDivMaestra.append(switchInputMaestra);
+
+      hojasConfig.append(switchDivMaestra);
+
+      templateSheetConfigObject.secondarySheets.forEach(function(secondarySheet) {
+        if (secondarySheet.masterSheet === masterSheet.name) {
+          var checkboxDivSecundaria = $("<div></div>").addClass("form-check form-check-sec");
+          var checkboxInputSecundaria = $("<input>")
+            .attr("type", "checkbox")
+            .attr("id", "checkbox_" + secondarySheet.name.replace(/ /g, "_"))
+            .addClass("form-check-input form-check-input-sec shadow-none")
+            .prop("disabled", true);
+
+          var iconColor = getColorForIcon(secondarySheet.name);
+
+          var checkboxLabelSecundaria = $("<label></label>")
+            .attr("for", "checkbox_" + secondarySheet.name.replace(/ /g, "_"))
+            .addClass("form-check-label form-check-label-sec")
+            .html(`<span data-bs-toggle="tooltip" data-bs-placement="right" title="${secondarySheet.description}" >
+            <i class="fa-solid fa-circle fa-questionstyle2" style="color: ${iconColor};"></i>
+            </span><span>${secondarySheet.name}</span>`)
+
+          checkboxDivSecundaria.append(checkboxLabelSecundaria);
+          checkboxDivSecundaria.append(checkboxInputSecundaria);
+
+          hojasConfig.append(checkboxDivSecundaria);
+
+          // Margen izquierdo de las checkboxes de hojas secundarias
+          checkboxDivSecundaria.css("margin-left", "15px");
+
+          // Evento para habilitar o deshabilitar los checkboxes hijos
+          switchInputMaestra.on("change", function() {
+            if ($(this).is(":checked") && $("#selectOptions").val() === "option1") {
+              checkboxDivSecundaria.find('input[type="checkbox"]').prop("disabled", false);
+            } else {
+              checkboxDivSecundaria.find('input[type="checkbox"]').prop("disabled", true);
+            }
+          });
+
+          $("#selectOptions").on("change", function() {
+            if ($("#selectOptions").val()!== "option1") {
+              checkboxDivSecundaria.find('input[type="checkbox"]').prop("disabled", true);
+              cambiarColorEtiqueta();
+            }
+          });
+
+        }
+      });
+    });
+
+    var projectTypeSelect = document.getElementById('projectCategory');
+
+    // Iterate through projectTypes array and populate options
+    templateSheetConfigObject.projectTypes.forEach(function(projectType) {
+      var option = document.createElement('option');
+      option.value = projectType.code; // Use the code as the value
+      option.text = projectType.nombre; // Use the nombre as the displayed text
+      projectTypeSelect.appendChild(option);
+    });
+
+  var exportacionVisibilityControl = $(".exportacionVisibilityControl");
+  var superficiesVisibilityControl = $(".superficiesVisibilityControl");
+  var panelcontrolVisibilityControl = $(".panelcontrolVisibilityControl");
+  var medicionesVisibilityControl = $(".medicionesVisibilityControl");
+
+  var selectOptions = $("#selectOptions");
+
+  if (templateSheetConfigObject.fileType == "Exportación Superficies") {
+    exportacionVisibilityControl.css("display", "block");
+  } else {
+    exportacionVisibilityControl.css("display", "none");
+  }
+
+  if (templateSheetConfigObject.fileType == "Cuadro Superficies") {
+    superficiesVisibilityControl.css("display", "block");
+  } else {
+    superficiesVisibilityControl.css("display", "none");
+  }
+
+  if (templateSheetConfigObject.fileType == "Panel de control") {
+    panelcontrolVisibilityControl.css("display", "block");
+  } else {
+    panelcontrolVisibilityControl.css("display", "none");
+  }
+
+  if (templateSheetConfigObject.fileType == "Cuadro Mediciones") {
+    medicionesVisibilityControl.css("display", "block");
+  } else {
+    medicionesVisibilityControl.css("display", "none");
+  }
+
+  var buttons = $(".herramientasAdicionales button");
+
+  // Verificar si todos los botones tienen "display: none"
+  var allButtonsHidden = buttons.toArray().every(function(button) {
+    return $(button).css("display") === "none";
+  });
+
+  // Si todos los botones están ocultos, ocultar el div principal
+  if (allButtonsHidden) {
+    $(".herramientasAdicionales").css("display", "none");
+  }
+
+  var buttons = $(".herramientasAdicionales button");
+
+  // Filtra los botones visibles y quita la clase "ult2" de todos los botones
+
+  var visibleButtons = buttons.filter(":visible");
+  visibleButtons.last().addClass("ult2");
+
+    applySavedConfiguration();
+
+  } else { cuadroChecker = false; }
+
+  var contentContainer = document.getElementById('contentContainer');
+  if (cuadroChecker) {
+    contentContainer.style.display = 'block';
+  } else {
+    var noContentMessage = document.getElementById('noContentMessage');
+    noContentMessage.style.display = 'block';
+    var noContentHideTable = document.getElementById('noContentHideTable');
+    noContentHideTable.style.display = 'none';
+
+    $(".herramientasAdicionales").css("display", "none");
+  }
+
+
+
+
+  // Verifica si es un Cuadro de Exportación y de ser así añade opciones adicionales.
+
+
+
+
+
+
+
+
+
+
+});
+
+function applyIconColor() {
+}
+
+// Función para aplicar colores a los switch en función del tabColor de su hoja maestra
+function applySwitchStyles(masterSheet) {
+  var switchInputMaestra = $("#switch_" + masterSheet.name.replace(/ /g, "_"));
+
+  function updateSwitchStyle() {
+    var isChecked = switchInputMaestra.is(":checked");
+    var knobColor = isChecked ? masterSheet.tabColor : "white";
+    var knobSvg = isChecked
+      ? 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 8 8"><circle r="3" fill="#ffffff"/></svg>')
+      : 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 8 8"><circle r="3" fill="' + masterSheet.tabColor + '"/></svg>');
+
+    switchInputMaestra.css("border-color", masterSheet.tabColor);
+    switchInputMaestra.css("background-color", knobColor);
+    switchInputMaestra.css("background-image", 'url("' + knobSvg + '")');
+  }
+
+  // Aplicar el estilo personalizado al cargar la página
+  updateSwitchStyle();
+
+  toggleChildCheckboxes(switchInputMaestra);
+
+  // Aplicar el estilo personalizado cuando cambie el estado del checkbox
+  switchInputMaestra.on("change", function () {
+    updateSwitchStyle();
+    toggleChildCheckboxes(switchInputMaestra);
+  });
+
+  cambiarColorEtiqueta();
+}
+
+function styleSwitches() {
+  templateSheetConfigObject.masterSheets.forEach(function(masterSheet) {
+    applySwitchStyles(masterSheet);
+  });
+}
+
+// Función para cambiar el color de la etiqueta según el estado del checkbox
+function cambiarColorEtiqueta() {
+    $('.form-check-input-sec').each(function() {
+        var checkbox = $(this);
+        var etiqueta = checkbox.siblings('.form-check-label-sec');
+
+        if (checkbox.prop('disabled')) {
+            etiqueta.css('color', 'lightgray');
+        } else {
+            etiqueta.css('color', '#666666'); // Cambiar 'black' por el color principal deseado
+        }
+    });
+}
+
+function getColorForIcon(hojaMaestraNombre) {
+  if (wsNames.includes(hojaMaestraNombre)) {
+    return "#64DD17";
+  } else {
+    return "lightgray";
+  }
+}
+
+// Función para cambiar el estado del checkbox en función del estado de su switch maestro
+function toggleChildCheckboxes(switchInputMaestra) {
+  var checkboxDivSecundaria = switchInputMaestra.closest(".form-check-mae").nextUntil(".form-check-mae");
+  if (switchInputMaestra.is(":checked") && $("#selectOptions").val() === "option1") {
+    checkboxDivSecundaria.find('input[type="checkbox"]').prop("disabled", false);
+  } else {
+    checkboxDivSecundaria.find('input[type="checkbox"]').prop("disabled", true);
+  }
+}
+
+// Función para recibir la señal del backend después de borrar las propiedades
+function handlePropertiesRemoved() {
+  applySavedConfiguration();
+}
+
+// Función para desactivar los checkboxes al borrar la configuración
+function removeCheckedCheckboxes() {
+  var inputs = document.querySelectorAll('[id^="switch_"], [id^="checkbox_"]');
+
+  inputs.forEach(function(input) {
+    if (input.type === "checkbox") {
+      input.checked = false; // Restablecemos el estado de los checkboxes a "false"
+    }
+  });
+
+  styleSwitches();
+}
+
+CuadrosConfig.afterButtonClicked = function(buttonId) {
+  var rowData = {};
+  var inputs = document.querySelectorAll('[id^="switch_"], [id^="checkbox_"]');
+
+  inputs.forEach(function(input) {
+    if (input.type === "checkbox") {
+      rowData[input.id.replace(/(switch|checkbox)_/, "")] = input.checked;
+    } else {
+      rowData[input.id] = input.value;
+    }
+  });
+
+  if (buttonId === 'cuadrosConfigSave') {
+    swalConfirm('saveDataToDocumentProperties', 'Se ha guardado la configuración.', '¿Quieres guardar la actual configuración del cuadro?', rowData)
+  } else if (buttonId === 'cuadrosConfigDelete') {
+    swalConfirm('removeDataFromDocumentProperties', 'Se ha eliminado la configuración actual.', 'Se eliminará la configuración guardada.', rowData, null, null, removeCheckedCheckboxes);
+  }
+}
+
+function applySavedConfiguration() {
+  // alert(JSON.stringify(savedConfiguration))
+  var inputs = document.querySelectorAll('[id*="switch_"], [id*="checkbox_"]');
+
+  inputs.forEach(function(input) {
+    var key = input.id.replace(/(switch_|checkbox_)/, ""); // Corrección aquí
+    //alert(key)
+    if (input.type === "checkbox") {
+      // Asignar el estado del checkbox
+      var value = savedConfiguration[key];
+      if(value) { input.checked = value === "true" ? true : false; } else { input.checked = false }
+    } else {
+      // Si es un input de texto u otro tipo, se asigna el valor almacenado
+      input.value = savedConfiguration[key] || "";
+    }
+  });
+
+  styleSwitches();
+}
+
+
+CuadrosConfig.openDialogActions = function(buttonSelected) {
+  if (buttonSelected === 'cuadrosConfigSend') {
+
+    var selectedOption = $('#selectOptions').val();
+    var overwriteSwitch = $('#overwrite-switch').prop('checked');;
+    
+      var rowData = {
+        "masterSheets": [],
+        "secondarySheets": []
+      };
+
+      var switchState;
+      var maestraObject;
+      var checkboxState;
+      var secundariaObject;
+
+      // Introducir datos de los switch maestros en rowData
+      templateSheetConfigObject.masterSheets.forEach(function(masterSheet) {
+        switchState = $('#switch_' + masterSheet.name.replace(/ /g, "_")).is(':checked');
+        maestraObject = {
+          "name": masterSheet.name,
+          "isTrue": switchState
+        };
+        rowData.masterSheets.push(maestraObject);
+      });
+
+      // Introducir datos de los checkboxes secundarios en rowData
+      templateSheetConfigObject.secondarySheets.forEach(function(secondarySheet) {
+        checkboxState = $('#checkbox_' + secondarySheet.name.replace(/ /g, "_")).is(':checked');
+        secundariaObject = {
+          "name": secondarySheet.name,
+          "masterSheet": secondarySheet.masterSheet,
+          "isTrue": checkboxState
+        };
+        rowData.secondarySheets.push(secundariaObject);
+      });
+
+    if (selectedOption === 'option1') {
+      swalConfirm('mainGenerateTemplateSheets', 'El cuadro se ha configurado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', rowData, overwriteSwitch, templateSheetConfigObject.fileType, applyIconColor);
+    } else if (selectedOption === 'option2') {
+
+      swalConfirm('mainCopySheetFromTemplate', 'La acción se ha completado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', rowData, overwriteSwitch, templateSheetConfigObject.fileType, applyIconColor);
+    } else if (selectedOption === 'option3') {
+
+        var selectPanelType = $('#selectPanelType').val();
+        var selectPanelTypeSheets = $('#selectPanelTypeSheets').val();
+        var rowDataExportacion = {
+          "selectPanelType": selectPanelType,
+          "selectPanelTypeSheets": selectPanelTypeSheets
+        };
+
+      swalConfirm('vincularHojaExportacion', 'La acción se ha completado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', rowData, overwriteSwitch, rowDataExportacion, applyIconColor);
+    }
+
+  } else if (buttonSelected === 'cuadrosConfigCopyTemplate') {
+    // swalinfo('Esta función aún está en desarrollo.')
+
+    let cuadroType = document.getElementById('cuadroType').value;
+    let projectCategory = document.getElementById('projectCategory').value;
+    let projectShortname = document.getElementById('projectShortname').value;
+    let projectCode = document.getElementById('projectCode').value;
+    let projectLocalidad = document.getElementById('projectLocalidad').value;
+    let cuadroFolder = document.getElementById('folderURL').value;
+    let cuadroFolderSup = document.getElementById('folderURLCS').value;
+    let cuadroFolderPanel = document.getElementById('folderURLPC').value;
+
+    var rowData = {
+          cuadroType,
+          projectCategory,
+          projectShortname,
+          projectCode,
+          projectLocalidad,
+          cuadroFolder,
+          cuadroFolderSup,
+          cuadroFolderPanel
+        }
+
+    swalConfirm('crearCuadroSuperficies', 'El cuadro se ha creado correctamente.', 'Se creará un nuevo cuadro de superficies en la carpeta especificada. Confirma para continuar.', rowData);
+  } else if (buttonSelected === 'cuadrosConfigVincular') {
+      var selectPanelType = $('#selectPanelType').val();
+      var selectPanelTypeSheets = $('#selectPanelTypeSheets').val();
+      var rowDataExportacion = {
+        "selectPanelType": selectPanelType,
+        "selectPanelTypeSheets": selectPanelTypeSheets
+      };
+
+    swalConfirm('vincularHojaExportacion', 'La acción se ha completado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', rowData, overwriteSwitch, rowDataExportacion, applyIconColor);
+  }
+}
+
+function updateButtonClicked() {
+  let updateLinkPage = document.getElementById("update-linkpage").checked;
+  let keepSheetVisibility = document.getElementById("update-keepVisibility").checked;
+  let updatePrefix = document.getElementById('updatePrefixID').value;
+  let prefixAll = document.getElementById("prefix-all-switch").checked;
+  let updateDebugReport = document.getElementById("update-debugReport").checked;
+
+  let updateHistorico = document.getElementById("update-historico").checked;
+  let updateBasic = document.getElementById("update-maindata").checked;
+  let updateAI = document.getElementById("update-ai").checked;
+  let updateAC = document.getElementById("update-ac").checked;
+
+  let btnID = 'Superficies';
+  var rowData = {
+        updatePrefix,
+        prefixAll,
+        updateLinkPage,
+        keepSheetVisibility,
+        updateDebugReport,
+        updateHistorico,
+        updateBasic,
+        updateAI,
+        updateAC
+      }
+  if (updateLinkPage) {
+    swalConfirm('morphCSUpdater', 'El cuadro se ha actualizado correctamente.', 'Se actualizará la hoja LINK en el proceso de actualización. Confirma para continuar.', btnID, rowData);
+  } else {
+    swalConfirm('morphCSUpdaterDirect', 'El cuadro se ha actualizado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', rowData);
+  }
+}
+
+document.getElementById('csUpdater').addEventListener("click", updateButtonClicked);
+
+$(document).ready(function() {
+  $('.prefixUpdateClass').attr("disabled", true);
+  $('.prefixUpdateClassColor').css('color', '#B0BEC5');
+  $('.fittext').fitText();
+
+});
+
+$('#update-linkpage').change(function() {
+    if ($(this).prop('checked')) {
+      $(".updateLinkPageCollapse").collapse('show');
+      $('.prefixUpdateClassColor').css('color', '#37474F');
+      $('.prefixUpdateClass').attr("disabled", false);
+      
+    } else {
+      $(".updateLinkPageCollapse").collapse('hide');
+      $('.prefixUpdateClass').attr("disabled", true);
+      $('.prefixUpdateClassColor').css('color', '#B0BEC5');
+    }
+});
+
+$('#prefix-all-switch').change(function() {
+    if ($(this).prop('checked')) {
+      $('.prefixUpdateClassColor').css('color', '#B0BEC5');
+    } else {
+      $('.prefixUpdateClassColor').css('color', '#37474F');
+    }
+});
+
+$(document).ready(function() {
+  google.script.run.fastInit(savedConfiguration);
+
+  $('#newCuadroButton').on('click', function () {
+    $('#newCuadroDiv').collapse('toggle');
+  });
+
+  setTimeout(function(){removeFadeOut(document.getElementById('loading-spin'), 300)}, 250);
+
+  $('#cuadrosConfigSend, #cuadrosConfigVincular, #cuadrosConfigCopyTemplate').on('click', function () { CuadrosConfig.openDialogActions($(this).attr('id')); });
+
+  $('#cuadrosConfigSave').on('click', function () { CuadrosConfig.afterButtonClicked('cuadrosConfigSave'); });
+  $('#cuadrosConfigDelete').on('click', function () { CuadrosConfig.afterButtonClicked('cuadrosConfigDelete'); });
+  $('.form-check-input-mae').change(function() { cambiarColorEtiqueta(); });
+
+  readyToLoadCuadroSheetnames();
+
+});
+
+  function updateVisibility() {
+    var selectedOption = $('#cuadroType').val();
+    
+    if (selectedOption === 'selectExpedienteCompleto') {
+      $('#folderURLdiv').hide();
+      $('#folderURLPCdiv').show();
+      $('#folderURLCSdiv').show();
+    } else {
+      $('#folderURLdiv').show();
+      $('#folderURLPCdiv').hide();
+      $('#folderURLCSdiv').hide();
+    }
+
+    if (selectedOption === 'selectPanelControl' || selectedOption === 'selectExpedienteCompleto') {
+      $('#projectLocalidadDiv').show();
+    } else {
+      $('#projectLocalidadDiv').hide();
+    }
+  }
+
+  $(document).ready(function () {
+    updateVisibility(); // Llamar la función al cargar la página
+
+    $('#cuadroType').change(function () {
+      updateVisibility(); // Llamar la función en el evento change
+    });
+  });
+
+async function readyToLoadCuadroSheetnames(selectedValue) {
+
+  
+
+  let selectPanelType = selectedValue || document.getElementById("selectPanelType").value;
+
+  //alert(selectPanelType);
+
+  google.script.run.withSuccessHandler(function(dataExtracted) {
+
+    loadCuadroSheetnames(dataExtracted)
+
+  }).getSelectedCuadroSheets(selectPanelType);
+}
+
+function loadCuadroSheetnames(dataExtracted){
+  let selectPanelTypeSheets = document.getElementById("selectPanelTypeSheets");
+  addDropdownElements(dataExtracted, selectPanelTypeSheets)
+}
+
+function addDropdownElements(wsNames, field) {
+  field.innerHTML = '';
+  wsNames.forEach(function(r){
+    let option = document.createElement("option");
+    option.textContent = r;
+    field.appendChild(option);
+  });
+}
+
+$('#selectPanelType').change(function() {
+  // Obtén el valor seleccionado
+  const selectedValue = $(this).val();
+  
+  // Llama a la función deseada con el valor seleccionado
+  // Aquí puedes reemplazar 'miFuncion' con el nombre de tu función
+  readyToLoadCuadroSheetnames(selectedValue)
+});
+
+</script>
+
+<?!= HtmlService.createHtmlOutputFromFile('public/helpers/swal').getContent(); ?>
+<?!= HtmlService.createHtmlOutputFromFile('public/helpers/footer').getContent(); ?>
+
+</body>
+</html>

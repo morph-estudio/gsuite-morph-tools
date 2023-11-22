@@ -12,15 +12,16 @@ function morphFreezer(btnID, sheetSelection) {
   const ss = SpreadsheetApp.getActive();
   var sh = ss.getSheetByName('LINK');
   var ss_id = ss.getId();
+  var ss_name = ss.getName();
 
   var userMail = Session.getActiveUser().getEmail();
   var dateNow = Utilities.formatDate(new Date(), 'GMT+2', 'dd/MM/yyyy - HH:mm:ss');
   var freezerDate = Utilities.formatDate(new Date(), 'GMT+2', 'yyyyMMdd');
-  var destName = `${ss.getName()} - ${freezerDate} - CONGELADO`;
+  var destName = `${ss_name} - ${freezerDate} - CONGELADO`;
   var functionErrors = [];
   
   var file = DriveApp.getFileById(ss_id);
-  Logger.log(`FILE: ${file.getName()}, FILEURL: ${file.getUrl()}`);
+  Logger.log(`FILE: ${ss_name}, FILEURL: ${file.getUrl()}`);
   var parentFolder = file.getParents();
   var parentFolderID = parentFolder.next().getId();
   var backupFolderSearch = DriveApp.getFolderById(parentFolderID);
@@ -46,7 +47,7 @@ function morphFreezer(btnID, sheetSelection) {
         throw new Error(`No se ha podido encontrar la carpeta de archivos congelados.`);
       }
 
-      var folderName = `${ss.getName().substring(0, 6)}-A-CS-${searchFor.substring(16, searchFor.length - 1)}`; // Obtener el nombre de la carpeta desde la cadena de búsqueda
+      var folderName = `${ss_name.substring(0, 6)}-A-CS-${searchFor.substring(16, searchFor.length - 1)}`; // Obtener el nombre de la carpeta desde la cadena de búsqueda
       var newFolder = backupFolderSearch.createFolder(folderName);
 
       backupFolderId = newFolder.getId();
@@ -130,7 +131,9 @@ function morphFreezer(btnID, sheetSelection) {
   visibleSheets = destinationSheets.filter(tempsheet => !tempsheet.isSheetHidden() && !excludedTabColors.includes(tempsheet.getTabColor()));
   hiddenSheets = destinationSheets.filter(tempsheet => tempsheet.isSheetHidden() || excludedTabColors.includes(tempsheet.getTabColor()));
 
-  var requests = [
+  var requests;
+
+  requests = [
     ...visibleSheets.map((sheet) => {
       var sheetid = sheet.getSheetId();
       var lastrow = sheet.getLastRow();
@@ -169,6 +172,12 @@ function morphFreezer(btnID, sheetSelection) {
 
   elapsedTime = (new Date().getTime() - startTime) / 1000; Logger.log(`Elapsed time after frozen proccess: ${elapsedTime} seconds.`);
 
+  SpreadsheetApp.flush();
+
+  if (ss_name.toLowerCase().indexOf("exportación superficies") !== -1) {
+    formatearFileExportacion(destination);
+  } else { Logger.log("El archivo no es un cuadro de exportación"); }
+
   } else {
 
     // Alternative Workflow for Superfreezer and Partial Freezer
@@ -193,7 +202,7 @@ function morphFreezer(btnID, sheetSelection) {
   });
   
   // Copy the source Spreadsheet.
-  var destination = ss.copy(ss.getName() + " - " + freezerDate);
+  var destination = ss.copy(ss_name + " - " + freezerDate);
 
     destinationId = destination.getId();
     destinationFile = DriveApp.getFileById(destinationId);
@@ -276,18 +285,31 @@ function morphFreezer(btnID, sheetSelection) {
 
   // EXCEL Conversion and LINK Sheet Data
 
-  let url = `https://docs.google.com/feeds/download/spreadsheets/Export?key=${destinationId}&exportFormat=xlsx`;
+  let excelUrl = `https://docs.google.com/feeds/download/spreadsheets/Export?key=${destinationId}&exportFormat=xlsx`;
 
   if (btnID === 'csFreezer') {
     let backupFolderText = backupFolderId == undefined ? '' : `=hyperlink("https://drive.google.com/corp/drive/folders/${backupFolderId}";"${backupFolderName}")`;
-    sh.getRange('B7').setValue(backupFolderText).setFontWeight('bold').setFontColor(hyperlinkFontColor).setNote(null).setNote(`Último congelado: ${dateNow} por ${userMail}`); // Last Update Note
-    sh.getRange('B8').setValue(backupFolderId);
-    sh.getRange('B9').setValue(url).setFontColor(hyperlinkFontColor).setFontWeight('normal'); // Add XLSX download url to sheet
+
+  var data = sh.getRange("A:A").getValues();
+  for (var i = 0; i < data.length; i++) {
+    var cellValue = data[i][0];
+    if (cellValue === "CARPETA CONGELADOS" || cellValue === "CARPETA BACKUP") {
+      sh.getRange(i + 1, 2).setValue(backupFolderText).setFontWeight('bold').setFontColor(hyperlinkFontColor).setNote(null).setNote(`Último congelado: ${dateNow} por ${userMail}`); // Last Update Note;
+    } else if (cellValue === "ID CARPETA CONGELADOS" || cellValue === "ID CARPETA BACKUP") {
+      sh.getRange(i + 1, 2).setValue(backupFolderId);
+    } else if (cellValue === "ÚLTIMO ARCHIVO CONGELADO") {
+      sh.getRange(i + 1, 2).setValue(destinationFile.getUrl()).setFontColor(hyperlinkFontColor).setFontWeight('normal');
+    } else if (cellValue === "DESCARGAR ARCHIVO XLSX") {
+      sh.getRange(i + 1, 2).setValue(excelUrl).setFontColor(hyperlinkFontColor).setFontWeight('normal'); // Add XLSX download url to sheet;
+    }
+  }
+
     sh.activate();
   } else if (btnID === 'superFreezerButton' || btnID === 'actPartialFreezer') {
     let confirm = Browser.msgBox('Documento Excel', '¿Quieres crear una copia en formato Excel en la misma carpeta?', Browser.Buttons.OK_CANCEL);
     if (confirm == 'ok') {
-      exportToXLSS(ss, url, freezerDate, parentFolderID);
+      var fileName = `${ss.getName()} - ${freezerDate} - CONGELADO.xlsx`;
+      exportToXLSS(fileName, excelUrl, parentFolderID);
     }
   }
 
@@ -301,7 +323,7 @@ function morphFreezer(btnID, sheetSelection) {
  * exportToXLSS
  * Crea un archivo XLSS a partir del ID de un archivo de Google Sheets
  */
-function exportToXLSS(ss, url, freezerDate, parentFolderID) {
+function exportToXLSS(fileName, url, parentFolderID) {
   try {
 
     let params = {
@@ -311,7 +333,7 @@ function exportToXLSS(ss, url, freezerDate, parentFolderID) {
     };
 
     let blob = UrlFetchApp.fetch(url, params).getBlob();
-    blob.setName(`${ss.getName()} - ${freezerDate} - CONGELADO.xlsx`);
+    blob.setName(fileName);
     DriveApp.getFolderById(parentFolderID).createFile(blob);
   } catch (f) {
     // Logger.log(f.toString());
@@ -324,4 +346,85 @@ function exportToXLSS(ss, url, freezerDate, parentFolderID) {
  */
 function morphFastFreezer() {
 
+}
+
+function formatearFileExportacion(destinationFile) {
+
+  var destinationSheets = destinationFile.getSheets();
+  
+  for (var i = 0; i < destinationSheets.length; i++) {
+    var sheet = destinationSheets[i];
+
+    var cellA1 = sheet.getRange("A1").getValue().toLowerCase();
+    if (cellA1.indexOf("selecciona resumen") !== -1) {
+      deleteColumnsInsideColumnGroup(sheet);
+      removeEmptyColumns(sheet);
+      deleteEmptyRows(sheet);
+      formatUnidadesColumn(sheet)
+    }
+  }
+}
+
+function deleteColumnsInsideColumnGroup(sheet) {
+  var maxColumn = sheet.getMaxColumns();
+  for (let c = maxColumn; c >= 1; c--) {
+    const d = sheet.getColumnGroupDepth(c);
+    if (d > 0) {
+      sheet.deleteColumn(c);
+    }
+  }
+}
+
+function formatUnidadesColumn(sheet) {
+  var lastColumn = sheet.getLastColumn();
+  var lastRow = sheet.getLastRow();
+
+  var headers = sheet.getRange(1, 1, 1, lastColumn).getValues()[0];
+  var columnNamesToFind = ['UNIDADES', 'PLANTAS', 'NIVEL', 'SUBTIPO TERRAZA', 'TIPO'];
+
+  for (var i = 0; i < columnNamesToFind.length; i++) {
+    var columnName = columnNamesToFind[i];
+    var columnIndex = headers.indexOf(columnName);
+    if (columnIndex !== -1) { break; }
+  }
+
+  Logger.log(`columnIndex: ${columnIndex}`)
+
+  // Encontramos una columna del array
+
+
+  var contieneComputo = false;
+
+  // Verificar si algún encabezado contiene "CÓMPUTO"
+  for (var i = 0; i < headers.length; i++) {
+    var header = headers[i];
+    if (header.indexOf('CÓMPUTO') !== -1) {
+      contieneComputo = true;
+      break;
+    }
+  }
+
+  Logger.log(`sheetName: ${sheet.getName()}, columnIndex: ${columnIndex}, contieneComputo: ${contieneComputo}, lastColumn: ${lastColumn}`)
+
+  if (contieneComputo) {
+
+    for (var newColumnIndex = columnIndex + 2; newColumnIndex <= lastColumn; newColumnIndex++) {
+      // Verificar si el índice está dentro de los límites de la matriz de encabezados
+        var header = headers[newColumnIndex - 1];
+
+        Logger.log(`newColumnIndex: ${newColumnIndex}, header: ${header}, conputoIndex: ${header.indexOf('CÓMPUTO')}`)
+        
+        // Verificar si el encabezado contiene "CÓMPUTO"
+        if (header.indexOf('CÓMPUTO') !== -1) {
+        } else {
+          var range = sheet.getRange(2, newColumnIndex, lastRow - 1, 1); // Ignorar el encabezado
+          range.setNumberFormat('0.00');
+        }
+    }
+
+  } else {
+    var range = sheet.getRange(2, columnIndex + 2, lastRow - 1, lastColumn - columnIndex - 1); // Ignorar el encabezado
+    range.setNumberFormat('0.00');
+  }
+  
 }

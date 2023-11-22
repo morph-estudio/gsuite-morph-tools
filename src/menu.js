@@ -1,21 +1,21 @@
 /** GLOBAL VARIABLES AND FUNCTIONS */
 
-const gmtVersion = '1.9.0';
-const morphDivision = '(I+D)';
-const morphDev = '(Devs)';
+var gmtVersion = '2.1.3';
+var morphDivision = '(I+D)';
+var morphDev = '(Devs)';
 
-const titleIX = 'Gsuite Morph Tools'; const barTitleIX = `💡 ${titleIX} ${gmtVersion}`;
-const titleSM = 'Gestor de hojas'; const barTitleSM = `📋 ${titleSM} ${morphDivision}`;
-const titleDS = 'Morph Document Studio'; const barTitleDS = `✨ ${titleDS} ${morphDivision}`;
-const titleLG = 'Registros Morph'; const barTitleLG = `✨ ${titleLG} ${morphDivision}`;
-const titleWIP = 'Morph Control Panel'; const barTitleWIP = `✨ ${titleWIP} ${morphDivision}`;
-const titleCL = 'Guía de estilo'; const barTitleCL = `🎨 ${titleCL} ${morphDivision}`;
+var titleIX = 'Gsuite Morph Tools'; var barTitleIX = `💡 ${titleIX} ${gmtVersion}`;
+var titleSM = 'Gestor de hojas'; var barTitleSM = `📋 ${titleSM} ${gmtVersion} ${morphDivision}`;
+var titleDS = 'Morph Document Studio'; var barTitleDS = `✨ ${titleDS} ${gmtVersion} ${morphDivision}`;
+var titleLG = 'Registros Morph'; var barTitleLG = `✨ ${titleLG} ${gmtVersion} ${morphDivision}`;
+var titlePC = 'Gestión de cuadros'; var barTitlePC = `✨ ${titlePC} ${gmtVersion} ${morphDivision}`;
+var titleCL = 'Guía de estilo'; var barTitleCL = `🎨 ${titleCL} ${gmtVersion} ${morphDivision}`;
 
-const ss = function() {
+var ss = function() {
   return SpreadsheetApp.getActiveSpreadsheet() }
-const sh = function() {
+var sh = function() {
   return SpreadsheetApp.getActiveSpreadsheet().getActiveSheet() }
-const ui = function() {
+var ui = function() {
   return SpreadsheetApp.getUi() }
 
 /** MAIN MENU ENGINE */
@@ -23,10 +23,11 @@ const ui = function() {
 function onOpen(e) {
   SpreadsheetApp.getUi().createAddonMenu()
     .addItem(titleIX, 'sidebarIndex')
+    .addItem(titlePC, 'sidebarPC')
     .addItem(titleSM, 'sidebarSM')
     .addItem(titleDS, 'sidebarDS')
+    .addSeparator()
     .addItem(titleLG, 'sidebarLG')
-    // .addItem(titleWIP, 'sidebarWIP')
     //.addItem(titleCL, 'sidebarCL')
     .addSeparator()
     .addItem('Changelog', 'sidebarChangelog')
@@ -51,7 +52,6 @@ function sidebarIndex() {
 
 function sidebarLG() {
   /* Browser.msgBox('Herramienta en desarrollo', 'Esta herramienta estará disponible en la próxima versión de Gsuite Morph Tools.', Browser.Buttons.OK); */
-  
   let html = HtmlService.createTemplateFromFile('public/main/logger-interno');
   html.permission = getDevPermission();
   html.loggerEntries = getLoggerEntries();
@@ -59,12 +59,12 @@ function sidebarLG() {
   
 }
 
-function sidebarWIP() {
-  let html = HtmlService.createTemplateFromFile('public/main/cuadroswip');
+function sidebarPC() {
+  let html = HtmlService.createTemplateFromFile('public/main/control-panel');
   html.savedProperties = getDocProperties();
-  html.config = templateSheetConfigObject();
+  html.config = templateSheetConfigObject(true);
   html.wsNames = getWorksheetNamesArray();
-  html = html.evaluate().setTitle(barTitleLG); ui().showSidebar(html);
+  html = html.evaluate().setTitle(barTitlePC); ui().showSidebar(html);
 }
 
 function sidebarDS() {
@@ -95,14 +95,14 @@ function sidebarDSDevs() {
 function sidebarSMDevs() {
   let html = HtmlService.createTemplateFromFile('public/main/sheet-manager');
   html.wsNames = getWorksheetNames();
-  html = html.evaluate().setTitle(`${barTitleSM} Devs`); ui().showSidebar(html)
+  html = html.evaluate().setTitle(`${barTitleSM} Devs`); ui().showSidebar(html);
 }
 
 function sidebarCLDevs() {
   let html = HtmlService.createTemplateFromFile('public/main/styles-front');
   html.obj = cargarEstilos();
   var estilos_sheet = PropertiesService.getDocumentProperties();
-  html = html.evaluate().setTitle(`${barTitleCL} Devs`); ui().showSidebar(html)
+  html = html.evaluate().setTitle(`${barTitleCL} Devs`); ui().showSidebar(html);
 }
 
 function sidebarChangelog() {

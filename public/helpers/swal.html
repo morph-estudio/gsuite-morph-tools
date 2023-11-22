@@ -91,7 +91,7 @@ function swalConfirm(fa, sc, tx, rw, rw2, rw3, onSuccessFunction) {
         }
         })
       .withFailureHandler(swalerror)
-      [fa](rw, rw2);
+      [fa](rw, rw2, rw3);
     } else if (result.isDenied) {
       return;
     }

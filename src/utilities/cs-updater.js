@@ -41,17 +41,7 @@ function morphCSUpdater(btnID, rowData) {
 
   var [updatePrefix, prefixAll, updateLinkPage, keepSheetVisibility, updateDebugReport, updateHistorico, updateBasic, updateAI, updateAC] = formData;
 
-  let backupOriginalFormula, backupOriginalValues;
-
   if (updateHistorico) historicoDeSuperficies();
-
-  if (updateBasic) {
-    var carpetaBackupRow = sh.getRange('A:A').getValues().flat().map(value => value.toString().toLowerCase()).indexOf('carpeta backup') + 1;
-    if (carpetaBackupRow > 0) {
-        backupOriginalFormula = sh.getRange('B' + carpetaBackupRow).getFormula();
-        backupOriginalValues = sh.getRange(carpetaBackupRow + 1, 2, 2, 1).getValues();
-    }
-  }
 
   // Main Format and Column A Text
 
@@ -150,8 +140,6 @@ function morphCSUpdater(btnID, rowData) {
       ];
       
       sh.getRange(1, 2, textColumnB.length, 1).setValues(textColumnB);
-      sh.getRange('B7').setFormula(backupOriginalFormula);
-      sh.getRange(8, 2, 2, 1).setValues(backupOriginalValues);
 
     try {    } catch (error) {
     }
@@ -224,6 +212,8 @@ function morphCSUpdater(btnID, rowData) {
         let delimiter = '\t';
         if (txtFileName.endsWith('.csv')) {
           delimiter = ',';
+        } else if (txtFileName.endsWith('.asv')) {
+          delimiter = '*';
         }
 
         if (updateDebugReport) {

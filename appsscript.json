@@ -38,13 +38,24 @@
         "userSymbol": "Slides",
         "serviceId": "slides",
         "version": "v1"
+      },
+      {
+        "userSymbol": "Calendar",
+        "version": "v3",
+        "serviceId": "calendar"
       }
     ],
     "libraries": [
       {
         "userSymbol": "OAuth2",
-        "version": "41",
-        "libraryId": "1B7FSrk5Zi6L1rSxxTDgDEUsPzlukDsi4KGuTMorsTQHhGBzBkMun4iDF"
+        "libraryId": "1B7FSrk5Zi6L1rSxxTDgDEUsPzlukDsi4KGuTMorsTQHhGBzBkMun4iDF",
+        "version": "41"
+      },
+      {
+        "userSymbol": "MorphLib",
+        "version": "1",
+        "libraryId": "1N22iPgmncHnjTlJaMl5xS_XnR1OWY1GvK2nVrpO5vj-hptwL0Q-zqpbp",
+        "developmentMode": false
       }
     ]
   }

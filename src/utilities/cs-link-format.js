@@ -100,7 +100,7 @@ function basicListFormat(sh, rowShift, colShift) {
 
   if(sh.getMaxColumns() < colArrayLength) sh.insertColumns(sh.getMaxColumns(), colArrayLength); // If there are not enough columns, insert a new one
 
-  sh.getRange(1 + rowShift, 1 + colShift, sh.getMaxRows(), 2).clear();
+  sh.getRange(1 + rowShift, 1 + colShift, sh.getMaxRows(), 2).clearFormat();
 
   var textColumnA = [
     ['URL PANEL DE CONTROL'],
@@ -109,8 +109,8 @@ function basicListFormat(sh, rowShift, colShift) {
     ['CARPETA CUADRO'],
     ['ID CARPETA CUADRO'],
     ['CARPETA EXPORTACIONES'],
-    ['CARPETA BACKUP'],
-    ['ID CARPETA BACKUP'],
+    ['CARPETA CARPETA CONGELADOS'],
+    ['ÚLTIMO ARCHIVO CONGELADO'],
     ['DESCARGAR ARCHIVO XLSX']
   ];
 
@@ -124,11 +124,11 @@ function basicListFormat(sh, rowShift, colShift) {
   sh.getRange(1 + rowShift, 1 + colShift, 9, 1).setFontWeight('bold');
   // Col A-B Border
   sh.getRange(1 + rowShift, 1 + colShift, 9, 2)
-  .setBorder(true, true, true, true, true, true, mainBorderColor, SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+  .setBorder(true, true, null, true, true, true, mainBorderColor, SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
   .setHorizontalAlignment('left');
   // Control Panel
   sh.getRange(1 + rowShift, 2 + colShift, 1, 1).setBackground('#ECFDF5').setFontWeight('bold').setFontColor('#00C853')
-  .setBorder(true, true, true, true, true, true, '#00C853', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+  .setBorder(true, true, null, true, true, true, '#00C853', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
   // Folder Text Style
   sh.getRangeList([`${col2}2`, `${col2}4`, `${col2}6`, `${col2}7`]).setFontWeight('bold').setFontColor('#0000FF');
   sh.getRange(`${col2}9`).setFontColor('#0000FF');
