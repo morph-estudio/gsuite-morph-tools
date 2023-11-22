@@ -2,6 +2,19 @@
 # Change Log
 Documentación de cambios del proyecto.
 
+## [ 2.1.3 ] - 2023/11/20
+
+### Added
+
+- Herramienta para crear nuevos cuadros de forma automática.
+- Detección automática del tipo de cuadros para el sistema de control de cuadros.
+- Herramienta para congelar hoja BC3 en el cuadro de mediciones.
+- Herramienta para generar archivos BC3 desde Google Sheets en el cuadro de mediciones.
+
+### Fixed
+
+- Fallos a la hora de actualizar el cuadro actualizando la hoja LINK
+
 ## [ 1.9.0 ] - 2023/08/24
 
 ### Added
