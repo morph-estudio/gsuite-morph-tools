@@ -10,7 +10,7 @@ Si has encontrado algún fallo o quieres solicitar una nueva función que te pue
 
 <div align="center">
   <img src="https://img.shields.io/badge/status-ongoing-success?color=CFD8DC&style=flat" />
-  <img src="https://img.shields.io/badge/started-25%20%2F%2007%20%2F%202022-success?color=CFD8DC&style=flat" />
+  <img src="https://img.shields.io/badge/started-25%20%2F%2007%20%2F%2022-success?color=CFD8DC&style=flat" />
   <img src="https://img.shields.io/badge/google-app script-success?color=A7FFEB&style=flat&logo=google&logoColor=white" />
-  <a href='mailto:asanchez@morphestudio.es' target="_blank"><img alt='42' src='https://img.shields.io/badge/Morph-Alfredo_Sanchez-success?color=FCCE0D&style=flat'/></a>
+  <a href='mailto:asanchez@morphestudio.es' target="_blank"><img alt='42' src='https://img.shields.io/badge/Morph-Alfredo_S._Romero-success?color=FCCE0D&style=flat'/></a>
 </div>
