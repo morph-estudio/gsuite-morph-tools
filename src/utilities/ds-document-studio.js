@@ -1,5 +1,5 @@
 /**
- * Gsuite Morph Tools - Morph Document Studio 2.0
+ * Gsuite Morph Tools - Morph Document Studio
  * Developed by alsanchezromero
  *
  * Morph Estudio, 2023

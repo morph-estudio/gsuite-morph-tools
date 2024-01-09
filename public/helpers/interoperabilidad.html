@@ -1,6 +1,4 @@
-<!--<div id="icsv" style="display: none;" class="mt-3 mb-2">  -->
-
-<div class="" style="margin-bottom:30px">
+<div class="" style="">
 
   <h3 class="menu-h3 mb-3"><i class="fa-solid fa-file-csv fa-margin fa-fw fa-sizing"></i>Importar CSV múltiple</h3>
 
@@ -24,71 +22,58 @@
 
   <button class="btn btn-primary gmt w-100 shadow-none" id="csvMainButton">Importar CSV</button>
 
-  <!-- <button class="btn btn-danger btn-xl w-100 shadow-none mt-1" id="csvMainButton" onClick="alert(counter)">Counter</button>
-  <button class="btn btn-danger btn-xl w-100 shadow-none mt-1" id="csvMainButton" onClick="alert(dat)">Object</button>
-
-  <button class="btn btn-danger btn-xl w-100 shadow-none mt-1" id="deleteButton" onclick="swalConfirm('deleteProperties', 'Se ha eliminado la configuración', 'Se eliminará la configuración guardada.')">Borrar</button>-->
-
 </div>
 
-<!--</div>  -->
-
 <script>
 
-var counter = 0;
-//var wsNames = JSON.parse("<?=JSON.stringify(wsNames)?>");
+  var counter = 0;
+  //var wsNames = JSON.parse("<?=JSON.stringify(wsNames)?>");
 
-var csvURL; var csvCELL;
-var rowData = {};
-var newRowAdd;
+  var csvURL; var csvCELL;
+  var rowData = {};
+  var newRowAdd;
 
-$("#moreFields").click(function () {
-  ++counter;
-  newRowAdd =
-  `<div id="row${counter}">` +
-  `<select id="selSht${counter}" class="form-select shadow-none mb-1" aria-describedby="email-field-help"></select>` +
-  '<div class="input-group flex-nowrap update mb-3">' +
-  '<span class="input-group-text"><i class="fa-solid fa-link"></i></span>' +
-  `<input type="text" class="form-control shadow-none" id="csvURL${counter}" placeholder="https://drive.google.com/file/">` +
-  '<span class="input-group-text"><i class="fa-solid fa-table-cells-large"></i></span>' +
-  `<input type="text" class="form-control shadow-none" id="csvCELL${counter}" placeholder="A1">` +
-  `<button class="btn btn-danger" id="deleteRow${counter}" type="button" onClick="reply_click(this.id)">` +
-  '<i class="fa-solid fa-trash fa-fw"></i></button> </div>';
+  $("#moreFields").click(function () {
+    ++counter;
+    newRowAdd =
+    `<div id="row${counter}">` +
+    `<select id="selSht${counter}" class="form-select shadow-none mb-1" aria-describedby="email-field-help"></select>` +
+    '<div class="input-group flex-nowrap update mb-3">' +
+    '<span class="input-group-text"><i class="fa-solid fa-link"></i></span>' +
+    `<input type="text" class="form-control shadow-none" id="csvURL${counter}" placeholder="https://drive.google.com/file/">` +
+    '<span class="input-group-text"><i class="fa-solid fa-table-cells-large"></i></span>' +
+    `<input type="text" class="form-control shadow-none" id="csvCELL${counter}" placeholder="A1">` +
+    `<button class="btn btn-danger" id="deleteRow${counter}" type="button" onClick="reply_click(this.id)">` +
+    '<i class="fa-solid fa-trash fa-fw"></i></button> </div>';
 
-  $('#newinput').append(newRowAdd);
-  afterDropDrownArrayReturneds2(wsNames, counter);
-});
-
-function reply_click(clicked_id) {
-  $("body").on("click", `#deleteRow${clicked_id.slice(9)}`, function () {
-      $(this).parents(`#row${clicked_id.slice(9)}`).remove();
-  })
-  --counter;
-}
-
-function afterDropDrownArrayReturneds(wsNames){
-  let emailField = document.getElementById("selSht0");
-  addDropdownElementss(wsNames, emailField)
-}
-
-function addDropdownElementss(wsNames, field) {
-  wsNames.forEach(function(r){
-    let option = document.createElement("option");
-    option.textContent = r;
-    field.appendChild(option);
+    $('#newinput').append(newRowAdd);
+    afterDropDrownArrayReturneds2(wsNames, counter);
   });
-}
 
-function afterDropDrownArrayReturneds2(wsNames, i){
-  let emailField = document.getElementById(`selSht${i}`);
-  addDropdownElementss(wsNames, emailField)
-}
+  function reply_click(clicked_id) {
+    $("body").on("click", `#deleteRow${clicked_id.slice(9)}`, function () {
+        $(this).parents(`#row${clicked_id.slice(9)}`).remove();
+    })
+    --counter;
+  }
 
+  function afterDropDrownArrayReturneds(wsNames){
+    let emailField = document.getElementById("selSht0");
+    addDropdownElementss(wsNames, emailField)
+  }
 
-</script>
+  function addDropdownElementss(wsNames, field) {
+    wsNames.forEach(function(r){
+      let option = document.createElement("option");
+      option.textContent = r;
+      field.appendChild(option);
+    });
+  }
 
-
-<script>
+  function afterDropDrownArrayReturneds2(wsNames, i){
+    let emailField = document.getElementById(`selSht${i}`);
+    addDropdownElementss(wsNames, emailField)
+  }
 
   function csvImportForm() {
 
@@ -156,120 +141,13 @@ function afterDropDrownArrayReturneds2(wsNames, i){
   document.getElementById("csvMainButton").addEventListener("click", afterButtonCSVimport);
   document.getElementById("saveCSVOptions").addEventListener("click", afterButtonCSVoptions);
 
-function cas() {
-  afterDropDrownArrayReturneds(wsNames)
-}
-</script>
-
-<script>
+  function cas() {
+    afterDropDrownArrayReturneds(wsNames)
+  }
 
   $(document).ready(function() {
    // var emailDropdowns = JSON.parse("<?=JSON.stringify(emailDropdowns)?>");
     cas();
   });
-</script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- <div id="icsv" style="display: none;" class="mt-3 mb-2">  -->
-
-  <h3 class="menu-h3 mb-3"><i class="fa-solid fa-network-wired fa-margin fa-fw fa-sizing"></i>Conectar G-Sheets</h3>
-
-  <div class="rounded">
-    <select id="selSheet" class="form-select shadow-none mb-1"></select>
-    <div class="input-group flex-nowrap update mb-3">
-      <span class="input-group-text"><i class="fa-solid fa-link"></i></span>
-      <input type="text" class="form-control shadow-none" id="connectSheetURL" placeholder="https://drive.google.com/file/">
-    </div>
-
-    <div class="form-check form-switch mt-2 mb-2">
-      <input class="form-check-input shadow-none" type="checkbox" role="switch" id="connectSheetLinkList">
-      <label class="form-check-label" style="position:relative;top:2px" for="connectSheetLinkList">Listar en la hoja LINK </label> <span data-bs-toggle="tooltip" data-bs-placement="right" title="Si estás en un cuadro con hoja LINK, marca esta casilla para añadir la hoja conectada.">
-  <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:1px"></i>
-  </span>
-    </div>
-  </div>
-
-  <button class="btn btn-primary gmt w-100 shadow-none" id="connectSheetButton">Conectar hojas</button>
-
-  <!-- <button class="btn btn-danger btn-xl w-100 shadow-none mt-1" id="csvMainButton" onClick="alert(counter)">Counter</button>
-  <button class="btn btn-danger btn-xl w-100 shadow-none mt-1" id="csvMainButton" onClick="alert(dat)">Object</button>
-
-  <button class="btn btn-danger btn-xl w-100 shadow-none mt-1" id="deleteButton" onclick="swalConfirm('deleteProperties', 'Se ha eliminado la configuración', 'Se eliminará la configuración guardada.')">Borrar</button>-->
-
-
-
-<!--</div>  -->
-
-<script>
-
-const SheetConnect = {};
-
-SheetConnect.loadWorksheetNames = function(wsNames) {
-
-  let selectField = document.getElementById("selSheet");
-  SheetConnect.addSelectElements(wsNames, selectField)
-  
-}
-
-SheetConnect.addSelectElements = function(wsNames, field) {
-
-  wsNames.forEach(function(r){
-    let option = document.createElement("option");
-    option.textContent = r;
-    field.appendChild(option);
-  });
-  
-}
-
-SheetConnect.sheetConnectForm = function() {
-
-    sheetConnectSheetname = document.getElementById(`selSheet`).value;
-    sheetConnectTargetURL = document.getElementById(`connectSheetURL`).value;
-    sheetConnectLinkList = document.getElementById(`connectSheetLinkList`).checked;
-    rowData[`sheetConnectSheetname`] = sheetConnectSheetname;
-    rowData[`sheetConnectTargetURL`] = sheetConnectTargetURL;
-    rowData[`sheetConnectLinkList`] = sheetConnectLinkList;
-
-  return rowData;
-}
-
-SheetConnect.sheetConnectButton = function() {
-  //execNoSuccess('sheetConnect', SheetConnect.sheetConnectForm());
-  swalConfirm('sheetConnect', 'Las hojas se han conectado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', SheetConnect.sheetConnectForm())
-}
-
-</script>
-
-<script>
-
-  $(document).ready(function() {
-    SheetConnect.loadWorksheetNames(wsNames);
-  });
-
-  document.getElementById(`connectSheetButton`).addEventListener("click", SheetConnect.sheetConnectButton);
 
 </script>

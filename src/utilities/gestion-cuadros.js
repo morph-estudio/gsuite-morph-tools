@@ -16,7 +16,7 @@ function mscPruebas() {
  */
 function crearCuadroSuperficies(rowData) {
   
-  var [projectCategory, folderURL, folderURLCS, folderURLPC, cuadroType, projectShortname, projectCode, projectLocalidad] = [rowData.projectCategory, rowData.cuadroFolder, rowData.cuadroFolderSup, rowData.cuadroFolderPanel, rowData.cuadroType, rowData.projectShortname, rowData.projectCode, rowData.projectLocalidad];
+  var [projectCategory, folderURL, folderURLCS, folderURLPC, cuadroType, projectShortname, projectCode, projectLocalidad, cuadroMinimum] = [rowData.projectCategory, rowData.cuadroFolder, rowData.cuadroFolderSup, rowData.cuadroFolderPanel, rowData.cuadroType, rowData.projectShortname, rowData.projectCode, rowData.projectLocalidad, rowData.cuadroMinimum];
 
   var cuadroTypeName; var cuadroTypeID; var excludedSheetNames; var destinationFolder;
 
@@ -105,51 +105,91 @@ function crearCuadroSuperficies(rowData) {
         break;
     }
 
-    var cuadroFileID = idArray[cuadroTypeName]; Logger.log(`cuadroTypeName:${cuadroTypeName}, cuadroFileID: ${cuadroFileID}, cuadroFileID: ${urlArray[cuadroTypeName]}`);
+    SpreadsheetApp.flush();
+
+    var cuadroFileID = idArray[cuadroTypeName]; Logger.log(`cuadroTypeName:${cuadroTypeName}, cuadroFileID: ${cuadroFileID}, cuadroFileID: ${urlArray[cuadroTypeName]}, cuadroMinimum: ${cuadroMinimum}`);
     var copiedFile = SpreadsheetApp.openById(cuadroFileID);
-
-    // Eliminar hojas cuyos nombres comienzan por "WIP"
-    var sheetsToDelete = copiedFile.getSheets().filter(function(sheet) {
-      return sheet.getName().startsWith("WIP");
-    });
-
-    sheetsToDelete.forEach(function(sheet) {
-      copiedFile.deleteSheet(sheet);
-    });
 
     var configJSONData = templateSheetConfigObject(false, cuadroTypeName);
     var projectTypeConfig = configJSONData.projectTypes.find(
       (type) => type.code === projectCategory
     );
 
-    // Hojas excluidas
+    if(cuadroMinimum === true) {
 
-    var excludedMasterSheetsCodes = projectTypeConfig.settings.excludedMasterSheets || {};
-    var excludedOtherSheets = projectTypeConfig.settings.excludedOtherSheets || {};
-    excludedSheetNames = new Set([
-      ...excludedMasterSheetsCodes.map((code) => {
-        var masterSheet = configJSONData.masterSheets.find((sheet) => sheet.code === code);
-        return masterSheet ? masterSheet.name : '';
-      }),
-      ...excludedOtherSheets,
-    ]);
-
-    if (excludedSheetNames != undefined && excludedSheetNames.size > 0) {
-      var copiedSheets = copiedFile.getSheets();
-      var sheetsToDelete = copiedSheets.filter((sheet) => excludedSheetNames.has(sheet.getName()));
-
-      var requests = sheetsToDelete.map((sheet) => {
-        return {
-          deleteSheet: {
-            sheetId: sheet.getSheetId(),
-          },
-        };
+      var minimumSheetsCodes = projectTypeConfig.settings.minimumCuadro || {};
+      
+      var minimumSheetsNames = minimumSheetsCodes.map((code) => {
+        var sheet = configJSONData.masterSheets.find((masterSheet) => masterSheet.code === code);
+        return sheet ? sheet.name : null;
       });
 
-      if (requests.length > 0) {
-        Sheets.Spreadsheets.batchUpdate({ requests }, copiedFile.getId());
+      Logger.log(`Estamos dentro de la configuración de cuadro mínimo. minimumSheetsNames: ${JSON.stringify(minimumSheetsNames)}`)
+
+      if (minimumSheetsNames instanceof Array && minimumSheetsNames.length > 0) {
+
+        minimumSheetsNames = new Set(minimumSheetsNames);
+
+        var copiedSheets = copiedFile.getSheets();
+        var sheetsToDelete = copiedSheets.filter((sheet) => !minimumSheetsNames.has(sheet.getName()));
+
+        Logger.log(`Se van a borrar las hojas. minimumSheetsNames: ${JSON.stringify(minimumSheetsNames)}, sheetsToDelete: ${JSON.stringify(sheetsToDelete)}`)
+
+        var requests = sheetsToDelete.map((sheet) => {
+          return {
+            deleteSheet: {
+              sheetId: sheet.getSheetId(),
+            },
+          };
+        });
+
+        if (requests.length > 0) {
+          Sheets.Spreadsheets.batchUpdate({ requests }, copiedFile.getId());
+        }
+      }
+
+    } else {
+
+      // Eliminar hojas cuyos nombres comienzan por "WIP"
+      var sheetsToDelete = copiedFile.getSheets().filter(function(sheet) {
+        return sheet.getName().startsWith("WIP");
+      });
+
+      sheetsToDelete.forEach(function(sheet) {
+        copiedFile.deleteSheet(sheet);
+      });
+
+      // Hojas excluidas
+
+      var excludedMasterSheetsCodes = projectTypeConfig.settings.excludedMasterSheets || {};
+      var excludedOtherSheets = projectTypeConfig.settings.excludedOtherSheets || {};
+      excludedSheetNames = new Set([
+        ...excludedMasterSheetsCodes.map((code) => {
+          var masterSheet = configJSONData.masterSheets.find((sheet) => sheet.code === code);
+          return masterSheet ? masterSheet.name : '';
+        }),
+        ...excludedOtherSheets,
+      ]);
+
+      if (excludedSheetNames != undefined && excludedSheetNames.size > 0) {
+        var copiedSheets = copiedFile.getSheets();
+        var sheetsToDelete = copiedSheets.filter((sheet) => excludedSheetNames.has(sheet.getName()));
+
+        var requests = sheetsToDelete.map((sheet) => {
+          return {
+            deleteSheet: {
+              sheetId: sheet.getSheetId(),
+            },
+          };
+        });
+
+        if (requests.length > 0) {
+          Sheets.Spreadsheets.batchUpdate({ requests }, copiedFile.getId());
+        }
       }
     }
+
+    SpreadsheetApp.flush();
 
     // Ocultar las hojas definidas en "hiddenSheets"
     var hiddenSheetCodes = projectTypeConfig.settings.hiddenSheets || [];
@@ -171,15 +211,16 @@ function crearCuadroSuperficies(rowData) {
 
     var instruccionesSheet; var linkRange;
 
+    SpreadsheetApp.flush();
+
     switch (cuadro) {
       case 'selectPanelControl':
 
         instruccionesSheet = copiedFile.getSheetByName('Instrucciones');
+
         var linkRange = 'B3';
         if (isExpediente) {
           instruccionesSheet.getRange(linkRange).setValue(urlArray['Cuadro Superficies']);
-        } else {
-          instruccionesSheet.getRange(linkRange).clearContent();
         }
         
         var values = instruccionesSheet.getRange("A1:B" + instruccionesSheet.getLastRow()).getValues();
@@ -197,8 +238,6 @@ function crearCuadroSuperficies(rowData) {
             cellB = projectShortname; found = true;
           } else if (cellA === 'Localidad') {
             cellB = projectLocalidad; found = true;
-          } else if (cellA.includes('Parcela')) {
-            cellB = 0; found = true;
           } else { cellB = null; }
           
           if (found) { instruccionesSheet.getRange(i + 1, 2, 1, 1).setValue(cellB); }
@@ -518,30 +557,32 @@ function mainGenerateTemplateSheets(rowData, overwriteSwitch, templateType) {
       copiedSheet.setTabColor(tabColor);
     }
 
-    var relativePosition = secondarySheet.relativePosition;
-    var masterSheetIndex = ss.getSheetByName(masterSheetName).getIndex();
-    var candidateSheetIndex = masterSheetIndex;
+    if (templateType != "Exportación Superficies") {
+      var relativePosition = secondarySheet.relativePosition;
+      var masterSheetIndex = ss.getSheetByName(masterSheetName).getIndex();
+      var candidateSheetIndex = masterSheetIndex;
 
-    var sheetsToCheck = configJSONData.secondarySheets.filter(function (sheet) {
-      return sheet.masterSheet === masterSheetName && sheet.relativePosition < relativePosition;
-    });
-
-    if (sheetsToCheck.length > 0) {
-      var closestSheet = sheetsToCheck.reduce(function (prev, current) {
-        return Math.abs(current.relativePosition - relativePosition) < Math.abs(prev.relativePosition - relativePosition) ? current : prev;
+      var sheetsToCheck = configJSONData.secondarySheets.filter(function (sheet) {
+        return sheet.masterSheet === masterSheetName && sheet.relativePosition < relativePosition;
       });
 
-      var sheetToMove = ss.getSheetByName(closestSheet.name);
-      if (sheetToMove) {
-        candidateSheetIndex = sheetToMove.getIndex();
-        Logger.log('closestSheet.name: ' + closestSheet.name);
-      } else {
-        Logger.log('Sheet ' + closestSheet.name + ' does not exist.');
-      }
-    }
+      if (sheetsToCheck.length > 0) {
+        var closestSheet = sheetsToCheck.reduce(function (prev, current) {
+          return Math.abs(current.relativePosition - relativePosition) < Math.abs(prev.relativePosition - relativePosition) ? current : prev;
+        });
 
-    ss.setActiveSheet(copiedSheet);
-    ss.moveActiveSheet(candidateSheetIndex + 1);
+        var sheetToMove = ss.getSheetByName(closestSheet.name);
+        if (sheetToMove) {
+          candidateSheetIndex = sheetToMove.getIndex();
+          Logger.log('closestSheet.name: ' + closestSheet.name);
+        } else {
+          Logger.log('Sheet ' + closestSheet.name + ' does not exist.');
+        }
+      }
+
+      ss.setActiveSheet(copiedSheet);
+      ss.moveActiveSheet(candidateSheetIndex + 1);
+    }
   });
 }
 
@@ -742,7 +783,8 @@ function addColumnGroup(sheet, columnIndexArray) {
     sheet.getRange(item).shiftRowGroupDepth(1);
     if (item.includes(":")) {
       var [startColumn, columnGroupShift] = item.split(":").map(value => getColumnIndexFromLetter(value));
-      sheet.getColumnGroup(startColumn, 1).collapse();
+      sheet.getColumnGroup(startColumn, 1);
+      // sheet.getColumnGroup(startColumn, 1).collapse();
     }
   });
 }

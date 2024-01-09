@@ -58,28 +58,6 @@
   </div>
 </form>
 
-<!--
-<div class="mt-2 mb-2">
-  <label for="heightNumber" class="form-label mt-3">Altura de filas</label>
-  <div class="input-group flex-nowrap update ">
-    <span class="input-group-text"><i class="fa-solid fa-arrow-up-1-9"></i></span>
-    <input type="text" class="form-control shadow-none" id="heightNumber" placeholder="ej: 100">
-    <button class="btn btn-primary shadow-none" type="button" id="increase-rows-height">Go!</button>
-  </div>
-  <div class="form-text">Introduce la altura <b>en píxeles</b> mientras tienes seleccionado el rango de filas.</div>
-</div>
--->
-
-<!--
-<div class="mb-4">
-  <h3>Estructura de carpetas</h3>
-  <p>Hay que seguir la estructura de niveles de la <b>plantilla</b>.</p>
-
-  <button class="btn btn-primary gmt sup grey w-100 shadow-none mb-1" onclick="execFunction('autoFolderTreeTpl', 'Se ha generado una plantilla para la estructura de carpetas.')">Crear plantilla</button>
-  <button class="btn btn-primary gmt inf pink w-100 shadow-none" onclick="swalConfirm('autoFolderTree', 'Se ha generado la estructura de carpetas.', 'Una vez ejecutado no se puede detener. Confirma para continuar.')">Generar estructura de carpetas</button>
-</div>
--->
-
 <script>
 
 var checkSelector = $('#imagefolder-image, #imagefolder-public-url, #imagefolder-fileid, #imagefolder-arrayformula, #imagefolder-filename');
@@ -137,14 +115,15 @@ function afterButtonClicked(){
       imageFolderImage,
       imageFolderArrayFormula
     };
-      swaload();
-      if (listImageFolder) {
-        execNoSuccess('insertImagesOfFolder', rowData);
-        // google.script.run.withSuccessHandler(e => {swalsuccess('Las imágenes se han listado correctamente.'), afterSubmit(e)}).withFailureHandler(swalerror).insertImagesOfFolder(rowData);
-      } else {
-        execNoSuccess('listFilesInFolder', rowData);
-        // google.script.run.withSuccessHandler(e => {swalsuccess('Los archivos se han listado correctamente.'), afterSubmit(e)}).withFailureHandler(swalerror).listFilesInFolder(rowData);
-      }
+
+    swaload();
+    if (listImageFolder) {
+      execNoSuccess('insertImagesOfFolder', rowData);
+      // google.script.run.withSuccessHandler(e => {swalsuccess('Las imágenes se han listado correctamente.'), afterSubmit(e)}).withFailureHandler(swalerror).insertImagesOfFolder(rowData);
+    } else {
+      execNoSuccess('listFilesInFolder', rowData);
+      // google.script.run.withSuccessHandler(e => {swalsuccess('Los archivos se han listado correctamente.'), afterSubmit(e)}).withFailureHandler(swalerror).listFilesInFolder(rowData);
+    }
   }
 }
 
@@ -170,20 +149,6 @@ function validate(){
   return el.checkValidity();
   });
 }
-
-/*
-function increaseRowsHeight(){
-  var heightSelectedNumber = document.getElementById("heightNumber").value;
-  var rowData = {
-    heightSelectedNumber
-  }
-  execNoSuccess('adjustRowsHeight', rowData);
-}
-
-function afterSubmit(e){
-  clearFields(["list-files"]);
-}
-*/
 
 document.getElementById("listButton").addEventListener("click",afterButtonClicked);
 document.getElementById("increase-rows-height").addEventListener("click",increaseRowsHeight);

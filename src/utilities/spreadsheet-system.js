@@ -3,6 +3,8 @@
  * Developed by alsanchezromero
  *
  * Copyright (c) 2023 Morph Estudio
+ * 
+ * Morph Spreadsheet System es un sistema de emulación de fórmulas offline para Google Sheets que evita la recalculación automática.
  */
 function bddcompuestos(mssUpdateColumnReferenceText, mssUpdateAllCheck) {
 

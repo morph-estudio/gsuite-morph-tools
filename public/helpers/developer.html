@@ -1,71 +1,71 @@
-<div id="" style="display: none" class="formulaModPermission devAreaPermission mt-4">
+<div id="" style="display: none" class="formulaModPermission devAreaPermission mt-4 mb-2">
 
-  <div class="accordion-body pb-0">
-    <h3 class="menu-h3 mb-3"><i class="fa-solid fa-laptop-code fa-margin fa-fw fa-sizing"></i>Funciones en desarrollo</h3>
-  </div>
+  <div style="display: none" class="accordion-body devAreaPermission formulaModPermission mt-4 ">
+    <h3 class="menu-h3 mb-3"><i class="fa-solid fa-network-wired fa-margin fa-fw fa-sizing"></i>Table Debugging</h3>
 
-    <button class="btn btn-primary index shadow-none w-100 centerScroll" title="Elimina las propiedades guardadas en el documento. Usar con precaución." onclick="swalConfirm('deleteProperties', 'Se han borrado los Document Properties.', 'Este proceso puede eliminar información sensible del documento. Cancela si no sabes lo que estás haciendo.')"><i class="fa-solid fa-trash-can fa-margin fa-fw"></i>Delete Document Properties</button>
-    <button class="btn btn-primary index shadow-none w-100 centerScroll" title="Adaptar la hoja variables para el nuevo sistema de rangos nombrados" onclick="execNoSuccess('macroModificarCuadros')"><i class="fa-solid fa-microchip fa-margin fa-fw"></i>Adaptar cuadro al sistema actualización de rangos nombrados</button>
-    <button class="btn btn-primary index shadow-none w-100 centerScroll" title="Formatea la hoja LINK a la última versión, borrando todo su contenido" onclick="swalConfirm('formatLinkSheet', 'La hoja LINK se ha actualizado.', 'Este proceso borrará todos los datos de la hoja LINK y la actualizará a la última versión. Confirma para continuar.', 'general')"><i class="fa-solid fa-border-none fa-margin fa-fw"></i>Reformatear hoja LINK</button>
-    <button class="btn btn-primary index shadow-none w-100 centerScroll" title="Script de transición al nuevo sistema de fórmulas en fila 3" onclick="execNoSuccess('helperToMoveFormulas')"><i class="fa-solid fa-margin fa-table-list fa-fw"></i>Llevar fórmulas a fila tres</button>
-    <button class="btn btn-primary index shadow-none w-100 centerScroll" onclick="swalConfirm('deleteNamedRanges', 'Se han borrado todos los rangos nombrados.', 'Cuidado, podrían perderse referencias de celda. Por favor, no continúes si no sabes lo que estás haciendo...')"><i class="fa-solid fa-eraser fa-margin fa-fw"></i>Eliminar rangos nombrados</button>
-    <button class="btn btn-primary index separator shadow-none w-100 centerScroll" title="Exporta un archivo TSV de la hoja actual con fórmulas en lugar de valores" onclick="execFunction('saveSheetAsTSV')"><i class="fa-solid fa-margin fa-file-excel fa-fw"></i>Exportar TSV con fórmulas</button>
-
-    <button class="btn btn-primary index shadow-none w-100 centerScroll" title="Actualizar lista de URLS a cuadros por cada proyecto" onclick="execNoSuccess('updateCSDB')"><i class="fa-solid fa-margin fa-table-list fa-fw"></i>Actualizar URLS CS-PC</button>
-    <button class="btn btn-primary index shadow-none w-100 centerScroll" title="Actualizar lista de comentarios del Panel de Control I+D-CS de forma manual" onclick="execNoSuccess('contarComentarios')"><i class="fa-solid fa-margin fa-table-list fa-fw"></i>Actualizar comentarios CS-PC</button>
-    <button class="btn btn-primary index separator shadow-none w-100 centerScroll" title="Formatea las hojas QUERY del I+D-CS-Panel de Control para adaptar los colores y ancho de columna tras añadir o quitar columnas al query" onclick="execFunction('formatearIDCS')"><i class="fa-solid fa-margin fa-file-excel fa-fw"></i>Formatear Querys CS-PC</button>
-
-  <div id="" style="display: none; margin-top:40px" class="devAreaPermission">
-
-    <button class="btn btn-primary index shadow-none w-100 centerScroll" onclick="execNoSuccess('postLessons')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Enviar mensajes de Chat</button>
-    <button class="btn btn-primary index shadow-none w-100 centerScroll" onclick="execNoSuccess('createTimeTriggerSpecifcDate')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Programar base de mensajes</button>
-    <button class="btn btn-primary index separator shadow-none w-100 centerScroll" onclick="swalConfirm('botBrainSave', 'Se ha acualizado la IA de Morph Robot', 'Por favor, no utilices esta función avanzada si no sabes lo que estás haciendo. Confirma para continuar.')"><i class="fa-solid fa-brain fa-margin fa-fw"></i>Actualizar cerebro de robot</button>
-
-    <button class="btn btn-primary index shadow-none w-100 centerScroll" id="adaptButton" onclick="execFunction('adaptarCuadroAntiguo', 'El cuadro se ha adaptado correctamente.')"><i class="fa-solid fa-margin fa-fw fa-triangle-exclamation"></i>Adaptar cuadro antiguo<span data-bs-toggle="tooltip" data-bs-placement="right" title="Adapta la hoja LINK de los cuadros anteriores a Gsuite Morph Tools">
-    <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:1px"></i>
-  </span></button>
-    <button class="btn btn-primary index shadow-none w-100 centerScroll" id="adaptDeleteButton" onclick="execNoSuccess('setCuadroAdaptado')"><i class="fa-solid fa-lock fa-margin fa-fw"></i>Bloquear botón adaptar</button>
-    <button class="btn btn-primary index separator shadow-none w-100 centerScroll" id="adaptDeleteButton" onclick="execNoSuccess('deleteProperty', 'adaptedSpreadsheet'), execDirect('sidebarIndex')"><i class="fa-solid fa-unlock fa-margin fa-fw"></i>Desbloquear botón adaptar</button>
-
-    <button class="btn btn-primary index shadow-none w-100 centerScroll" id="adaptDeleteButton" onclick="execNoSuccess('listNamedRanges')"><i class="fa-solid fa-list-ol fa-margin fa-fw"></i>Listado de rangos nombrados</button>
-    <button class="btn btn-primary index shadow-none w-100 centerScroll" id="adaptDeleteButton" onclick="execNoSuccess('addComponent')"><i class="fa-solid fa-file-circle-question fa-margin fa-fw"></i>Añadir componente de prueba a la BDD Componentes</button>
-    <button class="btn btn-primary index shadow-none w-100 centerScroll" onclick="swalConfirm('morphFastFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.')"><i class="fa-solid fa-margin fa-snowflake fa-fw"></i>Congelador rápido</button>
-
-    <div class="accordion-body pb-0 mt-4">
-      <h3 class="menu-h3 mb-3"><i class="fa-solid fa-square-caret-down fa-margin fa-fw fa-sizing"></i>Menú para developers</h3>
+    <div class="rounded">
+      <div class="input-group flex-nowrap update mb-1">
+        <span class="input-group-text"><i class="fa-solid fa-link"></i></span>
+        <input type="text" class="form-control shadow-none" id="videoUrl" placeholder="Introduce una URL...">
+      </div>
     </div>
 
-    <button class="btn btn-primary index shadow-none w-100 ult" onclick="execDirect('sidebarCLDevs')"><i class="fa-solid fa-margin fa-fw fa-swatchbook"></i>Guía de estilos WIP</button>
+    <button type="button" class="btn btn-primary gmt w-100 shadow-none" onclick="showVideo()">Mostrar fallos</button>
 
-  </div>
-
-</div>
-
-<!--
-<div id="transicionCuadros" style="display: none" class="accordion-body mt-4 pb-3 devAreaPermission">
-    <h3 class="mb-3"><i class="fa-solid fa-triangle-exclamation fa-margin fa-fw fa-sizing"></i>Transición de cuadros</h3>
-    <p>Si es un cuadro anterior a <u>Octubre 2022</u> debes adaptarlo antes de actualizar.</p>
-    <button class="btn btn-success mainbtn btn-xl w-100" id="adaptButton" onclick="execFunction('adaptarCuadroAntiguo', 'El cuadro se ha adaptado correctamente.')">Adaptar cuadro antiguo</button>
-</div>
--->
-
-<div style="display: none" class="accordion-body devAreaPermission formulaModPermission mt-4 ">
-  <h3 class="menu-h3 mb-3"><i class="fa-solid fa-network-wired fa-margin fa-fw fa-sizing"></i>Table Debugging</h3>
-
-  <div class="rounded">
-    <div class="input-group flex-nowrap update mb-1">
-      <span class="input-group-text"><i class="fa-solid fa-link"></i></span>
-      <input type="text" class="form-control shadow-none" id="videoUrl" placeholder="Introduce una URL...">
+    <div class="row mt-2">
+      <div class="">
+        <div id="videoPlayer"></div>
+      </div>
     </div>
   </div>
 
-  <button type="button" class="btn btn-primary gmt w-100 shadow-none" onclick="showVideo()">Mostrar fallos</button>
-
-  <div class="row mt-2">
-    <div class="">
-      <div id="videoPlayer"></div>
-    </div>
+  <div class="accordion-body mb-0 mt-4">
+    <h3 class="menu-h3"><i class="fa-solid fa-circle-dot fa-margin fa-fw fa-sizing"></i>Google Sheets / Cuadros</h3>
   </div>
+
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" title="Adaptar la hoja variables para el nuevo sistema de rangos nombrados" onclick="execNoSuccess('macroModificarCuadros')"><i class="fa-solid fa-microchip fa-margin fa-fw text-danger"></i>Adaptar cuadro al sistema actualización de rangos nombrados</button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" id="adaptDeleteButton" onclick="execNoSuccess('addComponent')"><i class="fa-solid fa-file-circle-question fa-margin fa-fw"></i>Añadir componente de prueba a la BDD Componentes</button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" onclick="swalConfirm('morphFastFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.')"><i class="fa-solid fa-margin fa-snowflake fa-fw"></i>Congelador rápido</button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" title="Elimina las propiedades guardadas en el documento. Usar con precaución." onclick="swalConfirm('deleteProperties', 'Se han borrado los Document Properties.', 'Este proceso puede eliminar información sensible del documento. Cancela si no sabes lo que estás haciendo.')"><i class="fa-solid fa-trash-can fa-margin fa-fw"></i>Delete Document Properties</button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" title="Exporta un archivo TSV de la hoja actual con fórmulas en lugar de valores" onclick="execFunction('saveSheetAsTSV')"><i class="fa-solid fa-margin fa-file-excel fa-fw"></i>Exportar TSV con fórmulas</button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" title="Script de transición al nuevo sistema de fórmulas en fila 3" onclick="execNoSuccess('helperToMoveFormulas')"><i class="fa-solid fa-margin fa-table-list fa-fw text-danger"></i>Llevar fórmulas a fila tres</button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" id="adaptDeleteButton" onclick="execNoSuccess('listNamedRanges')"><i class="fa-solid fa-list-ol fa-margin fa-fw"></i>Rangos nombrados: crear listado</button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" onclick="swalConfirm('deleteNamedRanges', 'Se han borrado todos los rangos nombrados.', 'Cuidado, podrían perderse referencias de celda. Por favor, no continúes si no sabes lo que estás haciendo...')"><i class="fa-solid fa-eraser fa-margin fa-fw"></i>Rangos nombrados: eliminar</button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" onclick="swalConfirm('deleteInvalidNamedRanges', 'Se han borrado todos los rangos nombrados.', 'Cuidado, podrían perderse referencias de celda. Por favor, no continúes si no sabes lo que estás haciendo...')"><i class="fa-solid fa-eraser fa-margin fa-fw"></i>Rangos nombrados: eliminar #REF</button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" title="Formatea la hoja LINK a la última versión, borrando todo su contenido" onclick="swalConfirm('formatLinkSheet', 'La hoja LINK se ha actualizado.', 'Este proceso borrará todos los datos de la hoja LINK y la actualizará a la última versión. Confirma para continuar.', 'general')"><i class="fa-solid fa-border-none fa-margin fa-fw text-danger"></i>Reformatear hoja LINK</button>
+
+  <div class="accordion-body mb-0 mt-4">
+    <h3 class="menu-h3"><i class="fa-solid fa-circle-dot fa-margin fa-fw fa-sizing"></i>Panel de control de cuadros</h3>
+  </div>
+
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" title="Actualizar lista de URLS a cuadros por cada proyecto" onclick="execNoSuccess('updateCSDB')"><i class="fa-solid fa-margin fa-table-list fa-fw"></i>Actualizar URLS CS-PC</button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" title="Actualizar lista de comentarios del Panel de Control I+D-CS de forma manual" onclick="execNoSuccess('contarComentarios')"><i class="fa-solid fa-margin fa-table-list fa-fw"></i>Actualizar comentarios CS-PC</button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" title="Formatea las hojas QUERY del I+D-CS-Panel de Control para adaptar los colores y ancho de columna tras añadir o quitar columnas al query" onclick="execFunction('formatearIDCS')"><i class="fa-solid fa-margin fa-file-excel fa-fw"></i>Formatear Querys CS-PC</button>
+
+  <div class="accordion-body mb-0 mt-4">
+    <h3 class="menu-h3"><i class="fa-solid fa-circle-dot fa-margin fa-fw fa-sizing"></i>Chatbot Brain</h3>
+  </div>
+
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" onclick="execNoSuccess('postLessons')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Enviar mensajes de Chat</button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" onclick="execNoSuccess('createTimeTriggerSpecifcDate')"><i class="fa-solid fa-comments fa-margin fa-fw"></i>Programar base de mensajes</button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" onclick="swalConfirm('botBrainSave', 'Se ha acualizado la IA de Morph Robot', 'Por favor, no utilices esta función avanzada si no sabes lo que estás haciendo. Confirma para continuar.')"><i class="fa-solid fa-brain fa-margin fa-fw"></i>Actualizar cerebro de robot</button>
+
+  <div class="accordion-body mb-0 mt-4">
+    <h3 class="menu-h3"><i class="fa-solid fa-circle-dot fa-margin fa-fw fa-sizing"></i>Desclasificados</h3>
+  </div>
+
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" id="adaptButton" onclick="execFunction('adaptarCuadroAntiguo', 'El cuadro se ha adaptado correctamente.')"><i class="fa-solid fa-margin fa-fw fa-triangle-exclamation"></i>Adaptar cuadro antiguo<span data-bs-toggle="tooltip" data-bs-placement="right" title="Adapta la hoja LINK de los cuadros anteriores a Gsuite Morph Tools">
+  <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:1px"></i>
+</span></button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" id="adaptDeleteButton" onclick="execNoSuccess('setCuadroAdaptado')"><i class="fa-solid fa-lock fa-margin fa-fw"></i>Bloquear botón adaptar</button>
+  <button class="btn btn-primary index shadow-none w-100 centerScroll" id="adaptDeleteButton" onclick="execNoSuccess('deleteProperty', 'adaptedSpreadsheet'), execDirect('sidebarIndex')"><i class="fa-solid fa-unlock fa-margin fa-fw"></i>Desbloquear botón adaptar</button>
+
+  <div class="accordion-body mb-0 mt-4">
+    <h3 class="menu-h3"><i class="fa-solid fa-circle-dot fa-margin fa-fw fa-sizing"></i>Menú para developers</h3>
+  </div>
+
+  <button class="btn btn-primary index shadow-none w-100 ult" onclick="execDirect('sidebarCLDevs')"><i class="fa-solid fa-margin fa-fw fa-swatchbook"></i>Guía de estilos WIP</button>
+
 </div>
 
 <script>
@@ -85,99 +85,4 @@
   }
 </script>
 
-<div id="pdfsechidden" style="display: none" class="accordion-body mt-4 pb-3 devAreaPermission">
 
-  <h3 class="menu-h3 mb-3"><i class="fa-regular fa-file-pdf fa-margin fa-fw fa-sizing"></i>Crear PDF Secuencial</h3>
-  <p>Selecciona la <u>celda desplegable</u> antes de darle al botón.</p>
-
-  <label for="pdfsecFilename" class="form-label"></i>Nombre del archivo</label>
-  <div class="input-group flex-nowrap update">
-    <span class="input-group-text"><i class="fa-solid fa-file-signature"></i></span>
-    <input type="text" class="form-control shadow-none" id="pdfsecFilename" placeholder="Ficha de {{cell}}">
-  </div>
-  <div id="template-id-help" class="form-text mt-2">Puedes usar el código {{cell}} para incluir el valor de la celda desplegable.</div>
-
-  <label for="pdfsecFolder" class="form-label mt-3"></i>URL Carpeta de destino</label>
-  <div class="input-group flex-nowrap update">
-    <span class="input-group-text"><i class="fa-regular fa-folder"></i></span>
-    <input type="text" class="form-control shadow-none" id="pdfsecFolder">
-  </div>
-  <div id="template-id-help" class="form-text mt-2">Deja vacío el campo para usar la misma carpeta que este documento.</div>
-
-  <div class="mt-3">
-    <label for="pdfsecSize" class="form-label">Tamaño</label>
-    <select class="form-select shadow-none" id="pdfsecSize" >
-      <option value="a3">A3</option>
-      <option value="a4" selected>A4</option>
-      <option value="a5">A5</option>
-      <option value="letter">Letter</option>
-      <option value="tabloid">Tabloid</option>
-      <option value="legal">Legal</option>
-      <option value="statement">Statement</option>
-      <option value="executive">Executive</option>
-    </select>
-  </div>
-
-  <div class="mt-3">
-    <label for="pdfsecOrientation" class="form-label">Orientación</label>
-    <select class="form-select shadow-none" id="pdfsecOrientation" >
-      <option value="True" selected>Vertical</option>
-      <option value="False">Horizontal</option>
-    </select>
-  </div>
-
-  <label for="pdfsecMargins" class="form-label mt-3"></i>Márgenes</label>
-  <div class="input-group flex-nowrap update" id="pdfsecMargins">
-    <span class="input-group-text"><i class="fa-solid fa-arrows-up-down"></i></span>
-    <input type="text" class="form-control shadow-none" id="pdfsecMarginTopBottom" placeholder="0.75" value="0.75">
-    <span class="input-group-text"><i class="fa-solid fa-arrows-left-right"></i></span>
-    <input type="text" class="form-control shadow-none" id="pdfsecMarginLeftRight" placeholder="0.7" value="0.7">
-  </div>
-
-  <div class="form-check form-switch mt-3">
-    <input class="form-check-input" type="checkbox" role="switch" id="pdfsecFitw" checked>
-    <label class="form-check-label" for="pdfsecFitw">Ajustar al ancho del documento</label>
-  </div>
-  
-  <div class="form-check form-switch mt-2">
-    <input class="form-check-input" type="checkbox" role="switch" id="pdfsecGridlines">
-    <label class="form-check-label" for="pdfsecGridlines">Mostrar rejilla Sheets</label>
-  </div>
-
-  <div class="form-check form-switch mt-2">
-    <input class="form-check-input" type="checkbox" role="switch" id="pdfsecFzr">
-    <label class="form-check-label" for="pdfsecFzr">Repetir encabezados en cada hoja</label>
-  </div>
-
-    <button class="btn btn-primary mainbtn btn-xl w-100 mt-3" id="adaptButton" onclick="secuencialFileClicked()">Crear PDFs</button>
-</div>
-
-<script>
-
-  function secuencialFileClicked() {
-    let secuencialFilename = document.getElementById('pdfsecFilename').value;
-    let secuencialDestFolder = document.getElementById('pdfsecFolder').value;
-    let secuencialSize = document.getElementById('pdfsecSize').value;
-    let secuencialOrientation = document.getElementById('pdfsecOrientation').value;
-    let secuencialMarTopBottom = document.getElementById('pdfsecMarginTopBottom').value;
-    let secuencialMarLeftRight = document.getElementById('pdfsecMarginLeftRight').value;
-    let secuencialFitw = document.getElementById('pdfsecFitw').checked;
-    let secuencialGridlines = document.getElementById('pdfsecGridlines').checked;
-    let secuencialFzr = document.getElementById('pdfsecFzr').checked;
-
-    let rowData = {
-          secuencialFilename,
-          secuencialDestFolder,
-          secuencialSize,
-          secuencialOrientation,
-          secuencialMarTopBottom,
-          secuencialMarLeftRight,
-          secuencialFitw,
-          secuencialGridlines,
-          secuencialFzr
-        };
-
-    swalConfirm('printValidation', 'Se han generado todos los archivos PDF.', 'Asegúrate de tener seleccionada la celda desplegable. Confirma para continuar.', rowData);
-  }
-
-</script>

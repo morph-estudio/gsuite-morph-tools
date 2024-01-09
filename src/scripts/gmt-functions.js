@@ -1,10 +1,9 @@
-// CATEGORY: RANGES
+// CATEGORY: Named Range Utilities
 
 /**
- * deleteNamedRanges
- * Remove all Named Ranges in a Spreadsheet
+ * Elimina todos los rangos nombrados de una hoja de cálculo de Google Sheets
  */
- function deleteNamedRanges() {
+function deleteNamedRanges() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   var namedRanges = ss.getNamedRanges();
   for (var i = 0; i < namedRanges.length; i++) {
@@ -13,71 +12,137 @@
 }
 
 /**
- * refreshNamedRanges
- * Refresh Named Ranges in a Morph Table based on TXT_OP_TPL
+ * Elimina todos los rangos nombrados que apuntan a un intervalo #REF! en una hoja de cálculo de Google Sheets.
+ */
+function deleteInvalidNamedRanges() {
+  const ss = SpreadsheetApp.getActive();
+  const namedRanges = ss.getNamedRanges();
+  const namesR = namedRanges.map(nr=>nr.getName());   
+  namesR.forEach(name=>{
+      ss.removeNamedRange(name);
+  });
+}
+
+/**
+ * Actualiza los rangos nombrados en la hoja de cálculo basados en una plantilla Morph.
  */
 function refreshNamedRanges() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var spreadsheetId = ss.getId();
-  var sh = ss.getSheetByName('X_Variables');
-  var sh_txtop = ss.getSheetByName('TXT OPERACIONES');
+  var ssID = ss.getId();
 
-  if (!sh || !sh_txtop) {
-    throw new Error(`No se encontraron las hojas 'TXT OPERACIONES' o 'X_Variables'`);
+  var shVarName = 'X Variables';
+  var shOpeName = 'TXT OPERACIONES';
+  var shVarColumnIndexName = 'VA1340';
+
+  var shVar = ss.getSheetByName(shVarName);
+  var shOpe = ss.getSheetByName(shOpeName);
+
+  if (!shVar || !shOpe) {
+    throw new Error(`No se encontraron las hojas ${shOpeName} o ${shVarName}.`);
   }
 
-  var headers = flattenArray(sh_txtop.getRange(1, 1, 1, sh_txtop.getLastColumn()).getValues());
-  // headers = headers.filter(Boolean);
-  Logger.log(`Headers: ${headers}`);
+  // Filtrar encabezados y valores de la plantilla de rangos nombrados
 
-  var headers_template = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0];
-  var parametrosColumnIndex = headers_template.indexOf("PLANTILLA PARAMETRO ARCHI");
+  var shOpeHeaders = flattenArray(shOpe.getRange(1, 1, 1, shOpe.getLastColumn()).getValues());
+  Logger.log(`Headers: ${shOpeHeaders}`);
 
-  if (parametrosColumnIndex !== -1) {
-    var columnARange = sh.getRange(2, parametrosColumnIndex + 1, sh.getMaxRows() - 1, 1);
-    var columnBRange = sh.getRange(2, parametrosColumnIndex + 2, sh.getMaxRows() - 1, 1);
+  var shVarHeaders = shVar.getRange(1, 1, 1, shVar.getLastColumn()).getValues()[0];
+  var shVarColumnIndex = shVarHeaders.indexOf(shVarColumnIndexName);
 
-    var columnA = columnARange.getValues();
-    var columnB = columnBRange.getValues();
+  if (shVarColumnIndex !== -1) {
+    var columnIDRange = shVar.getRange(2, shVarColumnIndex + 1, shVar.getMaxRows() - 1, 1).getValues();
+    var columnArchiRange = shVar.getRange(2, shVarColumnIndex + 2, shVar.getMaxRows() - 1, 1).getValues();
+    var columnTXTNameRange = shVar.getRange(2, shVarColumnIndex + 3, shVar.getMaxRows() - 1, 1).getValues();
+    var columnAltIDRange = shVar.getRange(2, shVarColumnIndex + 4, shVar.getMaxRows() - 1, 1).getValues();
+    var columnAltArchiRange = shVar.getRange(2, shVarColumnIndex + 5, shVar.getMaxRows() - 1, 1).getValues();
 
-    var filteredColumnA = [];
-    var filteredColumnB = [];
+    var filteredColumnArchiRange = [];
+    var filteredColumnTXTNameRange = [];
+    var filteredColumnIDRange = [];
 
-    for (var i = 0; i < columnB.length; i++) {
-      var valueB = columnB[i][0];
+    var altCodesObject = {};
+
+    for (var i = 0; i < columnAltIDRange.length; i++) {
+      var key = columnAltIDRange[i][0].substring(3); // Obtenemos el valor de columnAltIDRange en la fila i
+      var value = columnAltArchiRange[i][0]; // Obtenemos el valor de columnAltArchiRange en la misma fila
+      altCodesObject[key] = value; // Asignamos el valor al objeto usando el valor de columnAltIDRange como clave
+    }
+
+    Logger.log(`altCodesObject: ${JSON.stringify(altCodesObject)}`)
+
+    for (var i = 0; i < columnTXTNameRange.length; i++) {
+      var valueB = columnTXTNameRange[i][0];
       if (valueB) {
-        filteredColumnA.push(columnA[i][0]);
-        filteredColumnB.push(valueB);
+        filteredColumnArchiRange.push(columnArchiRange[i][0]);
+        filteredColumnIDRange.push(columnIDRange[i][0]);
+        filteredColumnTXTNameRange.push(valueB);
       }
     }
   }
 
-  Logger.log(`filteredColumnA: ${filteredColumnA}, filteredColumnB: ${filteredColumnB}`)
+  Logger.log(`filteredColumnArchiRange: ${filteredColumnArchiRange}, filteredColumnTXTNameRange: ${filteredColumnTXTNameRange}`)
 
   // Get Named Ranges using Google Sheets API
-  var response = Sheets.Spreadsheets.get(spreadsheetId);
-  var namedRanges = response.namedRanges;
+
+  var response = Sheets.Spreadsheets.get(ssID);
+  var namedRanges = response.namedRanges; Logger.log(`namedRanges: ${namedRanges}`);
   var namedRangesDict = {};
-  for (var i = 0; i < namedRanges.length; i++) {
-    namedRangesDict[namedRanges[i].name] = namedRanges[i];
+
+  // Verificar si namedRanges está vacío o es nulo
+
+  if (namedRanges || namedRanges != undefined) {
+    for (var i = 0; i < namedRanges.length; i++) {
+      namedRangesDict[namedRanges[i].name] = namedRanges[i];
+    }
   }
 
   var batchRequests = [];
+  var headerFound;
+  var columnIndex;
 
-  for (var i = 0; i < filteredColumnB.length; i++) {
+  for (var i = 0; i < filteredColumnTXTNameRange.length; i++) {
     SpreadsheetApp.flush();
-    var namedRangeName = filteredColumnB[i].toString().trim();
-    var txtvalue = filteredColumnA[i].toString().trim();
-    var columnIndex = headers.indexOf(txtvalue);
-  
+    var namedRangeName = filteredColumnTXTNameRange[i].toString().trim();
+    var idHeader = filteredColumnIDRange[i].toString().trim();
+    var txtHeader = filteredColumnArchiRange[i].toString().trim();
+    var columnIndex = shOpeHeaders.indexOf(txtHeader);
+
     if (columnIndex == -1) {
+      var altCodesObjectFiltered = {};
+      for (var key in altCodesObject) {
+        if (key === idHeader.substring(3)) { // Quita los tres primeros caracteres y compara
+          altCodesObjectFiltered[key] = altCodesObject[key];
+        }
+      }
+      
+      var found = false;
+      for (var key in altCodesObjectFiltered) {
+        columnIndex = shOpeHeaders.indexOf(altCodesObjectFiltered[key]);
+        if (columnIndex !== -1) {
+          found = true;
+          break;
+        }
+      }
+
+      Logger.log(`idHeader: ${idHeader}, txtHeader: ${txtHeader}, altCodesObjectFiltered: ${JSON.stringify(altCodesObjectFiltered)}, found: ${found}`)
+      
+      if (found) {
+        headerFound = true;
+      } else {
+        headerFound = false;
+      }
+    } else {
+      headerFound = true;
+    }
+
+    if (headerFound === false) {
       continue;
     } else {
       var namedRange = {
         range: {
-          sheetId: sh_txtop.getSheetId(),
+          sheetId: shOpe.getSheetId(),
           startRowIndex: 1,
-          endRowIndex: 5000,
+          endRowIndex: 7000,
           startColumnIndex: columnIndex,
           endColumnIndex: columnIndex + 1
         }
@@ -85,9 +150,8 @@ function refreshNamedRanges() {
 
       var existingNamedRange = namedRangesDict[namedRangeName];
 
-      Logger.log(`El rango es de tipo ${existingNamedRange}`)
-
       if (existingNamedRange != undefined) {
+
         // Update existing Named Range
         batchRequests.push({
           updateNamedRange: {
@@ -100,6 +164,7 @@ function refreshNamedRanges() {
           }
         });
       } else {
+
         // Add new Named Range
         batchRequests.push({
           addNamedRange: {
@@ -113,157 +178,23 @@ function refreshNamedRanges() {
     }
   }
 
+  Logger.log(`batchRequests: ${JSON.stringify(batchRequests)}`);
+
   // Send batch update request
 
-  //SpreadsheetApp.flush();
+  SpreadsheetApp.flush();
 
-    Sheets.Spreadsheets.batchUpdate({
-      requests: batchRequests
-    }, spreadsheetId);
-
+  Sheets.Spreadsheets.batchUpdate({
+    requests: batchRequests
+  }, ssID);
 }
 
-/**
- * refreshNamedRanges
- * Refresh Named Ranges in a Morph Table based on TXT_OP_TPL
- */
-function refreshNamedRanges_2() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var spreadsheetId = ss.getId();
-  var sh = ss.getSheetByName('X_Variables');
-  var sh_txtop = ss.getSheetByName('TXT OPERACIONES_2');
-  //var sh_txtsuperficies = ss.getSheetByName('TXT SUPERFICIES');
-
-  if (!sh || !sh_txtop) {
-    throw new Error(`No se encontraron las hojas 'TXT OPERACIONES' o 'X_Variables'`);
-  }
-
-/*
-  // Copiar contenido de 'TXT SUPERFICIES'
-  var txtSuperficiesRange = sh_txtsuperficies.getDataRange();
-  var txtSuperficiesValues = txtSuperficiesRange.getValues();
-
-  // Borrar contenido de 'TXT SUPERFICIES'
-  sh_txtsuperficies.clear();
-
-  // Pegar contenido en 'TXT SUPERFICIES' nuevamente
-  var targetRange = sh_txtsuperficies.getRange(1, 1, txtSuperficiesValues.length, txtSuperficiesValues[0].length);
-  targetRange.setValues(txtSuperficiesValues);
-*/
-
-  var headers = flattenArray(sh_txtop.getRange(1, 1, 1, sh_txtop.getLastColumn()).getValues());
-  headers = headers.filter(Boolean);
-  Logger.log(`Headers: ${headers}`);
-
-  var headers_template = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0];
-  var parametrosColumnIndex = headers_template.indexOf("PLANTILLA PARAMETRO ARCHI");
-
-  if (parametrosColumnIndex !== -1) {
-    var columnARange = sh.getRange(2, parametrosColumnIndex + 1, sh.getMaxRows() - 1, 1);
-    var columnBRange = sh.getRange(2, parametrosColumnIndex + 2, sh.getMaxRows() - 1, 1);
-
-    var columnA = columnARange.getValues();
-    var columnB = columnBRange.getValues();
-
-    var filteredColumnA = [];
-    var filteredColumnB = [];
-
-    for (var i = 0; i < columnB.length; i++) {
-      var valueB = columnB[i][0];
-      if (valueB) {
-        filteredColumnA.push(columnA[i][0]);
-        filteredColumnB.push(valueB);
-      }
-    }
-  }
-
-  Logger.log(`filteredColumnA: ${filteredColumnA}, filteredColumnB: ${filteredColumnB}`)
-
-  // Get Named Ranges using Google Sheets API
-  var response = Sheets.Spreadsheets.get(spreadsheetId);
-  var namedRanges = response.namedRanges;
-  var namedRangesDict = {};
-  for (var i = 0; i < namedRanges.length; i++) {
-    namedRangesDict[namedRanges[i].name] = namedRanges[i];
-  }
-
-  var batchRequests = [];
-  var batchSize = 5; // Tamaño del lote
-
-  for (var i = 0; i < filteredColumnB.length; i += batchSize) {
-    //SpreadsheetApp.flush();
-
-    var batchFilteredColumnA = filteredColumnA.slice(i, i + batchSize);
-    var batchFilteredColumnB = filteredColumnB.slice(i, i + batchSize);
-
-    for (var j = 0; j < batchFilteredColumnB.length; j++) {
-      var namedRangeName = batchFilteredColumnB[j].toString().trim();
-      var txtvalue = batchFilteredColumnA[j].toString().trim();
-      var columnIndex = headers.indexOf(txtvalue);
-    
-      if (columnIndex == -1) {
-        continue;
-      } else {
-        var namedRange = {
-          range: {
-            sheetId: sh_txtop.getSheetId(),
-            startRowIndex: 1,
-            endRowIndex: 50,
-            startColumnIndex: columnIndex,
-            endColumnIndex: columnIndex + 1
-          }
-        };
-
-        var existingNamedRange = namedRangesDict[namedRangeName];
-
-        Logger.log(`El rango es de tipo ${existingNamedRange}`)
-
-        if (existingNamedRange != undefined) {
-          // Update existing Named Range
-          batchRequests.push({
-            updateNamedRange: {
-              namedRange: {
-                name: namedRangeName.trim(),
-                namedRangeId: existingNamedRange.namedRangeId,
-                range: namedRange.range
-              },
-              fields: 'range'
-            }
-          });
-        } else {
-          // Add new Named Range
-          batchRequests.push({
-            addNamedRange: {
-              namedRange: {
-                name: namedRangeName,
-                range: namedRange.range
-              }
-            }
-          });
-        }
-      }
-    }
-
-    // Ejecutar lote de solicitudes
-
-    if (batchRequests.length > 0) {
-      Sheets.Spreadsheets.batchUpdate({
-        requests: batchRequests
-      }, spreadsheetId);
-
-      batchRequests = []; // Reiniciar las solicitudes del lote
-      //Utilities.sleep(1000);
-    }
-    
-  }
-}
-
-
-// CATEGORY: ROW/COLUMN DELETION AND SPREADSHEET OPTIMIZATION
+// CATEGORY: Main Tools & Utilities
 
 /**
- * deleteEmptyRows, removeEmptyColumns
- * Delete the rows and columns up to the last one that contains data
+ * Elimina las filas vacías en una hoja de cálculo hasta la última fila que contiene datos.
+ *
+ * @param {Sheet} sh - La hoja de cálculo en la que se eliminarán las filas vacías (opcional, se utiliza la hoja activa por defecto).
  */
 function deleteEmptyRows(sh) {
   sh = sh || SpreadsheetApp.getActiveSheet();
@@ -275,6 +206,11 @@ function deleteEmptyRows(sh) {
   }
 }
 
+/**
+ * Elimina las columnas vacías en una hoja de cálculo hasta la última columna que contiene datos.
+ *
+ * @param {Sheet} sh - La hoja de cálculo en la que se eliminarán las columnas vacías (opcional, se utiliza la hoja activa por defecto).
+ */
 function removeEmptyColumns(sh) {
   sh = sh || SpreadsheetApp.getActiveSheet();
   let maxCol = sh.getMaxColumns();
@@ -286,146 +222,7 @@ function removeEmptyColumns(sh) {
 }
 
 /**
- * deleteAllEmptyRows
- * Delete any row without data in a specified sheet
- */
- function deleteAllEmptyRows() {
-  let spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  let sheet = spreadsheet.getActiveSheet();
-  let data = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
-  let row = sheet.getLastRow();
-
-  while (row > 2) {
-    let rec = data.pop();
-    if (rec.join('').length === 0) {
-      sheet.deleteRow(row);
-    }
-    row--;
-  }
-  let maxRows = sheet.getMaxRows();
-  let lastRow = sheet.getLastRow();
-  if (maxRows - lastRow != 0) {
-    sheet.deleteRows(lastRow + 1, maxRows - lastRow);
-  }
-}
-
-/**
- * deleteUntilLastDataRow
- * Delete any row without data in a specified sheet.
- * DON'T KNOW IF "deleteAllEmptyRows" IS THE SAME FUNCTION <- REVISAR
- */
-function deleteUntilLastDataRow(sh) {
-  sh = sh || SpreadsheetApp.getActiveSheet();
-  var maxRows = sh.getMaxRows();
-  var lastDataRow = 0;
-  
-  for (var i = maxRows; i >= 1; i--) {
-    var rowRange = sh.getRange(i, 1, 1, sh.getLastColumn());
-    var rowValues = rowRange.getValues()[0];
-    var rowIsEmpty = true;
-    
-    for (var j = 0; j < rowValues.length; j++) {
-      if (rowValues[j]) {
-        rowIsEmpty = false;
-        break;
-      }
-    }
-    
-    if (rowIsEmpty) {
-      sh.deleteRow(i);
-    } else {
-      lastDataRow = i;
-      break;
-    }
-  }
-  
-  return lastDataRow;
-}
-
-/**
- * deleteExcessiveRows, optimizeSpreadsheet
- * Spreadsheet Optimization based on excessive empty rows
- */
-function deleteExcessiveRows(rowsInput, sh) {
-  sh = sh || SpreadsheetApp.getActiveSheet();
-  let maxRows = sh.getMaxRows();
-  if (maxRows < rowsInput) throw new Error(`La hoja ya tiene menos de ${rowsInput} filas.`)
-  sh.deleteRows(rowsInput, maxRows - rowsInput);
-}
-
-function optimizeSpreadsheet(rowsInput) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  var sheets = ss.getSheets();
-  var sheetList = { sheets: [], sheetNames: [] };
-
-  sheets.forEach(function(sh) {
-    let maxRows = sh.getMaxRows();
-    if (maxRows > rowsInput) {
-      sheetList.sheets.push(sh);
-      sheetList.sheetNames.push(sh.getName());
-    }
-  });
-
-  if (sheetList.sheets.length === 0) throw new Error(`No hay ninguna hoja con más de ${rowsInput} filas.`)
-
-  var sheetNamesWithFormat = sheetList.sheetNames.map(name => ` ${name}`);
-
-  var confirm = Browser.msgBox('Optimización del documento', `Las siguientes hojas tienen más de ${rowsInput} filas:\\n\\n${sheetNamesWithFormat}\\n\\nSuponiendo que las celdas sobrantes están vacías, ¿Quieres borrar las celdas vacías hasta la fila ${rowsInput} y así optimizar el documento?`, Browser.Buttons.OK_CANCEL);
-  if (confirm == 'ok') {
-    sheetList.sheets.forEach(function(sh) {
-      let maxRows = sh.getMaxRows();
-      sh.deleteRows(rowsInput, maxRows - rowsInput);
-    });
-  } else {
-    throw new Error(`No se ha optimizado el documento.`)
-  }
-}
-
-/**
- * purgeDocumentCache
- * Borrar la memoria caché de la hoja de cálculo
- */
- function purgeDocumentCache() {
-  SpreadsheetApp.flush()
-}
-
-// CATEGORY: SHEET FORMATTING
-
-/**
- * increaseFontSize, decreaseFontSize
- * Modify the text font size proportionally throughout the sheet
- */
-function increaseFontSize() {
-  const range = sh().getDataRange();
-  let fontsizes = range.getFontSizes();
-  let numRows = range.getNumRows();
-  let numCols = range.getNumColumns();
-
-  for (let i = 0; i < numRows; i++) {
-    for (let j = 0; j < numCols; j++) {
-      range.getCell(i + 1,j + 1).setFontSize(fontsizes[i][j] + 2)
-    }
-  }
-}
-
-function decreaseFontSize() {
-  const range = sh().getDataRange();
-  let fontsizes = range.getFontSizes();
-  let numRows = range.getNumRows();
-  let numCols = range.getNumColumns();
-
-  for (let i = 0; i < numRows; i++) {
-    for (let j = 0; j < numCols; j++) {
-      range.getCell(i + 1,j + 1).setFontSize(fontsizes[i][j] - 2)
-    }
-  }
-}
-
-// CATEGORY: UTILITIES
-
-/**
- * getDomainUsersList
- * Genera una lista con los usuarios del servidor Morph
+ * Obtiene una lista de usuarios del servidor Morph.
  */
 function getDomainUsersList() {
   let users = [];
@@ -462,7 +259,38 @@ function getDomainUsersList() {
 }
 
 /**
- * uniqueIdentifier
+ * Incrementa el tamaño de fuente proporcionalmente en toda la hoja.
+ */
+function increaseFontSize() {
+  const range = sh().getDataRange();
+  let fontsizes = range.getFontSizes();
+  let numRows = range.getNumRows();
+  let numCols = range.getNumColumns();
+
+  for (let i = 0; i < numRows; i++) {
+    for (let j = 0; j < numCols; j++) {
+      range.getCell(i + 1,j + 1).setFontSize(fontsizes[i][j] + 2)
+    }
+  }
+}
+
+/**
+ * Reduce el tamaño de fuente proporcionalmente en toda la hoja.
+ */
+function decreaseFontSize() {
+  const range = sh().getDataRange();
+  let fontsizes = range.getFontSizes();
+  let numRows = range.getNumRows();
+  let numCols = range.getNumColumns();
+
+  for (let i = 0; i < numRows; i++) {
+    for (let j = 0; j < numCols; j++) {
+      range.getCell(i + 1,j + 1).setFontSize(fontsizes[i][j] - 2)
+    }
+  }
+}
+
+/**
  * Genera identificadores únicos en las celdas seleccionadas.
  */
 function uniqueIdentifier() {
@@ -477,11 +305,14 @@ function uniqueIdentifier() {
   }
 }
 
-// FUNCTIONS IN FILES AND FOLDERS SECTION
+// CATEGORY: Files and Folders Section
 
 /**
- * listFilesInFolder
- * Crea una lista de archivos dentro de una carpeta de Google Drive
+ * Genera una lista de archivos dentro de una carpeta de Google Drive.
+ *
+ * @param {object} rowData - Los datos de la fila que contiene información sobre la carpeta.
+ * @param {string} rowData.listFolderID - El ID de la carpeta de Google Drive o la URL de la celda A1 que contiene la URL de la carpeta.
+ * @param {boolean} rowData.useA1 - Indica si se debe usar la celda A1 para obtener la URL de la carpeta.
  */
 function listFilesInFolder(rowData) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -516,8 +347,13 @@ function listFilesInFolder(rowData) {
   sh.getRange(splitArray[1], letterToColumn(splitArray[0]), names.length + 1, 3).setValues(result);
 }
 
+/**
+ * Reduce el nombre del tipo de archivo MIME a un valor corto.
+ *
+ * @param {string} mimetype - El tipo de archivo MIME a reducir.
+ * @return {string} - El valor corto del tipo de archivo MIME.
+ */
 function shortenMimetype(mimetype) {
-
   const mimetypes = {
     "application/vnd.google-apps.script": "GOOGLE_APPS_SCRIPT",
     "application/vnd.google-apps.drawing": "GOOGLE_DRAWINGS",
@@ -558,8 +394,15 @@ function shortenMimetype(mimetype) {
 }
 
 /**
- * insertImagesOfFolder
- * Insert the images from a folder into the selected cells
+ * Inserta las imágenes de una carpeta en las celdas seleccionadas.
+ *
+ * @param {object} rowData - Los datos de la fila que contiene información sobre la carpeta y la configuración de la inserción.
+ * @param {string} rowData.listFolderID - El ID de la carpeta de Google Drive o la URL de la celda A1 que contiene la URL de la carpeta.
+ * @param {boolean} rowData.useA1 - Indica si se debe usar la celda A1 para obtener la URL de la carpeta.
+ * @param {boolean} rowData.imageFolderFileID - Indica si se debe incluir el ID de archivo en la lista de datos.
+ * @param {boolean} rowData.imageFolderFileName - Indica si se debe incluir el nombre de archivo en la lista de datos.
+ * @param {boolean} rowData.imageFolderImage - Indica si se deben insertar las imágenes en las celdas.
+ * @param {boolean} rowData.imageFolderArrayFormula - Indica si se debe aplicar una fórmula de matriz para mostrar las imágenes.
  */
 function insertImagesOfFolder(rowData) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -624,16 +467,19 @@ function insertImagesOfFolder(rowData) {
     }
     SpreadsheetApp.flush();
   });
-  
 }
 
-// FUNCTIONS IN INTEROPERABILITY SECTION
+// CATEGORÍA: Funciones de la sección de Interoperabilidad
 
 /**
- * sheetConnect
  * Conecta hojas entre distintos documentos de Google Sheets.
+ *
+ * @param {object} rowData - Los datos de la fila que contiene información sobre la conexión de hojas.
+ * @param {string} rowData.sheetConnectSheetname - El nombre de la hoja que se va a conectar.
+ * @param {string} rowData.sheetConnectTargetURL - La URL del documento de Google Sheets de destino.
+ * @param {boolean} rowData.sheetConnectLinkList - Indica si se va a vincular la hoja de forma predeterminada en la lista de hojas.
  */
-function sheetConnect(rowData) {
+function vincularHojasImportrange(rowData) {
 
   let formData = [
     rowData[`sheetConnectSheetname`],
@@ -644,66 +490,27 @@ function sheetConnect(rowData) {
   let [sheetConnectSheetname, sheetConnectTargetURL, sheetConnectLinkList] = formData;
 
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sh = ss.getActiveSheet();
   let ss_url = ss.getUrl();
 
   let sourceSheet = ss.getSheetByName(sheetConnectSheetname);
-  var target = SpreadsheetApp.openById(getIdFromUrl(sheetConnectTargetURL));
-  var targetSheets = target.getSheets();
-  var targetSheet;
-  
-  var hojaEncontrada = false;
-  
-  for (var i = 0; i < targetSheets.length; i++) {
-    if (targetSheets[i].getName() == sheetConnectSheetname) {
-      hojaEncontrada = true;
-      break;
-    }
-  }
-  
-  if (hojaEncontrada) {
-    targetSheet = target.getSheetByName(sheetConnectSheetname);
+  if(sheetConnectLinkList){
+    var target = ss;
   } else {
-    targetSheet = sourceSheet.copyTo(target);
-    targetSheet.setName(sheetConnectSheetname).setTabColor(sourceSheet.getTabColor());
-    targetSheet.clearContents();
+    var target = SpreadsheetApp.openById(getIdFromUrl(sheetConnectTargetURL));
   }
+  
+  targetSheet = sourceSheet.copyTo(target);
+  targetSheet.setName(`X ${sheetConnectSheetname}`).setTabColor('#00ff00');
+  targetSheet.clearContents();
 
-  let targetSheetLink;
-
-  if (sheetConnectLinkList == true) {
-    targetSheetLink = target.getSheetByName('LINK');
- 
-    if (targetSheetLink.getRange('E2').getValue() != textMark) getEmptyLinkSheet();
-
-    let sheetLink = '#gid=' + targetSheet.getSheetId();
-    let lastRow = getLastDataRow(sh, 'E');
-
-    let linkRange_1 = targetSheetLink.getRange(lastRow, 5, 1, 2);
-    let linkRange_2 = targetSheetLink.getRange(lastRow, 5, 1, 1);
-
-/*
-    targetSheetLink.getRange(lastRow, 5, sh.getLastRow(), 2).clearFormat().setFontFamily('Montserrat').setFontSize(14).setFontWeight('normal').setHorizontalAlignment('left').setFontColor('#0000FF');
-    targetSheetLink.getRange(1, 5, 2, 2).setBackground(null).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
-    targetSheetLink.getRange(1, 4, 1, 1).setBorder(true, true, true, true, true, true, '#26c6da', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
-
-    if (targetSheetLink.getRange('E2').getValue() != `Hojas conectadas`) {
-      targetSheetLink.getRange(2, 5, 1, 2).setBackground('#fff').setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-        .setFontFamily('Inconsolata').setFontWeight('bold').setHorizontalAlignment('center');
-    }
-*/
-
-    linkRange_1.setValues([[`=hyperlink("${sheetLink}";"${targetSheet.getName()}"& " / ${target.getName()}")`, `=hyperlink("${ss_url}";"${ss.getName()}")`]])
-      .setBackground('#fafafa').setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
-    linkRange_2.setBackground('#fff').setFontColor('#78909c');
-
-  }
   targetSheet.getRange('A1').setFormula(`=IMPORTRANGE("${ss_url}";"${sheetConnectSheetname}!A1:AZZ10000")`)
 }
 
 /**
- * getCSVFilesData
- * Import CSV data by sheet and range
+ * Importa datos CSV por hoja y rango.
+ *
+ * @param {object} rowData - Los datos de la fila que contiene información sobre la importación de datos CSV.
+ * @param {number} counter - El contador que especifica la cantidad de datos CSV a importar.
  */
 function getCSVFilesData(rowData, counter) {
 
@@ -734,11 +541,12 @@ function getCSVFilesData(rowData, counter) {
   }
 }
 
-// FUNCTIONS IN HELP SECTION
+// CATEGORY: Functions in Help Section
 
 /**
- * cellCounter
- * Cell counter for Google Sheets document
+ * Contador de celdas para el documento de Google Sheets.
+ *
+ * @return {number} - El porcentaje de celdas utilizadas en relación con el límite de 10 millones de celdas.
  */
 let size;
 function cellCounter() {
@@ -753,6 +561,11 @@ function cellCounter() {
   return percentage;
 }
 
+/**
+ * Contador de celdas con mensaje descriptivo.
+ *
+ * @return {string} - Un mensaje que indica el porcentaje de celdas utilizadas y la cantidad total de celdas.
+ */
 function cellCounter2() {
   let ss = SpreadsheetApp.getActiveSpreadsheet();
   let sheets = ss.getSheets();
@@ -763,4 +576,92 @@ function cellCounter2() {
   let division = cells / 10000000 * 100;
   let percentage = +division.toFixed(0);
   return (`📈 Cada Google Sheets tiene capacidad para diez millones de celdas. Has usado el <strong>${percentage}%</strong> del total con <strong>${cells} celdas</strong>.`);
+}
+
+/**
+ * Elimina filas vacías hasta la última fila de datos en una hoja especificada.
+ *
+ * @param {Sheet} sh - La hoja en la que se eliminarán las filas vacías.
+ * @return {number} - El número de la última fila de datos después de la eliminación.
+ */
+function deleteUntilLastDataRow(sh) {
+  sh = sh || SpreadsheetApp.getActiveSheet();
+  var maxRows = sh.getMaxRows();
+  var lastDataRow = 0;
+  
+  for (var i = maxRows; i >= 1; i--) {
+    var rowRange = sh.getRange(i, 1, 1, sh.getLastColumn());
+    var rowValues = rowRange.getValues()[0];
+    var rowIsEmpty = true;
+    
+    for (var j = 0; j < rowValues.length; j++) {
+      if (rowValues[j]) {
+        rowIsEmpty = false;
+        break;
+      }
+    }
+    
+    if (rowIsEmpty) {
+      sh.deleteRow(i);
+    } else {
+      lastDataRow = i;
+      break;
+    }
+  }
+  
+  return lastDataRow;
+}
+
+/**
+ * Optimización de la hoja de cálculo eliminando filas excesivas.
+ *
+ * @param {number} rowsInput - El número máximo de filas permitidas en cada hoja.
+ * @throws {Error} - Si la hoja ya tiene menos de 'rowsInput' filas.
+ */
+function deleteExcessiveRows(rowsInput, sh) {
+  sh = sh || SpreadsheetApp.getActiveSheet();
+  let maxRows = sh.getMaxRows();
+  if (maxRows < rowsInput) throw new Error(`La hoja ya tiene menos de ${rowsInput} filas.`)
+  sh.deleteRows(rowsInput, maxRows - rowsInput);
+}
+
+/**
+ * Optimiza el documento de Google Sheets eliminando filas excesivas en todas las hojas que tienen más de 'rowsInput' filas.
+ *
+ * @param {number} rowsInput - El número máximo de filas permitidas en cada hoja.
+ * @throws {Error} - Si no hay ninguna hoja con más de 'rowsInput' filas o si el usuario cancela la optimización.
+ */
+function optimizeSpreadsheet(rowsInput) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheets = ss.getSheets();
+  var sheetList = { sheets: [], sheetNames: [] };
+
+  sheets.forEach(function(sh) {
+    let maxRows = sh.getMaxRows();
+    if (maxRows > rowsInput) {
+      sheetList.sheets.push(sh);
+      sheetList.sheetNames.push(sh.getName());
+    }
+  });
+
+  if (sheetList.sheets.length === 0) throw new Error(`No hay ninguna hoja con más de ${rowsInput} filas.`)
+
+  var sheetNamesWithFormat = sheetList.sheetNames.map(name => ` ${name}`);
+
+  var confirm = Browser.msgBox('Optimización del documento', `Las siguientes hojas tienen más de ${rowsInput} filas:\\n\\n${sheetNamesWithFormat}\\n\\nSuponiendo que las celdas sobrantes están vacías, ¿Quieres borrar las celdas vacías hasta la fila ${rowsInput} y así optimizar el documento?`, Browser.Buttons.OK_CANCEL);
+  if (confirm == 'ok') {
+    sheetList.sheets.forEach(function(sh) {
+      let maxRows = sh.getMaxRows();
+      sh.deleteRows(rowsInput, maxRows - rowsInput);
+    });
+  } else {
+    throw new Error(`No se ha optimizado el documento.`)
+  }
+}
+
+/**
+ * Borra la memoria caché del documento de hojas de cálculo.
+ */
+ function purgeDocumentCache() {
+  SpreadsheetApp.flush()
 }

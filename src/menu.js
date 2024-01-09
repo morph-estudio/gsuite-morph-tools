@@ -1,13 +1,15 @@
-/** GLOBAL VARIABLES AND FUNCTIONS */
+/**
+ * GLOBAL VARIABLES AND FUNCTIONS
+ */
 
-var gmtVersion = '2.1.3';
+var gmtVersion = '3.0.0';
 var morphDivision = '(I+D)';
 var morphDev = '(Devs)';
 
-var titleIX = 'Gsuite Morph Tools'; var barTitleIX = `💡 ${titleIX} ${gmtVersion}`;
-var titleSM = 'Gestor de hojas'; var barTitleSM = `📋 ${titleSM} ${gmtVersion} ${morphDivision}`;
-var titleDS = 'Morph Document Studio'; var barTitleDS = `✨ ${titleDS} ${gmtVersion} ${morphDivision}`;
-var titleLG = 'Registros Morph'; var barTitleLG = `✨ ${titleLG} ${gmtVersion} ${morphDivision}`;
+var titleIX = 'Herramientas de Google Suite'; var barTitleIX = `💡 ${titleIX} ${gmtVersion}`;
+var titleSM = 'Gestor de hojas de Sheets'; var barTitleSM = `📋 ${titleSM} ${gmtVersion} ${morphDivision}`;
+var titleDS = 'Morph Document Studio'; var barTitleDS = `⚱️ ${titleDS} ${gmtVersion} ${morphDivision}`;
+var titleLG = 'Registros Morph'; var barTitleLG = `📝 ${titleLG} ${gmtVersion} ${morphDivision}`;
 var titlePC = 'Gestión de cuadros'; var barTitlePC = `✨ ${titlePC} ${gmtVersion} ${morphDivision}`;
 var titleCL = 'Guía de estilo'; var barTitleCL = `🎨 ${titleCL} ${gmtVersion} ${morphDivision}`;
 
@@ -18,17 +20,18 @@ var sh = function() {
 var ui = function() {
   return SpreadsheetApp.getUi() }
 
-/** MAIN MENU ENGINE */
+/**
+ * MAIN MENU ENGINE
+ */
 
 function onOpen(e) {
   SpreadsheetApp.getUi().createAddonMenu()
-    .addItem(titleIX, 'sidebarIndex')
     .addItem(titlePC, 'sidebarPC')
+    .addItem(titleIX, 'sidebarIndex')
     .addItem(titleSM, 'sidebarSM')
     .addItem(titleDS, 'sidebarDS')
     .addSeparator()
     .addItem(titleLG, 'sidebarLG')
-    //.addItem(titleCL, 'sidebarCL')
     .addSeparator()
     .addItem('Changelog', 'sidebarChangelog')
     .addToUi();
@@ -42,6 +45,8 @@ function onInstall(e) {
  * SIDEBAR FUNCTIONS
  */
 
+/* Browser.msgBox('Herramienta en desarrollo', 'Esta herramienta estará disponible en la próxima versión de Gsuite Morph Tools.', Browser.Buttons.OK); */
+
 function sidebarIndex() {
   let html = HtmlService.createTemplateFromFile('public/main/index');
   html.permission = getDevPermission();
@@ -51,16 +56,14 @@ function sidebarIndex() {
 }
 
 function sidebarLG() {
-  /* Browser.msgBox('Herramienta en desarrollo', 'Esta herramienta estará disponible en la próxima versión de Gsuite Morph Tools.', Browser.Buttons.OK); */
   let html = HtmlService.createTemplateFromFile('public/main/logger-interno');
   html.permission = getDevPermission();
   html.loggerEntries = getLoggerEntries();
   html = html.evaluate().setTitle(barTitleLG); ui().showSidebar(html);
-  
 }
 
 function sidebarPC() {
-  let html = HtmlService.createTemplateFromFile('public/main/control-panel');
+  let html = HtmlService.createTemplateFromFile('public/main/gestion-cuadros');
   html.savedProperties = getDocProperties();
   html.config = templateSheetConfigObject(true);
   html.wsNames = getWorksheetNamesArray();
@@ -81,25 +84,13 @@ function sidebarSM() {
 }
 
 function sidebarCL() {
-  let html = HtmlService.createTemplateFromFile('public/main/styles-front');
+  let html = HtmlService.createTemplateFromFile('public/main/gestion-estilos');
   html.obj = cargarEstilos();
   html = html.evaluate().setTitle(barTitleWIP); ui().showSidebar(html);
 }
 
-function sidebarDSDevs() {
-  let html = HtmlService.createTemplateFromFile('public/main/document-studio');
-  html.dsProperties = getDocProperties(); html.headerDropdownValues = headerDropdownValues();
-  html = html.evaluate().setTitle(`${barTitleDS} Devs`); ui().showSidebar(html);
-}
-
-function sidebarSMDevs() {
-  let html = HtmlService.createTemplateFromFile('public/main/sheet-manager');
-  html.wsNames = getWorksheetNames();
-  html = html.evaluate().setTitle(`${barTitleSM} Devs`); ui().showSidebar(html);
-}
-
 function sidebarCLDevs() {
-  let html = HtmlService.createTemplateFromFile('public/main/styles-front');
+  let html = HtmlService.createTemplateFromFile('public/main/gestion-estilos');
   html.obj = cargarEstilos();
   var estilos_sheet = PropertiesService.getDocumentProperties();
   html = html.evaluate().setTitle(`${barTitleCL} Devs`); ui().showSidebar(html);
@@ -115,8 +106,7 @@ function sidebarChangelog() {
  */
 
 function getSavedSheetProperties(rowData) {
-  PropertiesService.getDocumentProperties()
-    .setProperties(rowData);
+  PropertiesService.getDocumentProperties().setProperties(rowData);
 }
 
 function saveSheetPropertiesWithArray(rowData, array, arrayName) {

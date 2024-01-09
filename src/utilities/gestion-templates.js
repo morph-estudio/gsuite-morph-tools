@@ -1,6 +1,4 @@
-////////////////////////////
 // JSON TEMPLATE DATA
-////////////////////////////
 
 /**
  * Devuelve el ID de diferentes archivos clave de Morph.
@@ -67,6 +65,8 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
 
   tipoArchivo = booleanGetTipoArchivo ? getTipoArchivo() : tipoArchivo;
 
+  // Browser.msgBox(tipoArchivo);
+
   switch (tipoArchivo) {
     case 'Panel de control':
 
@@ -77,27 +77,20 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "nombre": "Plurifamiliar",
             "code": "plurifami",
             "settings": {
-              "excludedMasterSheets": ["norurbani", "pconhoras"],
-              "hiddenSheets": [],
-              "excludedOtherSheets": []
+              "excludedMasterSheets": ["norurbani"],
+              "hiddenSheets": ["contactos", "xbddproye", "xcontacto", "xcuadrsup", "xempresas", "xhorastar", "xmasuputi", "xnormativ", "xproyecoo", "xrosciuda", "xroscimix", "xrosedren", "xvariable", "xvarianor", "xvariacos", "xvariapyt"],
+              "excludedOtherSheets": [],
+              "minimumCuadro": ["instrucio", "datosproy", "contactos", "planifica", "pconhoras", "panconkpi", "premiscli", "predimmix", "predimsup", "cosdesglo", "cosprecio", "xbddproye", "xcontacto", "xcuadrsup", "xempresas", "xhorastar", "xmasuputi", "xnormativ", "xproyecoo", "xrosciuda", "xroscimix", "xrosedren", "xvariable", "xvarianor", "xvariacos", "xvariapyt"]
             }
           },
           {
             "nombre": "Unifamiliar",
             "code": "unifamili",
             "settings": {
-              "excludedMasterSheets": ["norurbani", "pconhoras"],
-              "hiddenSheets": [],
-              "excludedOtherSheets": []
-            }
-          },
-          {
-            "nombre": "Hospitality",
-            "code": "hospitali",
-            "settings": {
-              "excludedMasterSheets": ["norurbani", "pconhoras"],
-              "hiddenSheets": [],
-              "excludedOtherSheets": []
+              "excludedMasterSheets": ["norurbani"],
+              "hiddenSheets": ["contactos", "xbddproye", "xcontacto", "xcuadrsup", "xempresas", "xhorastar", "xmasuputi", "xnormativ", "xproyecoo", "xrosciuda", "xroscimix", "xrosedren", "xvariable", "xvarianor", "xvariacos", "xvariapyt"],
+              "excludedOtherSheets": [],
+              "minimumCuadro": ["instrucio", "datosproy", "contactos", "planifica", "pconhoras", "panconkpi", "premiscli", "predimmix", "predimsup", "cosdesglo", "cosprecio", "xbddproye", "xcontacto", "xcuadrsup", "xempresas", "xhorastar", "xmasuputi", "xnormativ", "xproyecoo", "xrosciuda", "xroscimix", "xrosedren", "xvariable", "xvarianor", "xvariacos", "xvariapyt"]
             }
           }
         ],
@@ -113,7 +106,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "name": "Datos proyecto",
             "code": "datosproy",
             "description": "Datos generales del proyecto con id único",
-            "tabColor": "#00ffff",
+            "tabColor": "#1155cc",
             "settings": {}
           },
           {
@@ -131,7 +124,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "settings": {}
           },
           {
-            "name": "Planificación",
+            "name": "Contenido Documental",
             "code": "planifica",
             "description": "Tabla de planificación de proyecto",
             "tabColor": "#00ffff",
@@ -145,59 +138,17 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "settings": {}
           },
           {
-            "name": "Horas",
+            "name": "Control Horas",
             "code": "pconhoras",
             "description": "Plantilla para la planificación de horas de proyecto",
-            "tabColor": "#cc0000",
+            "tabColor": "#00ffff",
             "settings": {}
           },
           {
             "name": "Due Diligence",
             "code": "duedilige",
             "description": "Reporte de diligencias al inicio de proyecto",
-            "tabColor": "#6aa84f",
-            "settings": {}
-          },
-          {
-            "name": "KPIs",
-            "code": "panconkpi",
-            "description": "Tabla de principales KPI de proyecto",
-            "tabColor": "#9900ff",
-            "settings": {}
-          },
-          {
-            "name": "Premisas cliente",
-            "code": "premiscli",
-            "description": "Mix de premisas del cliente para unidades y ZZCC",
-            "tabColor": "#1155cc",
-            "settings": {}
-          },
-          {
-            "name": "Predim Mix Sup y PEC",
-            "code": "predimmix",
-            "description": "Tabla de configuración para el predimensionado inicial",
-            "tabColor": "#1155cc",
-            "settings": {}
-          },
-          {
-            "name": "Predim Sup VT",
-            "code": "predimsup",
-            "description": "Tabla de valores para el predimensionado inicial",
-            "tabColor": "#1155cc",
-            "settings": {}
-          },
-          {
-            "name": "Costes desglosados",
-            "code": "cosdesglo",
-            "description": "Tablas de costes de predimensionados y superficies BIM",
-            "tabColor": "#1155cc",
-            "settings": {}
-          },
-          {
-            "name": "Costes precios",
-            "code": "cosprecio",
-            "description": "Hoja maestra de precios €/m2 y ratios",
-            "tabColor": "#1155cc",
+            "tabColor": "#ff9900",
             "settings": {}
           },
           {
@@ -205,6 +156,153 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "code": "norurbani",
             "description": "Check automatizado de la normativa urbanística del proyecto",
             "tabColor": "#e69138",
+            "settings": {}
+          },
+          {
+            "name": "KPIs",
+            "code": "panconkpi",
+            "description": "Tabla de principales KPI de proyecto",
+            "tabColor": "#ff00ff",
+            "settings": {}
+          },
+          {
+            "name": "Premisas cliente",
+            "code": "premiscli",
+            "description": "Mix de premisas del cliente para unidades y ZZCC",
+            "tabColor": "#ff00ff",
+            "settings": {}
+          },
+          {
+            "name": "Predim Mix Sup y PEC",
+            "code": "predimmix",
+            "description": "Tabla de configuración para el predimensionado inicial",
+            "tabColor": "#ff00ff",
+            "settings": {}
+          },
+          {
+            "name": "Predim Sup VT",
+            "code": "predimsup",
+            "description": "Tabla de valores para el predimensionado inicial",
+            "tabColor": "#ff00ff",
+            "settings": {}
+          },
+          {
+            "name": "Costes desglosados",
+            "code": "cosdesglo",
+            "description": "Tablas de costes de predimensionados y superficies BIM",
+            "tabColor": "#ff00ff",
+            "settings": {}
+          },
+          {
+            "name": "Costes precios",
+            "code": "cosprecio",
+            "description": "Hoja maestra de precios €/m2 y ratios",
+            "tabColor": "#ff00ff",
+            "settings": {}
+          },
+          {
+            "name": "X BDD Proyectos",
+            "code": "xbddproye",
+            "description": "",
+            "tabColor": "#00ff00",
+            "settings": {}
+          },
+          {
+            "name": "X Contactos",
+            "code": "xcontacto",
+            "description": "",
+            "tabColor": "#00ff00",
+            "settings": {}
+          },
+          {
+            "name": "X Cuadro Sup",
+            "code": "xcuadrsup",
+            "description": "",
+            "tabColor": "#00ff00",
+            "settings": {}
+          },
+          {
+            "name": "X Empresas",
+            "code": "xempresas",
+            "description": "",
+            "tabColor": "#00ff00",
+            "settings": {}
+          },
+          {
+            "name": "X Horas tareas",
+            "code": "xhorastar",
+            "description": "",
+            "tabColor": "#00ff00",
+            "settings": {}
+          },
+          {
+            "name": "X Matriz superficies útiles",
+            "code": "xmasuputi",
+            "description": "",
+            "tabColor": "#00ff00",
+            "settings": {}
+          },
+          {
+            "name": "X Normativa",
+            "code": "xnormativ",
+            "description": "",
+            "tabColor": "#00ff00",
+            "settings": {}
+          },
+          {
+            "name": "X PROYECTOS Coordinación",
+            "code": "xproyecoo",
+            "description": "",
+            "tabColor": "#00ff00",
+            "settings": {}
+          },
+          {
+            "name": "X Roseta de ciudades",
+            "code": "xrosciuda",
+            "description": "",
+            "tabColor": "#00ff00",
+            "settings": {}
+          },
+          {
+            "name": "X ROSETA CIUDADES y mixes",
+            "code": "xroscimix",
+            "description": "",
+            "tabColor": "#00ff00",
+            "settings": {}
+          },
+          {
+            "name": "X Roseta edificabilidad y rentas",
+            "code": "xrosedren",
+            "description": "",
+            "tabColor": "#00ff00",
+            "settings": {}
+          },
+          {
+            "name": "X Variables",
+            "code": "xvariable",
+            "description": "",
+            "tabColor": "#00ff00",
+            "settings": {}
+          },
+          {
+            "name": "X Variables normativa",
+            "code": "xvarianor",
+            "description": "",
+            "tabColor": "#00ff00",
+            "settings": {}
+          },
+          {
+            "name": "X Variables Coste",
+            "code": "xvariacos",
+            "description": "",
+            "tabColor": "#00ff00",
+            "settings": {}
+          },
+          {
+            "name": "X Variables PT",
+            "code": "xvariapyt",
+            "description": "",
+            "tabColor": "#00ff00",
             "settings": {}
           }
         ],
@@ -227,8 +325,9 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "code": "plurifami",
             "settings": {
               "excludedMasterSheets": ["computviv", "csrestipo", "csresplan", "aytobasur", "cssupauto"],
-              "hiddenSheets": ["sisectors", "siocupaci", "aytojusti", "aytoconst", "aytomadrd", "cuadrvtft", "cuadrogar", "histconst", "TXT OPERACIONES"],
+              "hiddenSheets": ["sisectors", "siocupaci", "aytojusti", "aytoconst", "aytomadrd", "cuadrvtft", "cuadrogar", "histconst", "txtoperac", "xexportac", "xvariable", "xvariabsi", "txtsuperf"],
               "excludedOtherSheets": ["TXT FALSOS TECHOS", "TXT VENTANAS"],
+              "minimumCuadro": ["csupelink", "cschivato", "conedific", "chektipom", "chektipos", "conplanta", "txtoperac", "xexportac", "xvariable", "xvariabsi", "txtsuperf"]
             }
           },
           {
@@ -236,19 +335,11 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "code": "unifamili",
             "settings": {
               "excludedMasterSheets": ["computviv", "csrestipo", "csresplan", "aytobasur", "cssupauto"],
-              "hiddenSheets": ["sisectors", "siocupaci", "aytojusti", "aytoconst", "aytomadrd", "cuadrvtft", "cuadrogar", "histconst", "TXT OPERACIONES"],
+              "hiddenSheets": ["sisectors", "siocupaci", "aytojusti", "aytoconst", "aytomadrd", "cuadrvtft", "cuadrogar", "histconst", "txtoperac", "txtoperac", "xexportac", "xvariable", "xvariabsi", "txtsuperf"],
               "excludedOtherSheets": ["TXT FALSOS TECHOS", "TXT VENTANAS"],
+              "minimumCuadro": ["csupelink", "cschivato", "conedific", "chektipom", "chektipos", "conplanta", "txtoperac", "xexportac", "xvariable", "xvariabsi", "txtsuperf"]
             }
-          },
-          {
-            "nombre": "Hospitality",
-            "code": "hospitali",
-            "settings": {
-              "excludedMasterSheets": ["computviv", "csrestipo", "csresplan", "aytobasur", "cssupauto"],
-              "hiddenSheets": ["sisectors", "siocupaci", "aytojusti", "aytoconst", "aytomadrd", "cuadrvtft", "cuadrogar", "histconst", "TXT OPERACIONES"],
-              "excludedOtherSheets": ["TXT FALSOS TECHOS", "TXT VENTANAS"],
-            }
-          },
+          }
         ],
         "masterSheets": [
           {
@@ -330,7 +421,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "settings": {
               "filaFormulas": true,
               "tipoSuperficie": {
-                "range": "A5",
+                "range": "E2",
                 "action": "setValue"
               },
             }
@@ -343,6 +434,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "settings": {
             }
           },
+          /*
           {
             "name": "RESUMEN TIPOS",
             "code": "csrestipo",
@@ -369,6 +461,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
               }
             }
           },
+          */
           {
             "name": "Cuadro garaje",
             "code": "cuadrogar",
@@ -473,6 +566,46 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "settings": {
             }
           },
+          {
+            "name": "TXT OPERACIONES",
+            "code": "txtoperac",
+            "description": "Hoja que documenta los cambios de superficies a lo largo del proyecto",
+            "tabColor": "#00ff00",
+            "settings": {
+            }
+          },
+          {
+            "name": "X Exportación",
+            "code": "xexportac",
+            "description": "Hoja que documenta los cambios de superficies a lo largo del proyecto",
+            "tabColor": "#00ff00",
+            "settings": {
+            }
+          },
+          {
+            "name": "X Variables",
+            "code": "xvariable",
+            "description": "Hoja que documenta los cambios de superficies a lo largo del proyecto",
+            "tabColor": "#00ff00",
+            "settings": {
+            }
+          },
+          {
+            "name": "X Variables SI",
+            "code": "xvariabsi",
+            "description": "Hoja que documenta los cambios de superficies a lo largo del proyecto",
+            "tabColor": "#00ff00",
+            "settings": {
+            }
+          },
+          {
+            "name": "TXT SUPERFICIES",
+            "code": "txtsuperf",
+            "description": "Hoja que documenta los cambios de superficies a lo largo del proyecto",
+            "tabColor": "#00ff00",
+            "settings": {
+            }
+          }
         ],
         "secondarySheets": [
           {
@@ -697,8 +830,9 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "code": "plurifami",
             "settings": {
               "excludedMasterSheets": [],
-              "hiddenSheets": [],
-              "excludedOtherSheets": []
+              "hiddenSheets": ["resconfig", "resvivtip", "resvivpla"],
+              "excludedOtherSheets": [],
+              "minimumCuadro": ["cexpolink", "resconfig", "resvivtip", "resvivpla"]
             }
           },
           {
@@ -706,17 +840,9 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "code": "unifamili",
             "settings": {
               "excludedMasterSheets": [],
-              "hiddenSheets": [],
-              "excludedOtherSheets": []
-            }
-          },
-          {
-            "nombre": "Hospitality",
-            "code": "hospitali",
-            "settings": {
-              "excludedMasterSheets": [],
-              "hiddenSheets": [],
-              "excludedOtherSheets": []
+              "hiddenSheets": ["resconfig", "resvivtip", "resvivpla"],
+              "excludedOtherSheets": [],
+              "minimumCuadro": ["cexpolink", "resconfig", "resvivtip", "resvivpla"]
             }
           }
         ],
@@ -738,25 +864,25 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             }
           },
           {
-            "name": "RESUMEN TIPOS",
+            "name": "PLANTILLA TIPOS",
             "code": "resvivtip",
             "description": "Hoja de resúmenes de superficies por tipos",
             "tabColor": "#ff00ff",
             "settings": {
               "tipoResumen": {
-                "range": "A2",
+                "range": "B2",
                 "action": "setValue"
               }
             }
           },
           {
-            "name": "RESUMEN PLANTAS",
+            "name": "PLANTILLA PLANTAS",
             "code": "resvivpla",
             "description": "Hoja de resúmenes de superficies por planta",
             "tabColor": "#ffd966",
             "settings": {
               "tipoResumen": {
-                "range": "A2",
+                "range": "B2",
                 "action": "setValue"
               }
             }
@@ -766,34 +892,43 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
           {
             "name": "RESUMEN VIV TIPO",
             "description": "Resumen de superficies interiores de vivienda por tipo",
-            "masterSheet": "RESUMEN TIPOS",
+            "masterSheet": "PLANTILLA TIPOS",
             "relativePosition": 1,
             "settings": {
               "tipoResumen": { "value": "RESUMEN VIV TIPO" }
             }
           },
           {
-            "name": "RESUMEN BLOQUE-LETRA INDIVIDUAL",
+            "name": "RESUMEN BLOQUE-LETRA M",
             "description": "Resumen de superficies interiores de vivienda por bloque-letra",
-            "masterSheet": "RESUMEN TIPOS",
+            "masterSheet": "PLANTILLA TIPOS",
             "relativePosition": 1,
             "settings": {
-              "tipoResumen": { "value": "RESUMEN BLOQUE-LETRA INDIVIDUAL" }
+              "tipoResumen": { "value": "RESUMEN BLOQUE-LETRA M" }
             }
           },
           {
             "name": "RESUMEN ÚTIL VIV SUBTIPO",
-            "description": "Superficies de superficies interiores y exteriores de vivienda por tipo y subtipo",
-            "masterSheet": "RESUMEN TIPOS",
+            "description": "Resumen de superficies útiles interiores y exteriores de vivienda por tipo y subtipo",
+            "masterSheet": "PLANTILLA TIPOS",
             "relativePosition": 2,
             "settings": {
               "tipoResumen": { "value": "ÚTIL VIV SUBTIPO" }
             }
           },
           {
+            "name": "RESUMEN BLOQUE-LETRA ESTANCIAS",
+            "description": "Resumen de superficies interiores y exteriores de vivienda por tipo y subtipo",
+            "masterSheet": "PLANTILLA TIPOS",
+            "relativePosition": 2,
+            "settings": {
+              "tipoResumen": { "value": "RESUMEN BLOQUE-LETRA ESTANCIAS" }
+            }
+          },
+          {
             "name": "Aparcamiento_Trastero",
             "description": "Cuadro de superficies de aparcamientos y trasteros",
-            "masterSheet": "RESUMEN PLANTAS",
+            "masterSheet": "PLANTILLA PLANTAS",
             "relativePosition": 1,
             "settings": {
               "tipoResumen": { "value": 'Aparcamiento_Trastero' },
@@ -802,7 +937,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
           {
             "name": "PLANTAS SR",
             "description": "Superficies por planta construidas sobre rasante",
-            "masterSheet": "RESUMEN PLANTAS",
+            "masterSheet": "PLANTILLA PLANTAS",
             "relativePosition": 2,
             "settings": {
               "tipoResumen": { "value": 'PLANTAS SR' },
@@ -811,7 +946,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
           {
             "name": "PLANTAS BR",
             "description": "Superficies por planta bajo rasante",
-            "masterSheet": "RESUMEN PLANTAS",
+            "masterSheet": "PLANTILLA PLANTAS",
             "relativePosition": 3,
             "settings": {
               "tipoResumen": { "value": 'PLANTAS BR' },
@@ -820,7 +955,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
           {
             "name": "PLANTAS URB",
             "description": "Superficies por planta de urbanización",
-            "masterSheet": "RESUMEN PLANTAS",
+            "masterSheet": "PLANTILLA PLANTAS",
             "relativePosition": 4,
             "settings": {
               "tipoResumen": { "value": 'PLANTAS URB' },
@@ -829,7 +964,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
           {
             "name": "ZZCC SR",
             "description": "Superficies por planta de zonas comunes sobre rasante",
-            "masterSheet": "RESUMEN PLANTAS",
+            "masterSheet": "PLANTILLA PLANTAS",
             "relativePosition": 5,
             "settings": {
               "tipoResumen": { "value": 'ZZCC SR' },
@@ -851,7 +986,8 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "settings": {
               "excludedMasterSheets": [],
               "hiddenSheets": [],
-              "excludedOtherSheets": []
+              "excludedOtherSheets": [],
+              "minimumCuadro": []
             }
           },
           {
@@ -860,16 +996,8 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "settings": {
               "excludedMasterSheets": [],
               "hiddenSheets": [],
-              "excludedOtherSheets": []
-            }
-          },
-          {
-            "nombre": "Hospitality",
-            "code": "hospitali",
-            "settings": {
-              "excludedMasterSheets": [],
-              "hiddenSheets": [],
-              "excludedOtherSheets": []
+              "excludedOtherSheets": [],
+              "minimumCuadro": []
             }
           }
         ],
@@ -879,6 +1007,14 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "code": "cexpolink",
             "description": "Hoja de datos generales y conexión con otros cuadros",
             "tabColor": "#ffff00",
+            "settings": {
+            }
+          },
+          {
+            "name": "DATA",
+            "code": "cuamedvar",
+            "description": "Hoja de configuración, datos y variables del cuadro de mediciones",
+            "tabColor": "#00ff00",
             "settings": {
             }
           },
@@ -894,7 +1030,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "name": "Materiales BIM",
             "code": "materibim",
             "description": "Listado de materiales que vienen del modelo BIM",
-            "tabColor": "#a64d79",
+            "tabColor": "#ff9900",
             "settings": {
             }
           },
@@ -928,7 +1064,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
 
       break;
     
-    default:
+    case 'none':
 
       templateSheetConfigObject = {
         "fileType": ["none"],
@@ -945,15 +1081,6 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
           {
             "nombre": "Unifamiliar",
             "code": "unifamili",
-            "settings": {
-              "excludedMasterSheets": [],
-              "hiddenSheets": [],
-              "excludedOtherSheets": []
-            }
-          },
-          {
-            "nombre": "Hospitality",
-            "code": "hospitali",
             "settings": {
               "excludedMasterSheets": [],
               "hiddenSheets": [],

@@ -1,5 +1,5 @@
 /**
- * Gsuite Morph Tools - CS Updater 1.8.4
+ * Gsuite Morph Tools - CS Updater
  * Developed by alsanchezromero
  *
  * Morph Estudio, 2023
@@ -143,7 +143,6 @@ function morphCSUpdater(btnID, rowData) {
 
     try {    } catch (error) {
     }
-
   }
 
   // Array List of export files
@@ -152,18 +151,20 @@ function morphCSUpdater(btnID, rowData) {
 
       keepNewestFilesOfEachNameInAFolder(expFolderDef); // Delete duplicated files in Exports Folder
 
-      let prefijo = [updatePrefix] || ['TXT','MED', 'CSV', 'SUP']; // prefix mask
+      let prefijo = (updatePrefix.trim() !== "") ? [updatePrefix] : ['TXT', 'MED', 'CSV', 'SUP']; // prefix mask
       let files = expFolderDef.getFiles();
       while (files.hasNext()) {
         file = files.next();
         filename = file.getName();
+
         if (prefixAll === true) {
           if (filename.includes('.txt')) {
-            list.push([file.getName(), file.getId(), file.getName().slice(0, -4).replace('Sheets ', '').toUpperCase()]);
+            list.push([file.getName(), file.getId(), file.getName().toUpperCase().slice(0, -4).replace('SHEETS ', '').trim()]);
           }
         } else {
-          if (prefijo.some(prefix => filename.includes(prefix))) {
-            list.push([file.getName(), file.getId(), file.getName().slice(0, -4).replace('Sheets ', '').toUpperCase()]);
+          let filenamePrefix = filename.split(' ')[0]; // Obtenemos el prefijo antes del primer espacio
+          if (prefijo.some(prefix => filenamePrefix.includes(prefix))) {
+            list.push([file.getName(), file.getId(), file.getName().toUpperCase().slice(0, -4).replace('SHEETS ', '').trim()]);
           }
         }
       }

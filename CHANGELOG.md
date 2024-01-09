@@ -2,6 +2,44 @@
 # Change Log
 Documentación de cambios del proyecto.
 
+## [ 3.0.0 ] - 2023/12/21
+
+### Added
+
+- Todas las funcionalidades de la pestaña "Gestión de cuadros" aparecen publicadas como pestaña principal de la aplicación, superando la base beta.
+- El actualizador en el panel "control de cuadros" ahora solo permite actualizar desde el cuadro de superficies. Con esto evitamos actualizaciones accidentales que destrozan la hoja LINK.
+
+### Changed
+
+- Se ha configurado la prestaña de "Gestión de cuadros" como la pestaña principal de la aplicación. La antigua pestaña principal se ha renombrado como "Herramientas de Google Suite". La pestaña "Gestor de hojas" se ha renombrado como "Gestor de hojas de Sheets".
+- El generador .BC3 permite guardar el archivo en una carpeta personalizada.
+- Herramienta PDF Secuencial se ha añadido en el menú principal de Herramientas de Google Suite.
+- Se ha mejorado el diseño del apartado de Desarrollo en el menú de Herramientas de Google Suite.
+- Se ha eliminado el apartado "Cuadros" del menú de Herramientas de Google Suite (sus funcionalidades se han movido a la pestaña "Gestión de cuadros").
+
+### Fixed
+
+- Se ha arreglado el problema con el selector de prefijos del actualizador de cuadros, que no reconocía la matriz de prefijos predefinidos y cogía siempre cualquier prefijo.
+- Generador .BC3 adaptado a la última versión del Cuadro de Mediciones.
+- Arreglos menores en la plantilla del configurador de cuadros.
+- Arreglado bug al ocultar hojas al crear un nuevo cuadro Morph.
+
+## [ 2.1.5 ] - 2023/11/30
+
+### Fixed
+
+- Arreglos menores en la herramienta de generación BC3.
+
+## [ 2.1.4 ] - 2023/11/30
+
+### Added
+
+- Opción para crear "cuadro mínimo" en el configurador de cuadros.
+
+### Fixed
+
+- Adaptación de la configuración de cuadros a los cambios en plantilla.
+
 ## [ 2.1.3 ] - 2023/11/20
 
 ### Added

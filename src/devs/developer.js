@@ -1,5 +1,42 @@
 // SECTION = FUNCTIONS IN DEVELOPMENT
 
+function refreshFormulasInSelectedRow() {
+  // Mostrar un cuadro de diálogo para que el usuario ingrese el número de fila
+  var ui = SpreadsheetApp.getUi();
+  var result = ui.prompt('Introduce el número de fila:');
+
+  // Obtener el número de fila ingresado por el usuario
+  var rowNumber = parseInt(result.getResponseText());
+
+  // Obtener la hoja de cálculo actual
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+
+  // Obtener la última columna en la fila especificada
+  var lastColumn = sheet.getLastColumn();
+
+  // Obtener la gama de celdas en la fila especificada
+  var rowRange = sheet.getRange(rowNumber, 1, 1, lastColumn);
+
+  // Obtener los valores en la fila
+  var values = rowRange.getValues();
+
+  // Obtener las fórmulas en la fila
+  var formulas = rowRange.getFormulas();
+
+  // Recorrer las celdas en la fila y refrescar las fórmulas
+  for (var i = 0; i < values[0].length; i++) {
+    if (formulas[0][i] !== "") {
+      // Borrar el contenido de la celda
+      sheet.getRange(rowNumber, i + 1).clearContent();
+
+      // Volver a pegar la fórmula
+      sheet.getRange(rowNumber, i + 1).setFormula(formulas[0][i]);
+    }
+  }
+}
+
+
+
 /**
  * getWorksheetNamesArray
  * Returns a list of sheetnames, used for the first load after opening the sidebar.
@@ -1141,17 +1178,6 @@ function authCallback(request) {
 // SECTION = DEPRECATED FUNCTIONS
 
 /**
- * colorMe
- * Fondo de celdas con el color Morph
- */
-function colorMe() {
-  let ss = SpreadsheetApp.getActive();
-  let selection = ss.getSelection();
-  let currentCell = selection.getActiveRange();
-  currentCell.setBackgroundColor('#f1cb50');
-}
-
-/**
  * drawPalette
  * Genera la paleta de colores del Cuadro de Superficies
  */
@@ -1173,44 +1199,6 @@ function drawPalette() {
   let ss = SpreadsheetApp.getActive();
   let sheet = ss.getSheetByName('chart');
   ss.deleteSheet(sheet);
-}
-
-/**
- * adjustRowsHeight
- * Ajusta la altura de las filas seleccionadas.
- */
-function adjustRowsHeight(rowData) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sh = ss.getActiveSheet();
-
-  let formData = [rowData.heightSelectedNumber];
-  let [heightSelectedNumber] = formData;
-
-  let a = sh.getSelection().getActiveRange().getValues();
-  let ab = sh.getSelection().getActiveRange().getA1Notation();
-  let abs = ab.split(':'); let abst = getSplitA1Notation(abs[0]);
-  sh.setRowHeights(abst[1], a.length, heightSelectedNumber);
-}
-
-/**
- * autoResizeAllRows, autoResizeAllCols
- * Automatically adjust the size of rows and columns
- */
-function autoResizeAllRows() {
-  const sh = ss().getActiveSheet();
-  const maxRows = sh.getLastRow();
-  sh.autoResizeRows(1, maxRows)
-}
-
-function autoResizeAllCols() {
-  const sh = ss().getActiveSheet();
-  const numCols = sh.getLastColumn();
-
-  for (let j = 1; j < numCols + 1; j++) {
-    sh.autoResizeColumn(j);
-    let colWidth = sh.getColumnWidth(j)
-    sh.setColumnWidth(j, colWidth + 20)
-  }
 }
 
 /**

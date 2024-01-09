@@ -109,7 +109,7 @@ function basicListFormat(sh, rowShift, colShift) {
     ['CARPETA CUADRO'],
     ['ID CARPETA CUADRO'],
     ['CARPETA EXPORTACIONES'],
-    ['CARPETA CARPETA CONGELADOS'],
+    ['CARPETA CONGELADOS'],
     ['ÚLTIMO ARCHIVO CONGELADO'],
     ['DESCARGAR ARCHIVO XLSX']
   ];

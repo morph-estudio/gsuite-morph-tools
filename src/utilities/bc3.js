@@ -18,6 +18,7 @@ function generarArchivoBC3() {
 
   // Variables iniciales
 
+  var LNKSheetname = "LINK";
   var BC3Sheetname = "BC3";
   var VARSheetname = "Data";
 
@@ -25,7 +26,19 @@ function generarArchivoBC3() {
   var bc3Sheet = ss.getSheetByName(BC3Sheetname);
   var bc3Date = obtenerFechaHoraMadrid('ddMMyy');
 
-  var finalFolder = DriveApp.getFolderById("1rnVSZZYHM7VHwxUVwISXBeres5kuiycQ");
+  var linkSheet = ss.getSheetByName(LNKSheetname);
+  var linkData = linkSheet.getRange("A:B").getValues();
+
+  for (var i = 0; i < linkData.length; i++) {
+    if (linkData[i][0] === "CARPETA EXPORTACIÓN .BC3" && linkData[i][1] != "") {
+      var getFolderUrl = linkData[i][1];
+      var getFolderID = getIdFromUrl(getFolderUrl);
+    } else {
+      var getFolderID = obtenerBackupFolder(ss);
+    }
+  }
+
+  var finalFolder = DriveApp.getFolderById(getFolderID);
 
   // Array para guardar las líneas del archivo BC3
 
@@ -43,6 +56,10 @@ function generarArchivoBC3() {
 
   var dataRange = bc3Sheet.getDataRange();
   var data = dataRange.getValues();
+
+  if (data[0][5] === false){
+    throw new Error(`El archivo no se puede generar porque la visualización BC3 de la hoja "BC3" se encuentra desactivada.`);
+  }
 
   // Mapear las columnas de la hoja Sheets
 
@@ -65,6 +82,8 @@ function generarArchivoBC3() {
   var Altura = columnMapping['Altura'];
   var Cantidad = columnMapping['Cantidad'];
   var CanPres = columnMapping['CanPres'];
+  var Pres = columnMapping['Pres'];
+  var Direct = columnMapping['Direct'];
 
   // Generar líneas de inicio del documento
 
@@ -106,13 +125,16 @@ function generarArchivoBC3() {
         line = `~C|${row[Codigo]}#||${row[Resumen]}|0|${bc3Date}|0|`;
         lineDesglose = `~Y|${row[Capcode]}#|${row[Codigo]}#\\\\|`;
 
-        bc3LinesSubs.push(line); bc3LinesSubs.push(lineDesglose);
+        bc3LinesSubs.push(line);
+        bc3LinesSubs.push(lineDesglose);
         break;
         /**/
       case 'Partida': // Línea de información de la partida
-        line = `~C|${row[Codigo]}|${row[Ud]}|${row[Resumen]}|0|${bc3Date}|PAR|`;
+        line = `~C|${row[Codigo]}|${row[Ud]}|${row[Resumen]}|${row[Pres]}|${bc3Date}|PAR|`;
+        lineDesglose = `${row[Codigo]} \\ \\ `;
 
-        bc3LinesPart.push(line); bc3DesglPart.push(`${row[Codigo]} \\ \\ `);
+        bc3LinesPart.push(line);
+        bc3DesglPart.push(lineDesglose);
         break;
       case 'RES': // Resumen de la partida
         line = `~T|${row[Codigo]}|${row[Resumen]}|`;
@@ -121,8 +143,12 @@ function generarArchivoBC3() {
         break;
       case 'SLT': // Líneas de medición
         //line = `~N | ${row[Subcode]} \\ ${row[Codigo]} | | | LINO \\ ${row[Comentario]} \\ ${row[N]} \\ ${row[Longitud]} \\ ${row[Anchura]} \\ ${row[Altura]} \\ | LIN |`;
-        line = `~N|${row[Subcode]}\\${row[Codigo]}|||LINO\\${row[Comentario]}\\${row[N].toString().trim()}\\${row[Longitud].toString().trim()}\\${row[Anchura].toString().trim()}\\${row[Altura].toString().trim()}\\|LIN|`;
-
+        if(row[Direct] === "SI"){
+          line = `~N|${row[Subcode]}\\${row[Codigo]}|||LINO\\${row[Comentario]}\\${row[Cantidad].toString().trim()}\\\\\\|LIN|`;//${row[Cantidad].toString().trim()}
+        } else{
+          line = `~N|${row[Subcode]}\\${row[Codigo]}|||LINO\\${row[Comentario]}\\${row[N].toString().trim()}\\${row[Longitud].toString().trim()}\\${row[Anchura].toString().trim()}\\${row[Altura].toString().trim()}\\|LIN|`;
+        }
+        
         bc3LinesPart.push(line);
         break;
       case 'TZP': // Cuando termina un subcapítulo se añade la línea de desglose correspondiente a ese subcapítulo
@@ -149,6 +175,12 @@ function generarArchivoBC3() {
   var blob = Utilities.newBlob('').setDataFromString(bc3Content, "ISO-8859-1");
   blob.setName(fileName);
   finalFolder.createFile(blob);
+
+  for (var i = 0; i < linkData.length; i++) {
+    if (linkData[i][0] === "CARPETA EXPORTACIÓN .BC3") {
+      linkSheet.getRange(i + 1, 2).setValue(finalFolder.getUrl());
+    }
+  }
 }
 
 /**
@@ -312,6 +344,53 @@ function formatearHojaBC3() {
   spreadsheet.deleteSheet(duplicatedSheet);
 }
 
+/**
+ * Obtener la carpeta de respaldo asociada a una hoja de cálculo y crearla si no existe.
+ *
+ * @param {Spreadsheet} spreadsheet - La hoja de cálculo para la cual se obtiene o crea la carpeta de respaldo.
+ * @return {string} El ID de la carpeta de respaldo.
+ * @throws {Error} Si se cancela la creación de la carpeta.
+ */
+function obtenerBackupFolder(spreadsheet) {
+  var ss_id = spreadsheet.getId();
+  var file = DriveApp.getFileById(ss_id);
+  var parentFolder = file.getParents();
+  var parentFolderID = parentFolder.next().getId();
+  var backupFolderSearch = DriveApp.getFolderById(parentFolderID);
+
+  var backupFolder, backupFolderId;
+  let searchFor = 'title contains "BC3"';
+  backupFolder = backupFolderSearch.searchFolders(searchFor);
+
+  if (!backupFolder.hasNext()) {
+    var response = Browser.msgBox("Atención", "No se ha encontrado la carpeta para los archivos congelados. ¿Deseas crearla automáticamente?", Browser.Buttons.OK_CANCEL);
+    if (response == "cancel") {
+      throw new Error(`No se ha podido encontrar la carpeta de archivos congelados.`);
+    }
+    
+    var folderName = `${ss_name.substring(0, 6)}-A-CS-${searchFor.substring(16, searchFor.length - 1)}`;
+    var newFolder = backupFolderSearch.createFolder(folderName);
+
+    backupFolderId = newFolder.getId();
+    backupFolder = DriveApp.getFolderById(backupFolderId);
+  } else {
+    backupFolder = backupFolder.next();
+    backupFolderId = backupFolder.getId();
+  }
+
+  return backupFolderId;
+
+  // var newSpreadsheet = generarXLSXdeDuplicatedSheet(backupFolder, duplicatedSheet, BC3Sheetname);
+}
+
+/**
+ * Generar un archivo XLSX a partir de una hoja de cálculo duplicada y moverlo a la carpeta de respaldo.
+ *
+ * @param {Folder} backupFolder - La carpeta de respaldo donde se almacenará el archivo XLSX.
+ * @param {Sheet} duplicatedSheet - La hoja de cálculo duplicada de la que se generará el archivo XLSX.
+ * @param {string} originalSheetName - El nombre de la hoja de cálculo original.
+ * @return {Spreadsheet} El nuevo archivo XLSX generado.
+ */
 function generarXLSXdeDuplicatedSheet(backupFolder, duplicatedSheet, originalSheetName) {
 
   var spreadsheet = duplicatedSheet.getParent();
@@ -341,6 +420,12 @@ function generarXLSXdeDuplicatedSheet(backupFolder, duplicatedSheet, originalShe
   return newSpreadsheet;
 }
 
+/**
+ * Obtener la fecha y hora actual en la zona horaria de Madrid y formatearla.
+ *
+ * @param {string} formato - El formato deseado para la fecha y hora. Por defecto: 'yyyyMMdd HH:mm'.
+ * @return {string} La fecha y hora actual formateada en la zona horaria de Madrid.
+ */
 function obtenerFechaHoraMadrid(formato) {
   var formato = formato || 'yyyyMMdd HH:mm';
   var madridTimeZone = CalendarApp.getTimeZone();
@@ -348,6 +433,11 @@ function obtenerFechaHoraMadrid(formato) {
   return fechaHoraMadrid;
 }
 
+/**
+ * Elimina filas sobrantes en una hoja de cálculo.
+ *
+ * @param {Sheet} sh - La hoja de cálculo en la que se eliminarán las filas sobrantes. Si no se proporciona, se usa la hoja de cálculo activa.
+ */
 function eliminarFilasSobrantes(sh) {
   sh = sh || SpreadsheetApp.getActiveSheet();
   let maxRows = sh.getMaxRows();

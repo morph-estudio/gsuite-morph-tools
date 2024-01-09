@@ -48,35 +48,20 @@
 <div class="accordion" id="accordionExample">
 
   <div class="accordion-item">
-    <h2 class="accordion-header" id="headingCuadros">
-      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCuadros" aria-expanded="true" aria-controls="collapseCuadros">
-        Cuadros
-      </button>
-    </h2>
-    <div id="collapseCuadros" class="accordion-collapse collapse show" aria-labelledby="headingCuadros" data-bs-parent="#accordionExample">
-      <div class="accordion-body mt-2">
-
-        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/helpCuadros').getContent(); ?>
-        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/cuadros').getContent(); ?>
-
-      </div>
-    </div>
-  </div>
-
-  <div class="accordion-item">
     <h2 class="accordion-header" id="headingSheets">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSheets" aria-expanded="false" aria-controls="collapseSheets">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSheets" aria-expanded="true" aria-controls="collapseSheets">
         Google Sheets
       </button>
     </h2>
-    <div id="collapseSheets" class="accordion-collapse collapse" aria-labelledby="headingSheets" data-bs-parent="#accordionExample">
+    <div id="collapseSheets" class="accordion-collapse collapse show" aria-labelledby="headingSheets" data-bs-parent="#accordionExample">
       <div class="accordion-body pb-0 mt-2">
 
         <!-- <div class="mt-1 pb-0">
           <p>En esta app tienes las funciones implementadas por el equipo I+D para Google Suite.</p>
-        </div> -->
+        </div> 
 
         <button id="superFreezerButton" class="btn btn-primary gmt blue btn-lg-gmt w-100 mt-1 mb-3 shadow-none centerScroll"  onclick="swalConfirm('morphFreezer', 'El archivo se ha congelado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', this.id)">Supercongelador</button>
+        -->
 
       </div>
 
@@ -146,6 +131,21 @@
     </div>
   </div>
 
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingPDFSecuencial">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePDFSecuencial" aria-expanded="false" aria-controls="collapsePDFSecuencial">
+        PDF Secuencial
+      </button>
+    </h2>
+    <div id="collapsePDFSecuencial" class="accordion-collapse collapse" aria-labelledby="headingPDFSecuencial" data-bs-parent="#accordionExample">
+      <div class="accordion-body mt-2 pb-3">
+
+        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/pdfSecuencial').getContent(); ?>
+
+      </div>
+    </div>
+  </div>
+
   <div class="accordion-item devAreaPermission" style="display: none;">
     <h2 class="accordion-header" id="headingEstCom">
       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEstCom" aria-expanded="false" aria-controls="collapseEstCom">
@@ -155,7 +155,7 @@
     <div id="collapseEstCom" class="accordion-collapse collapse" aria-labelledby="headingEstCom" data-bs-parent="#accordionExample">
       <div class="accordion-body mt-2 pb-3">
 
-        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/estilosComplejos').getContent(); ?>
+        <?!= HtmlService.createHtmlOutputFromFile('public/helpers/estilos-complejos').getContent(); ?>
 
       </div>
     </div>
