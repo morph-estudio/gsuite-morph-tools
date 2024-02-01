@@ -152,8 +152,16 @@
       </div>
 
       <div class="form-check form-switch mt-2 ms-2" >
-        <input class="form-check-input shadow-none" type="checkbox" role="switch" id="minimumSwitch">
-        <label class="form-check-label" for="minimumSwitch">Cuadro mínimo<span data-bs-toggle="tooltip" data-bs-placement="right" title="Si lo marcas se creará un cuadro solo con las hojas esenciales, es decir, check de viviendas y superficies por planta, excluyendo los cuadros de justificación y otras hojas que luego podrás ir incluyendo con el configurador de cuadros."><i class="fa-regular fa-circle-question fa-questionstyle" style=""></i></span></label>
+        <input class="form-check-input shadow-none" type="checkbox" role="switch" id="ampliadoSwitch">
+        <label class="form-check-label" for="ampliadoSwitch">Cuadro ampliado<span data-bs-toggle="tooltip" data-bs-placement="right" title="Si lo marcas se añadirán al cuadro más hojas aparte de las esenciales, como los cuadros de garaje y justificación de incendios."><i class="fa-regular fa-circle-question fa-questionstyle" style=""></i></span></label>
+      </div>
+
+      <div class="mt-3">
+        <label for="cuadroSoftware" class="form-label whiteText"><i class="fa-solid fa-p fa-margin fa-fw whiteText"></i>Software BIM</label>
+        <select class="form-select shadow-none" id="cuadroSoftware" >
+          <option value="selectArchicad" selected>Archicad</option>
+          <option value="selectRevit">Revit</option>
+        </select>
       </div>
 
       <div class="mt-3">
@@ -366,6 +374,7 @@
       <button class="btn btn-primary index i2 shadow-none w-100 centerScroll superficiesVisibilityControl" onclick="swalConfirm('refreshNamedRanges', 'Los rangos se han actualizado correctamente.', 'Se actualizarán los rangos nombrados. Por favor, no continúes si no sabes lo que estás haciendo...')"><i class="fa-solid fa-registered fa-margin fa-fw"></i>Actualizar rangos nombrados</button>
       <button class="btn btn-primary index i2 shadow-none w-100 centerScroll superficiesVisibilityControl" onclick="swalConfirm('historicoDeSuperficies', 'El punto histórico se ha añadido correctamente.', 'Se creará un punto temporal en el histórico de superficies. Confirma para continuar.')"><i class="fa-solid fa-clock-rotate-left fa-margin fa-fw"></i>Crear punto manual en el histórico de superficies</button>
       <button class="btn btn-primary index i2 shadow-none w-100 centerScroll medicionesVisibilityControl" onclick="swalConfirm('generarArchivoBC3', 'El archivo se ha generado correctamente.', 'Se generará un archivo BC3 con la información del proyecto. Confirma para continuar.')"><i class="fa-solid fa-filter-circle-dollar fa-margin fa-fw"></i>Generar archivo BC3 de importación para Presto</button>
+      <button class="btn btn-primary index i2 shadow-none w-100 centerScroll medicionesVisibilityControl" onclick="swalConfirm('sendToBigqueryDatabase', 'Los datos se han enviado a la base de datos.', 'El histórico actual se guardará en la base de datos de mediciones.')"><i class="fa-solid fa-database fa-margin fa-fw"></i>Enviar histórico actual a la base de datos</button>
 
       <button class="btn btn-primary index i2 shadow-none w-100 centerScroll" onclick="swalConfirm('refreshFormulasInSelectedRow', 'Las fórmulas se han depurado.', 'Se borrarán y volverán a copiar las fórmulas de las primeras filas de la hoja.')"><i class="fa-solid fa-retweet fa-margin fa-fw"></i>Refrescar fila de fórmulas</button>
 
@@ -409,6 +418,11 @@ $(document).ready(function() {
 
     // Generación dinámica de switches y checkboxes para las hojas maestras y secundarias
     templateSheetConfigObject.masterSheets.forEach(function(masterSheet) {
+
+      if (masterSheet.settings.showInList === false) {
+        return; // Esto es equivalente a "continue" en un bucle forEach.
+      }
+
       var switchDivMaestra = $("<div></div>").addClass("form-check form-check-mae form-switch");
       var switchInputMaestra = $("<input>")
         .attr("type", "checkbox")
@@ -752,6 +766,7 @@ CuadrosConfig.openDialogActions = function(buttonSelected) {
     // swalinfo('Esta función aún está en desarrollo.')
 
     let cuadroType = document.getElementById('cuadroType').value;
+    let cuadroSoftware = document.getElementById('cuadroSoftware').value;
     let projectCategory = document.getElementById('projectCategory').value;
     let projectShortname = document.getElementById('projectShortname').value;
     let projectCode = document.getElementById('projectCode').value;
@@ -759,10 +774,11 @@ CuadrosConfig.openDialogActions = function(buttonSelected) {
     let cuadroFolder = document.getElementById('folderURL').value;
     let cuadroFolderSup = document.getElementById('folderURLCS').value;
     let cuadroFolderPanel = document.getElementById('folderURLPC').value;
-    let cuadroMinimum = $('#minimumSwitch').prop('checked');
+    let cuadroAmpliadoSwitch = $('#ampliadoSwitch').prop('checked');
 
     var rowData = {
           cuadroType,
+          cuadroSoftware,
           projectCategory,
           projectShortname,
           projectCode,
@@ -770,7 +786,7 @@ CuadrosConfig.openDialogActions = function(buttonSelected) {
           cuadroFolder,
           cuadroFolderSup,
           cuadroFolderPanel,
-          cuadroMinimum
+          cuadroAmpliadoSwitch
         }
 
     swalConfirm('crearCuadroSuperficies', 'El cuadro se ha creado correctamente.', 'Se creará un nuevo cuadro de superficies en la carpeta especificada. Confirma para continuar.', rowData);

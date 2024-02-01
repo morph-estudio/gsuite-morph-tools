@@ -16,182 +16,125 @@ function mscPruebas() {
  */
 function crearCuadroSuperficies(rowData) {
   
-  var [projectCategory, folderURL, folderURLCS, folderURLPC, cuadroType, projectShortname, projectCode, projectLocalidad, cuadroMinimum] = [rowData.projectCategory, rowData.cuadroFolder, rowData.cuadroFolderSup, rowData.cuadroFolderPanel, rowData.cuadroType, rowData.projectShortname, rowData.projectCode, rowData.projectLocalidad, rowData.cuadroMinimum];
+  var [projectCategory, folderURL, csFolderURL, pcFolderURL, cuadroType, cuadroSoftware, projectShortname, projectCode, projectLocalidad, cuadroAmpliadoSwitch] = [rowData.projectCategory, rowData.cuadroFolder, rowData.cuadroFolderSup, rowData.cuadroFolderPanel, rowData.cuadroType, rowData.cuadroSoftware, rowData.projectShortname, rowData.projectCode, rowData.projectLocalidad, rowData.cuadroAmpliadoSwitch];
 
-  var cuadroTypeName; var cuadroTypeID; var excludedSheetNames; var destinationFolder;
+  var cuadroTypeName;
+  var cuadroTypeID;
+  var includedSheetNames;
+  var destinationFolder;
 
-  var idArray = {}; var urlArray = {};
+  var idArray = {};
+  var urlArray = {};
+
+  const cuadroTypes = getCuadroTypes(); Logger.log(`cuadroTypes: ${cuadroTypes}`);
 
   Logger.log(`cuadroType: ${cuadroType}, projectCategory: ${projectCategory}, projectCode: ${projectCode}, projectShortname: ${projectShortname}, folderURL: ${folderURL}`);
+
+  // Comprobaciones iniciales 
 
   var isExpediente = cuadroType === "selectExpedienteCompleto" ? true : false;
   var cuadrosArray = isExpediente === true ? ["selectPanelControl", "selectCuadroSuperficies", "selectCuadroExportacion"] : [cuadroType];
 
   cuadrosArray.forEach(function(cuadro) {
 
-    switch (cuadro) {
-      case 'selectPanelControl':
-        var cuadroTypeName = getTipoArchivo(null, 1);
-        cuadroTypeID = naveNodrizaIDS(cuadroTypeName);
-        destinationFolder = isExpediente === true ? folderURLPC : folderURL;
-
-        break;
-      case 'selectCuadroSuperficies':
-        var cuadroTypeName = getTipoArchivo(null, 2);
-        cuadroTypeID = naveNodrizaIDS(cuadroTypeName);
-        destinationFolder = isExpediente === true ? folderURLCS : folderURL;
-
-        break;
-      case 'selectCuadroExportacion':
-        var cuadroTypeName = getTipoArchivo(null, 3);
-        cuadroTypeID = naveNodrizaIDS(cuadroTypeName);
-        destinationFolder = isExpediente === true ? folderURLCS : folderURL;
-
-        break;
-      case 'selectCuadroMediciones':
-        var cuadroTypeName = getTipoArchivo(null, 4);
-        cuadroTypeID = naveNodrizaIDS(cuadroTypeName);
-        destinationFolder = isExpediente === true ? folderURLCS : folderURL;
-
-        break;
-      default:
-        break;
+    const cuadroTypeName = getTipoArchivo(null, cuadroTypes[cuadro]);
+    if (cuadroTypeName) {
+      cuadroTypeID = naveNodrizaIDS(cuadroTypeName);
+      folderByCuadro = cuadroTypes[cuadro] === 1 ? pcFolderURL : csFolderURL;
+      destinationFolder = isExpediente ? folderByCuadro : folderURL;
     }
 
     try {
       destinationFolder = DriveApp.getFolderById(getIdFromUrl(destinationFolder));
     } catch (error) {
-        throw new Error('No se ha encontrado las carpetas especificadas.');
+        throw new Error('No se ha encontrado la carpeta especificada.');
     }
 
     // Traer la configuración del objeto JSON
 
     var configJSONData = templateSheetConfigObject(false, cuadroTypeName);
-    var projectTypeConfig = configJSONData.projectTypes.find(
-      (type) => type.code === projectCategory
-    );
+    var projectTypeConfig = configJSONData.projectTypes.find((type) => type.code === projectCategory);
 
-    if (!projectTypeConfig) { throw new Error('Project type not found in configuration.'); }
+    if (!projectTypeConfig) { throw new Error('No se ha encontrado una configuración para este tipo de proyecto.'); }
 
     // Generar la copia de plantilla
 
-    var nuevoNombre = `${projectCode} ${cuadroTypeName} ${projectShortname}`;
-    var newFile = DriveApp.getFileById(cuadroTypeID).makeCopy(nuevoNombre, destinationFolder);
+    var newFilename = `${projectCode} ${cuadroTypeName} ${projectShortname}`;
+    var newFile = DriveApp.getFileById(cuadroTypeID).makeCopy(newFilename, destinationFolder);
     var newFileID = newFile.getId();
 
     idArray[cuadroTypeName] = newFileID;
     urlArray[cuadroTypeName] = newFile.getUrl();
-
   });
 
   cuadrosArray.forEach(function(cuadro) {
 
-    Logger.log(`urlArray: ${JSON.stringify(urlArray)}, idArray: ${JSON.stringify(idArray)}`)
+    Logger.log(`cuadroTypes[cuadro]: ${cuadroTypes[cuadro]}`);
 
-    switch (cuadro) {
-      case 'selectPanelControl':
-        cuadroTypeName = getTipoArchivo(null, 1);
-        break;
-      case 'selectCuadroSuperficies':
-        cuadroTypeName = getTipoArchivo(null, 2);
-        break;
-      case 'selectCuadroExportacion':
-        cuadroTypeName = getTipoArchivo(null, 3);
-        break;
-      case 'selectCuadroMediciones':
-        cuadroTypeName = getTipoArchivo(null, 4);
-        break;
-      default:
-        break;
-    }
+    cuadroTypeName = getTipoArchivo(null, cuadroTypes[cuadro] || null);
 
-    SpreadsheetApp.flush();
+    var cuadroFileID = idArray[cuadroTypeName];
+    var archivoCopiado = SpreadsheetApp.openById(cuadroFileID);
 
-    var cuadroFileID = idArray[cuadroTypeName]; Logger.log(`cuadroTypeName:${cuadroTypeName}, cuadroFileID: ${cuadroFileID}, cuadroFileID: ${urlArray[cuadroTypeName]}, cuadroMinimum: ${cuadroMinimum}`);
-    var copiedFile = SpreadsheetApp.openById(cuadroFileID);
+    Logger.log(`Tipo de cuadro: ${cuadroTypeName}, ID Archivo: ${cuadroFileID}, URL Cuadro: ${urlArray[cuadroTypeName]}, ¿Es ampliado?: ${cuadroAmpliadoSwitch}`);
 
     var configJSONData = templateSheetConfigObject(false, cuadroTypeName);
     var projectTypeConfig = configJSONData.projectTypes.find(
       (type) => type.code === projectCategory
     );
+    
+    // Eliminar los rangos nombrados en función del tipo de cuadro
 
-    if(cuadroMinimum === true) {
+    if (cuadro === "selectCuadroSuperficies" && cuadroSoftware !== "Revit") {
+      eliminarRangosNombradosPorPrefijo(archivoCopiado, "RVT");
+    }
 
-      var minimumSheetsCodes = projectTypeConfig.settings.minimumCuadro || {};
-      
-      var minimumSheetsNames = minimumSheetsCodes.map((code) => {
-        var sheet = configJSONData.masterSheets.find((masterSheet) => masterSheet.code === code);
-        return sheet ? sheet.name : null;
+    SpreadsheetApp.flush();
+
+    // Hojas excluidas
+
+    var includedMasterSheetsCodes;
+
+    includedMasterSheetsCodes = cuadroAmpliadoSwitch ? projectTypeConfig.settings.fullCuadro : projectTypeConfig.settings.minimumCuadro;
+
+    if (cuadroSoftware === "Revit") {
+      var revitSheetsCodes = projectTypeConfig.settings.revitCuadro;
+      Object.assign(includedMasterSheetsCodes, revitSheetsCodes);
+    }
+
+    includedSheetNames = new Set(
+      includedMasterSheetsCodes.map((code) => {
+        var masterSheet = configJSONData.masterSheets.find((sheet) => sheet.code === code);
+        return masterSheet ? masterSheet.name : '';
+      })
+    );
+
+    Logger.log(`includedSheetNames: ${JSON.stringify(includedSheetNames)}`)
+
+    if (includedSheetNames.size > 0) {
+      var hojasArchivoCopiado = archivoCopiado.getSheets();
+      var sheetsToDelete = hojasArchivoCopiado.filter((sheet) => {
+        var sheetName = sheet.getName();
+        return !includedSheetNames.has(sheetName);
       });
 
-      Logger.log(`Estamos dentro de la configuración de cuadro mínimo. minimumSheetsNames: ${JSON.stringify(minimumSheetsNames)}`)
-
-      if (minimumSheetsNames instanceof Array && minimumSheetsNames.length > 0) {
-
-        minimumSheetsNames = new Set(minimumSheetsNames);
-
-        var copiedSheets = copiedFile.getSheets();
-        var sheetsToDelete = copiedSheets.filter((sheet) => !minimumSheetsNames.has(sheet.getName()));
-
-        Logger.log(`Se van a borrar las hojas. minimumSheetsNames: ${JSON.stringify(minimumSheetsNames)}, sheetsToDelete: ${JSON.stringify(sheetsToDelete)}`)
-
-        var requests = sheetsToDelete.map((sheet) => {
-          return {
-            deleteSheet: {
-              sheetId: sheet.getSheetId(),
-            },
-          };
-        });
-
-        if (requests.length > 0) {
-          Sheets.Spreadsheets.batchUpdate({ requests }, copiedFile.getId());
-        }
-      }
-
-    } else {
-
-      // Eliminar hojas cuyos nombres comienzan por "WIP"
-      var sheetsToDelete = copiedFile.getSheets().filter(function(sheet) {
-        return sheet.getName().startsWith("WIP");
+      var requests = sheetsToDelete.map((sheet) => {
+        return {
+          deleteSheet: {
+            sheetId: sheet.getSheetId(),
+          },
+        };
       });
 
-      sheetsToDelete.forEach(function(sheet) {
-        copiedFile.deleteSheet(sheet);
-      });
-
-      // Hojas excluidas
-
-      var excludedMasterSheetsCodes = projectTypeConfig.settings.excludedMasterSheets || {};
-      var excludedOtherSheets = projectTypeConfig.settings.excludedOtherSheets || {};
-      excludedSheetNames = new Set([
-        ...excludedMasterSheetsCodes.map((code) => {
-          var masterSheet = configJSONData.masterSheets.find((sheet) => sheet.code === code);
-          return masterSheet ? masterSheet.name : '';
-        }),
-        ...excludedOtherSheets,
-      ]);
-
-      if (excludedSheetNames != undefined && excludedSheetNames.size > 0) {
-        var copiedSheets = copiedFile.getSheets();
-        var sheetsToDelete = copiedSheets.filter((sheet) => excludedSheetNames.has(sheet.getName()));
-
-        var requests = sheetsToDelete.map((sheet) => {
-          return {
-            deleteSheet: {
-              sheetId: sheet.getSheetId(),
-            },
-          };
-        });
-
-        if (requests.length > 0) {
-          Sheets.Spreadsheets.batchUpdate({ requests }, copiedFile.getId());
-        }
+      if (requests.length > 0) {
+        Sheets.Spreadsheets.batchUpdate({ requests }, archivoCopiado.getId());
       }
     }
 
     SpreadsheetApp.flush();
 
     // Ocultar las hojas definidas en "hiddenSheets"
+
     var hiddenSheetCodes = projectTypeConfig.settings.hiddenSheets || [];
     var hiddenSheetNames = hiddenSheetCodes.map((code) => {
       var sheet = configJSONData.masterSheets.find((masterSheet) => masterSheet.code === code);
@@ -200,7 +143,7 @@ function crearCuadroSuperficies(rowData) {
 
     hiddenSheetNames.forEach(function(sheetName) {
       if (sheetName) {
-        var sheetToHide = copiedFile.getSheetByName(sheetName);
+        var sheetToHide = archivoCopiado.getSheetByName(sheetName);
         if (sheetToHide) {
           sheetToHide.hideSheet();
         }
@@ -211,12 +154,10 @@ function crearCuadroSuperficies(rowData) {
 
     var instruccionesSheet; var linkRange;
 
-    SpreadsheetApp.flush();
-
     switch (cuadro) {
       case 'selectPanelControl':
 
-        instruccionesSheet = copiedFile.getSheetByName('Instrucciones');
+        instruccionesSheet = archivoCopiado.getSheetByName('Instrucciones');
 
         var linkRange = 'B3';
         if (isExpediente) {
@@ -241,7 +182,6 @@ function crearCuadroSuperficies(rowData) {
           } else { cellB = null; }
           
           if (found) { instruccionesSheet.getRange(i + 1, 2, 1, 1).setValue(cellB); }
-          
         }
 
         let BDDPC_ID = '1xWhvOUZPGgkRr8Emtt2lm4n6U67VCiO4h1PqpX72Dbs';
@@ -252,7 +192,7 @@ function crearCuadroSuperficies(rowData) {
         break;
       case 'selectCuadroSuperficies':
 
-        instruccionesSheet = copiedFile.getSheetByName('LINK');
+        instruccionesSheet = archivoCopiado.getSheetByName('LINK');
         var linkRange = 'B1';
         if (isExpediente) {
           instruccionesSheet.getRange(linkRange).setValue(urlArray['Panel de control']);
@@ -263,12 +203,11 @@ function crearCuadroSuperficies(rowData) {
         let BDDCS_ID = '1P5R7Gw22DeTjyaCHLqXngQDYA5WdenVGYMPoaYM1OrQ';
         importRangeToken(idArray['Cuadro Superficies'], BDDCS_ID);
         importRangeToken(idArray['Cuadro Superficies'], idArray['Panel de control']);
-        
 
         break;
       case 'selectCuadroExportacion':
 
-        var instruccionesSheet = copiedFile.getSheetByName('LINK');
+        var instruccionesSheet = archivoCopiado.getSheetByName('LINK');
         var linkRange = 'B2:B3';
         if (isExpediente) {
           var cuadroSuperficiesValue = [urlArray['Cuadro Superficies']];
@@ -284,7 +223,7 @@ function crearCuadroSuperficies(rowData) {
         break;
       case 'selectCuadroMediciones':
 
-        var instruccionesSheet = copiedFile.getSheetByName('LINK');
+        var instruccionesSheet = archivoCopiado.getSheetByName('LINK');
         var headers = instruccionesSheet.getRange(1, 1, 1, instruccionesSheet.getLastColumn()).getValues()[0];
         var columnIndex = headers.indexOf("AC: URL");
         if (columnIndex !== -1) {
@@ -580,6 +519,8 @@ function mainGenerateTemplateSheets(rowData, overwriteSwitch, templateType) {
         }
       }
 
+      SpreadsheetApp.flush()
+
       ss.setActiveSheet(copiedSheet);
       ss.moveActiveSheet(candidateSheetIndex + 1);
     }
@@ -612,10 +553,38 @@ function aplicarConfiguracion(ss, masterSheetName, secondarySheetName, masterShe
 
     switch (action) {
       case "setValue":
-        secondarySheet.getRange(range).setValue(value);
+        if (range.includes(';')) {
+          var headerParts = range.split(";");
+          var columnHeader = headerParts[0];
+          var rowNumber = parseInt(headerParts[1]);
+
+          var headerRow = secondarySheet.getRange(1, 1, 1, secondarySheet.getLastColumn()).getValues()[0];
+          var columnIndex = headerRow.indexOf(columnHeader) + 1;
+
+          // Verificar si se encontró el encabezado
+          if (columnIndex > 0) {
+            secondarySheet.getRange(rowNumber, columnIndex).setValue(value);
+          } else {
+            Logger.log("El encabezado '" + columnHeader + "' no se encontró en la hoja.");
+          }
+        } else { secondarySheet.getRange(range).setValue(value); }
         break;
       case "setBoolean":
-        secondarySheet.getRange(range).setValue(value);
+        if (range.includes(';')) {
+          var headerParts = range.split(";");
+          var columnHeader = headerParts[0];
+          var rowNumber = parseInt(headerParts[1]);
+
+          var headerRow = secondarySheet.getRange(1, 1, 1, secondarySheet.getLastColumn()).getValues()[0];
+          var columnIndex = headerRow.indexOf(columnHeader) + 1;
+
+          // Verificar si se encontró el encabezado
+          if (columnIndex > 0) {
+            secondarySheet.getRange(rowNumber, columnIndex).setValue(value);
+          } else {
+            Logger.log("El encabezado '" + columnHeader + "' no se encontró en la hoja.");
+          }
+        } else { secondarySheet.getRange(range).setValue(value); }
         break;
       case "deleteRange":
         columnIndexArray = getColumnsRangeObject(range, true);
@@ -647,6 +616,7 @@ function aplicarConfiguracion(ss, masterSheetName, secondarySheetName, masterShe
     }
   }
   Logger.log(`Applied settings for ${secondarySheetName}`);
+  SpreadsheetApp.flush()
 }
 
 
@@ -915,4 +885,80 @@ function agruparColumnasDeExportacion() {
       }
     }
   }
+}
+
+function eliminarRangosNombradosPorPrefijo(ss, prefijo) {
+  var rangosNombrados = ss.getNamedRanges();
+  
+  for (var i = 0; i < rangosNombrados.length; i++) {
+    var nombre = rangosNombrados[i].getName();
+    
+    if (nombre.startsWith(prefijo)) {
+      rangosNombrados[i].remove();
+    }
+  }
+}
+
+function fechaformat() {
+  var fecha = `12/01/2024`
+  var fechaNueva = Utilities.formatDate(fecha, 'GMT', 'yyyy-MM-dd');
+  Logger.log(fechaNueva)
+}
+
+function sendToBigqueryDatabase() {
+
+  var histSheetname = 'hisexport';
+  var projectId = 'alsan-scripts';
+  var datasetId = 'medautocomparativo';
+  var tableId = 'historico';
+
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var hoja = ss.getSheetByName(histSheetname);
+  var rango = hoja.getDataRange();
+  var values = rango.getValues();
+
+  var rowsCSV = values.join("\n");
+  var data = Utilities.newBlob(rowsCSV, 'application/octet-stream');
+
+  function convertValuesToRows(data) {
+    var rows = [];  
+    var headers = values[0];
+
+    Logger.log(`headers: ${headers}`)
+
+    for (var i = 1, numColumns = data.length; i < numColumns; i++) {
+      var row = BigQuery.newTableDataInsertAllRequestRows();
+      row.json = data[i].reduce(function(obj, value, index) {
+        obj[headers[index]] = value;
+        return obj;
+      }, {});
+      rows.push(row);
+    }; 
+    Logger.log(`rows: ${rows}`)
+    return rows;
+  }
+
+  
+
+  function bigqueryInsertData(data, tableId) {
+    var insertAllRequest = BigQuery.newTableDataInsertAllRequest();
+    insertAllRequest.rows = convertValuesToRows(data);     
+    var response = BigQuery.Tabledata.insertAll(insertAllRequest, projectId, datasetId, tableId);
+    if (response.insertErrors) {
+      Logger.log(response.insertErrors);
+    }
+  }
+
+  try {
+    bigqueryInsertData(Utilities.parseCsv(data.getDataAsString()), tableId);
+  } catch (error) {
+    Logger.log('Error al enviar datos a BigQuery: ' + error.message);
+    throw new Error('Ha habido un error enviando los datos a la base de datos.');
+  }
+}
+
+
+function isDate(value) {
+  // Comprueba si el valor es una instancia válida de Date en JavaScript.
+  return Object.prototype.toString.call(value) === '[object Date]' && !isNaN(value.getTime());
 }

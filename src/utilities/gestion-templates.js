@@ -26,31 +26,36 @@ function naveNodrizaIDS(file) {
  * @param {string} file - El nombre del archivo para el cual se desea obtener el ID.
  * @return {string} El nombre del archivo clave correspondiente.
  */
+
 function getTipoArchivo(file, index) {
-  if(index === undefined){
-    var ss = file || SpreadsheetApp.getActive();
-    var nombreArchivo = ss.getName().toLowerCase();
-  } else {
-    var nombreArchivo = "undefined";
+  let nombreArchivo = index === undefined
+    ? (file || SpreadsheetApp.getActive()).getName().toLowerCase()
+    : "undefined";
+
+  const tiposArchivo = {
+    1: 'Panel de control',
+    2: 'Cuadro Superficies',
+    3: 'Exportación Superficies',
+    4: 'Cuadro Mediciones'
+  };
+
+  for (const [key, value] of Object.entries(tiposArchivo)) {
+    if (nombreArchivo.includes(value.toLowerCase()) || index === parseInt(key)) {
+      return value;
+    }
   }
 
-  var stringCS = 'Cuadro Superficies';
-  var stringPC = 'Panel de control';
-  var stringCE = 'Exportación Superficies';
-  var stringCM = 'Cuadro Mediciones';
+  return "none";
+}
 
-  if (nombreArchivo.includes(stringPC.toLowerCase()) || index === 1) {
-    return stringPC;
-  } else if (nombreArchivo.includes(stringCS.toLowerCase()) || index === 2) {
-    return stringCS;
-  } else if (nombreArchivo.includes(stringCE.toLowerCase()) || index === 3) {
-    return stringCE;
-  } else if (nombreArchivo.includes(stringCM.toLowerCase()) || index === 4) {
-    return stringCM;
-  } else {
-    return "none";
-  }
-
+function getCuadroTypes() {
+  var cuadroTypes = {
+    'selectPanelControl': 1,
+    'selectCuadroSuperficies': 2,
+    'selectCuadroExportacion': 3,
+    'selectCuadroMediciones': 4
+  };
+  return cuadroTypes;
 }
 
 /**
@@ -77,20 +82,20 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "nombre": "Plurifamiliar",
             "code": "plurifami",
             "settings": {
-              "excludedMasterSheets": ["norurbani"],
-              "hiddenSheets": ["contactos", "xbddproye", "xcontacto", "xcuadrsup", "xempresas", "xhorastar", "xmasuputi", "xnormativ", "xproyecoo", "xrosciuda", "xroscimix", "xrosedren", "xvariable", "xvarianor", "xvariacos", "xvariapyt"],
-              "excludedOtherSheets": [],
-              "minimumCuadro": ["instrucio", "datosproy", "contactos", "planifica", "pconhoras", "panconkpi", "premiscli", "predimmix", "predimsup", "cosdesglo", "cosprecio", "xbddproye", "xcontacto", "xcuadrsup", "xempresas", "xhorastar", "xmasuputi", "xnormativ", "xproyecoo", "xrosciuda", "xroscimix", "xrosedren", "xvariable", "xvarianor", "xvariacos", "xvariapyt"]
+              "minimumCuadro": ["instrucio", "datosproy", "contactos", "registros", "planifica", "registros", "pconhoras", "duedilige", "premiscli", "cosdesglo", "cosprecio", "xbddproye", "xcontacto", "xcuadrsup", "xempresas", "xhorastar", "xmasuputi", "xnormativ", "xproyecoo", "xrosciuda", "xroscimix", "xrosedren", "xvariable", "xvarianor", "xvariacos", "xvariapyt"],
+              "fullCuadro": ["instrucio", "datosproy", "contactos", "registros", "planifica", "registros", "pconhoras", "duedilige", "panconkpi", "cosdesglo", "cosprecio", "premiscli", "predimmix", "predimsup", "predimcos", "xbddproye", "xcontacto", "xcuadrsup", "xempresas", "xhorastar", "xmasuputi", "xnormativ", "xproyecoo", "xrosciuda", "xroscimix", "xrosedren", "xvariable", "xvarianor", "xvariacos", "xvariapyt"],
+              "revitCuadro": [],
+              "hiddenSheets": ["contactos", "xbddproye", "xcontacto", "xcuadrsup", "xempresas", "xhorastar", "xmasuputi", "xnormativ", "xproyecoo", "xrosciuda", "xroscimix", "xrosedren", "xvariable", "xvarianor", "xvariacos", "xvariapyt"]
             }
           },
           {
             "nombre": "Unifamiliar",
             "code": "unifamili",
             "settings": {
-              "excludedMasterSheets": ["norurbani"],
-              "hiddenSheets": ["contactos", "xbddproye", "xcontacto", "xcuadrsup", "xempresas", "xhorastar", "xmasuputi", "xnormativ", "xproyecoo", "xrosciuda", "xroscimix", "xrosedren", "xvariable", "xvarianor", "xvariacos", "xvariapyt"],
-              "excludedOtherSheets": [],
-              "minimumCuadro": ["instrucio", "datosproy", "contactos", "planifica", "pconhoras", "panconkpi", "premiscli", "predimmix", "predimsup", "cosdesglo", "cosprecio", "xbddproye", "xcontacto", "xcuadrsup", "xempresas", "xhorastar", "xmasuputi", "xnormativ", "xproyecoo", "xrosciuda", "xroscimix", "xrosedren", "xvariable", "xvarianor", "xvariacos", "xvariapyt"]
+              "minimumCuadro": ["instrucio", "datosproy", "contactos", "registros", "planifica", "registros", "pconhoras", "duedilige", "premiscli", "cosdesglo", "cosprecio", "xbddproye", "xcontacto", "xcuadrsup", "xempresas", "xhorastar", "xmasuputi", "xnormativ", "xproyecoo", "xrosciuda", "xroscimix", "xrosedren", "xvariable", "xvarianor", "xvariacos", "xvariapyt"],
+              "fullCuadro": ["instrucio", "datosproy", "contactos", "registros", "planifica", "registros", "pconhoras", "duedilige", "panconkpi", "cosdesglo", "cosprecio", "premiscli", "predimmix", "predimsup", "predimcos", "xbddproye", "xcontacto", "xcuadrsup", "xempresas", "xhorastar", "xmasuputi", "xnormativ", "xproyecoo", "xrosciuda", "xroscimix", "xrosedren", "xvariable", "xvarianor", "xvariacos", "xvariapyt"],
+              "revitCuadro": [],
+              "hiddenSheets": ["contactos", "xbddproye", "xcontacto", "xcuadrsup", "xempresas", "xhorastar", "xmasuputi", "xnormativ", "xproyecoo", "xrosciuda", "xroscimix", "xrosedren", "xvariable", "xvarianor", "xvariacos", "xvariapyt"]
             }
           }
         ],
@@ -166,6 +171,20 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "settings": {}
           },
           {
+            "name": "Costes desglosados",
+            "code": "cosdesglo",
+            "description": "Tablas de costes de predimensionados y superficies BIM",
+            "tabColor": "#ff00ff",
+            "settings": {}
+          },
+          {
+            "name": "Costes precios",
+            "code": "cosprecio",
+            "description": "Hoja maestra de la base de datos de precios €/m2",
+            "tabColor": "#ff00ff",
+            "settings": {}
+          },
+          {
             "name": "Premisas cliente",
             "code": "premiscli",
             "description": "Mix de premisas del cliente para unidades y ZZCC",
@@ -187,16 +206,9 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "settings": {}
           },
           {
-            "name": "Costes desglosados",
-            "code": "cosdesglo",
+            "name": "Predim Costes",
+            "code": "predimcos",
             "description": "Tablas de costes de predimensionados y superficies BIM",
-            "tabColor": "#ff00ff",
-            "settings": {}
-          },
-          {
-            "name": "Costes precios",
-            "code": "cosprecio",
-            "description": "Hoja maestra de precios €/m2 y ratios",
             "tabColor": "#ff00ff",
             "settings": {}
           },
@@ -314,7 +326,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
     case 'Cuadro Superficies':
 
       try {
-        var valoresUnicos = obtenerValoresUnicosDeRangoNombrado('X Variables', '.', 'Desplegables/ UNIDADES');
+        var valoresUnicos = obtenerValoresUnicosDeRangoNombrado('X Variables', '.', 'Desplegables/ Nombre unidades');
       } catch (error) { }
 
       templateSheetConfigObject = {
@@ -324,20 +336,20 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "nombre": "Plurifamiliar",
             "code": "plurifami",
             "settings": {
-              "excludedMasterSheets": ["computviv", "csrestipo", "csresplan", "aytobasur", "cssupauto"],
-              "hiddenSheets": ["sisectors", "siocupaci", "aytojusti", "aytoconst", "aytomadrd", "cuadrvtft", "cuadrogar", "histconst", "txtoperac", "xexportac", "xvariable", "xvariabsi", "txtsuperf"],
-              "excludedOtherSheets": ["TXT FALSOS TECHOS", "TXT VENTANAS"],
-              "minimumCuadro": ["csupelink", "cschivato", "conedific", "chektipom", "chektipos", "conplanta", "txtoperac", "xexportac", "xvariable", "xvariabsi", "txtsuperf"]
+              "fullCuadro": ["csupelink", "cschivato", "conedific", "chektipom", "chektipos", "conplanta", "cuadrogar", "cuadrvtft", "sisectors", "siocupaci", "txtoperac", "xexportac", "xvariable", "xvariabsi", "txtsuperf"],
+              "minimumCuadro": ["csupelink", "cschivato", "conedific", "chektipom", "chektipos", "conplanta", "txtoperac", "xexportac", "xvariable", "xvariabsi", "txtsuperf"],
+              "revitCuadro": ["rvtsisect", "rvtsiocup", "rvtconare", "rvtutiesp", "rvtutihab"],
+              "hiddenSheets": ["sisectors", "siocupaci", "aytojusti", "aytoconst", "aytomadrd", "cuadrvtft", "cuadrogar", "histconst", "txtoperac", "xexportac", "xvariable", "xvariabsi", "txtsuperf", "rvtconare", "rvtutiesp", "rvtutihab"]
             }
           },
           {
             "nombre": "Unifamiliar",
             "code": "unifamili",
             "settings": {
-              "excludedMasterSheets": ["computviv", "csrestipo", "csresplan", "aytobasur", "cssupauto"],
-              "hiddenSheets": ["sisectors", "siocupaci", "aytojusti", "aytoconst", "aytomadrd", "cuadrvtft", "cuadrogar", "histconst", "txtoperac", "txtoperac", "xexportac", "xvariable", "xvariabsi", "txtsuperf"],
-              "excludedOtherSheets": ["TXT FALSOS TECHOS", "TXT VENTANAS"],
-              "minimumCuadro": ["csupelink", "cschivato", "conedific", "chektipom", "chektipos", "conplanta", "txtoperac", "xexportac", "xvariable", "xvariabsi", "txtsuperf"]
+              "fullCuadro": ["csupelink", "cschivato", "conedific", "chektipom", "chektipos", "conplanta", "cuadrogar", "cuadrvtft", "sisectors", "siocupaci", "txtoperac", "xexportac", "xvariable", "xvariabsi", "txtsuperf"],
+              "minimumCuadro": ["csupelink", "cschivato", "conedific", "chektipom", "chektipos", "conplanta", "txtoperac", "xexportac", "xvariable", "xvariabsi", "txtsuperf"],
+              "revitCuadro": ["rvtsisect", "rvtsiocup", "rvtconare", "rvtutiesp", "rvtutihab"],
+              "hiddenSheets": ["sisectors", "siocupaci", "aytojusti", "aytoconst", "aytomadrd", "cuadrvtft", "cuadrogar", "histconst", "txtoperac", "xexportac", "xvariable", "xvariabsi", "txtsuperf", "rvtconare", "rvtutiesp", "rvtutihab"]
             }
           }
         ],
@@ -347,21 +359,27 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "code": "csupelink",
             "description": "Hoja de datos generales y conexión con otros cuadros",
             "tabColor": "#ffff00",
-            "settings": {}
+            "settings": {
+              "showInList": true,
+            }
           },
           {
             "name": "CHIVATOS",
             "code": "cschivato",
             "description": "Hoja resumen de los principales chivatos del cuadro",
             "tabColor": "#ff0000",
-            "settings": {}
+            "settings": {
+              "showInList": true,
+            }
           },
           {
             "name": "Construida_Edificable",
             "code": "conedific",
             "description": "Hoja con las principales superficies construidas y edificables",
             "tabColor": "#3c78d8",
-            "settings": {}
+            "settings": {
+              "showInList": true,
+            }
           },
           {
             "name": "Check TIPO M",
@@ -369,9 +387,10 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "description": "Hoja de chequeo de las superficies generales por tipología",
             "tabColor": "#3c78d8",
             "settings": {
+              "showInList": true,
               "filaFormulas": true,
               "portalSwitch": {
-                "range": "E2",
+                "range": "BLOQUE;2",
                 "action": "setBoolean"
               },
               "deleteColumnGroup": {
@@ -394,9 +413,10 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "description": "Hoja de chequeo de las superficies de estancias por tipología",
             "tabColor": "#3c78d8",
             "settings": {
+              "showInList": true,
               "filaFormulas": true,
               "portalSwitch": {
-                "range": "E2",
+                "range": "BLOQUE;2",
                 "action": "setBoolean"
               },
               "deleteColumnGroup": {
@@ -419,58 +439,24 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "description": "Resúmenes de las superficies por planta, incluyendo aparcamiento y trasteros",
             "tabColor": "#ffd966",
             "settings": {
+              "showInList": true,
               "filaFormulas": true,
               "tipoSuperficie": {
-                "range": "E2",
+                "range": "PLANTAS;2",
                 "action": "setValue"
               },
             }
           },
-          {
-            "name": "CÓMPUTO VIV",
-            "code": "computviv",
-            "description": "Resumen de unidades de vivienda por tipología y planta",
-            "tabColor": "#ff00ff",
-            "settings": {
-            }
-          },
-          /*
-          {
-            "name": "RESUMEN TIPOS",
-            "code": "csrestipo",
-            "description": "Hojas resumen para cuadro de exportación",
-            "tabColor": "#ff00ff",
-            "settings": {
-              "filaFormulas": true,
-              "tipoResumen": {
-                "range": "A5",
-                "action": "setValue"
-              }
-            }
-          },
-          {
-            "name": "RESUMEN PLANTAS",
-            "code": "csresplan",
-            "description": "Resúmenes de las superficies por planta, incluyendo aparcamiento y trasteros",
-            "tabColor": "#ff00ff",
-            "settings": {
-              "filaFormulas": false,
-              "tipoResumen": {
-                "range": "A4",
-                "action": "setValue"
-              }
-            }
-          },
-          */
           {
             "name": "Cuadro garaje",
             "code": "cuadrogar",
             "description": "Cuadro de chequeo de las superficies y plazas de garaje",
             "tabColor": "#6aa84f",
             "settings": {
+              "showInList": true,
               "filaFormulas": true,
               "switch": {
-                "range": "A2",
+                "range": "BLOQUE;2",
                 "action": "setValue"
               },
             }
@@ -481,6 +467,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "description": "Cuadro justificativo de ventanas y falsos techos",
             "tabColor": "#6aa84f",
             "settings": {
+              "showInList": true,
               "filaFormulas": true,
             }
           },
@@ -490,6 +477,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "description": "Desglose de superficies automáticas",
             "tabColor": "#6aa84f",
             "settings": {
+              "showInList": true,
             }
           },
           {
@@ -498,6 +486,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "description": "Cuadro de sectores de incendios y LRE",
             "tabColor": "#cc4125",
             "settings": {
+              "showInList": true,
               "filaFormulas": true,
             }
           },
@@ -507,6 +496,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "description": "Cuadro general de ocupación para Seguridad contra Incendios",
             "tabColor": "#cc4125",
             "settings": {
+              "showInList": true,
               "filaFormulas": true,
             }
           },
@@ -514,16 +504,18 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "name": "Cuadros justificativos AYTO",
             "code": "aytojusti",
             "description": "Cuadro resumen de justificación de superficies para el ayuntamiento",
-            "tabColor": "#c27ba0",
+            "tabColor": "#ff00ff",
             "settings": {
+              "showInList": true,
             }
           },
           {
             "name": "AYTO CONST USO",
             "code": "aytoconst",
             "description": "Cuadro de ayuntamiento de superficies construidas por uso",
-            "tabColor": "#c27ba0",
+            "tabColor": "#ff00ff",
             "settings": {
+              "showInList": true,
               "typeSwitch": {
                 "range": "A1",
                 "action": "setValue"
@@ -534,8 +526,9 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "name": "AYTO MADRID",
             "code": "aytomadrd",
             "description": "Cuadro de ayuntamiento de superficies computables y no computables",
-            "tabColor": "#c27ba0",
+            "tabColor": "#ff00ff",
             "settings": {
+              "showInList": true,
               "portal": {
                 "range": "B1",
                 "action": "setValue"
@@ -551,11 +544,21 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             }
           },
           {
+            "name": "CÓMPUTO UNIDAD",
+            "code": "computviv",
+            "description": "Resumen de unidades de vivienda por tipología y planta",
+            "tabColor": "#ff00ff",
+            "settings": {
+              "showInList": true,
+            }
+          },
+          {
             "name": "IT 03 CB Cuarto Basuras",
             "code": "aytobasur",
             "description": "Cuadro de ayuntamiento de justificación de los cuartos de basuras",
-            "tabColor": "#c27ba0",
+            "tabColor": "#ff00ff",
             "settings": {
+              "showInList": true,
             }
           },
           {
@@ -564,6 +567,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "description": "Hoja que documenta los cambios de superficies a lo largo del proyecto",
             "tabColor": "#9900ff",
             "settings": {
+              "showInList": true,
             }
           },
           {
@@ -572,6 +576,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "description": "Hoja que documenta los cambios de superficies a lo largo del proyecto",
             "tabColor": "#00ff00",
             "settings": {
+              "showInList": true,
             }
           },
           {
@@ -580,6 +585,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "description": "Hoja que documenta los cambios de superficies a lo largo del proyecto",
             "tabColor": "#00ff00",
             "settings": {
+              "showInList": true,
             }
           },
           {
@@ -588,6 +594,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "description": "Hoja que documenta los cambios de superficies a lo largo del proyecto",
             "tabColor": "#00ff00",
             "settings": {
+              "showInList": true,
             }
           },
           {
@@ -596,6 +603,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "description": "Hoja que documenta los cambios de superficies a lo largo del proyecto",
             "tabColor": "#00ff00",
             "settings": {
+              "showInList": true,
             }
           },
           {
@@ -604,8 +612,65 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "description": "Hoja que documenta los cambios de superficies a lo largo del proyecto",
             "tabColor": "#00ff00",
             "settings": {
+              "showInList": true,
             }
-          }
+          },
+          {
+            "name": "RVT_SI SECTORES Y LRE",
+            "code": "rvtsisect", 
+            "description": "Cuadro de sectores de incendios y LRE (Revit)",
+            "tabColor": "#cc4125",
+            "settings": {
+              "showInList": false,
+              "filaFormulas": true,
+            }
+          },
+          {
+            "name": "RVT_SI OCUPACIÓN",
+            "code": "rvtsiocup",
+            "description": "Cuadro general de ocupación para Seguridad contra Incendios (Revit)",
+            "tabColor": "#cc4125",
+            "settings": {
+              "showInList": false,
+              "filaFormulas": true,
+            }
+          },
+          {
+            "name": "RVT_TXT OPERACIONES",
+            "code": "rvttxtope",
+            "description": "Hoja que documenta los cambios de superficies a lo largo del proyecto (Revit)",
+            "tabColor": "#00ff00",
+            "settings": {
+              "showInList": false
+            }
+          },
+          {
+            "name": "RVT_TXT CONST AREAS",
+            "code": "rvtconare",
+            "description": "",
+            "tabColor": "#00ff00",
+            "settings": {
+              "showInList": false
+            }
+          },
+          {
+            "name": "RVT_TXT UTIL ESPACIOS",
+            "code": "rvtutiesp",
+            "description": "",
+            "tabColor": "#00ff00",
+            "settings": {
+              "showInList": false
+            }
+          },
+          {
+            "name": "RVT_TXT UTIL HAB",
+            "code": "rvtutihab",
+            "description": "",
+            "tabColor": "#00ff00",
+            "settings": {
+              "showInList": false
+            }
+          },
         ],
         "secondarySheets": [
           {
@@ -829,20 +894,20 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "nombre": "Plurifamiliar",
             "code": "plurifami",
             "settings": {
-              "excludedMasterSheets": [],
-              "hiddenSheets": ["resconfig", "resvivtip", "resvivpla"],
-              "excludedOtherSheets": [],
-              "minimumCuadro": ["cexpolink", "resconfig", "resvivtip", "resvivpla"]
+              "minimumCuadro": ["cexpolink", "resconfig", "resvivtip", "resvivpla"],
+              "fullCuadro": ["cexpolink", "resconfig", "resvivtip", "resvivpla"],
+              "revitCuadro": [],
+              "hiddenSheets": ["resconfig", "resvivtip", "resvivpla"]
             }
           },
           {
             "nombre": "Unifamiliar",
             "code": "unifamili",
             "settings": {
-              "excludedMasterSheets": [],
-              "hiddenSheets": ["resconfig", "resvivtip", "resvivpla"],
-              "excludedOtherSheets": [],
-              "minimumCuadro": ["cexpolink", "resconfig", "resvivtip", "resvivpla"]
+              "minimumCuadro": ["cexpolink", "resconfig", "resvivtip", "resvivpla"],
+              "fullCuadro": ["cexpolink", "resconfig", "resvivtip", "resvivpla"],
+              "revitCuadro": [],
+              "hiddenSheets": ["resconfig", "resvivtip", "resvivpla"]
             }
           }
         ],
@@ -984,20 +1049,20 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "nombre": "Plurifamiliar",
             "code": "plurifami",
             "settings": {
-              "excludedMasterSheets": [],
-              "hiddenSheets": [],
-              "excludedOtherSheets": [],
-              "minimumCuadro": []
+              "minimumCuadro": ["cexpolink", "cuamedvar", "bctrespre", "materibim", "calprebim", "calpreglo", "calpreuni", "materibim", "materibim"],
+              "fullCuadro": ["cexpolink", "resconfig", "resvivtip", "resvivpla"],
+              "revitCuadro": [],
+              "hiddenSheets": ["resconfig", "resvivtip", "resvivpla"]
             }
           },
           {
             "nombre": "Unifamiliar",
             "code": "unifamili",
             "settings": {
-              "excludedMasterSheets": [],
-              "hiddenSheets": [],
-              "excludedOtherSheets": [],
-              "minimumCuadro": []
+              "minimumCuadro": ["cexpolink", "resconfig", "resvivtip", "resvivpla"],
+              "fullCuadro": ["cexpolink", "resconfig", "resvivtip", "resvivpla"],
+              "revitCuadro": [],
+              "hiddenSheets": ["resconfig", "resvivtip", "resvivpla"]
             }
           }
         ],
@@ -1052,12 +1117,40 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
           },
           {
             "name": "Calidades y presupuesto UNICOS",
-            "code": "calpreglo",
+            "code": "calpreuni",
             "description": "Hoja de control general para mediciones BIM",
             "tabColor": "#1155cc",
             "settings": {
             }
-          }
+          },
+          {
+            "name": "X BDD Variables",
+            "code": "xbddvaria",
+            "description": "Hoja de conexión con la base de datos",
+            "tabColor": "#00ff00",
+            "settings": { }
+          },
+          {
+            "name": "X BDD Componentes",
+            "code": "xbddcompo",
+            "description": "Hoja de conexión con la base de datos",
+            "tabColor": "#00ff00",
+            "settings": { }
+          },
+          {
+            "name": "X BDD Compuestos",
+            "code": "xbddcompu",
+            "description": "Hoja de conexión con la base de datos",
+            "tabColor": "#00ff00",
+            "settings": { }
+          },
+          {
+            "name": "X CYPE_EST",
+            "code": "xcypeestr",
+            "description": "Hoja de conexión con la base de datos",
+            "tabColor": "#00ff00",
+            "settings": { }
+          },
         ],
         "secondarySheets": []
       }
@@ -1073,9 +1166,10 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "nombre": "Plurifamiliar",
             "code": "plurifami",
             "settings": {
-              "excludedMasterSheets": [],
-              "hiddenSheets": [],
-              "excludedOtherSheets": []
+              "minimumCuadro": [],
+              "fullCuadro": [],
+              "revitCuadro": [],
+              "hiddenSheets": []
             }
           },
           {

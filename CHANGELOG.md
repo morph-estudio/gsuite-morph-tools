@@ -2,6 +2,17 @@
 # Change Log
 Documentación de cambios del proyecto.
 
+## [ 3.1.0 ] - 2024/02/01
+
+### Added
+
+- Opción para elegir plantilla de Archicad/Revit al crear un nuevo cuadro.
+
+### Changed
+
+- Nuevas configuraciones de plantilla en el configurador de cuadros.
+- El anterior cuadro mínimo es ahora la opción principal de creación de cuadros, cambiándose por un switch de "cuadro ampliado".
+
 ## [ 3.0.0 ] - 2023/12/21
 
 ### Added
