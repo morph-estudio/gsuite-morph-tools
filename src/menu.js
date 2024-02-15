@@ -2,7 +2,7 @@
  * GLOBAL VARIABLES AND FUNCTIONS
  */
 
-var gmtVersion = '3.1.0';
+var gmtVersion = '3.1.4';
 var morphDivision = '(I+D)';
 var morphDev = '(Devs)';
 

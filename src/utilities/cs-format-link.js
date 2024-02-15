@@ -121,14 +121,14 @@ function basicListFormat(sh, rowShift, colShift) {
   // Specific Formatting
 
   // Col A
-  sh.getRange(1 + rowShift, 1 + colShift, 9, 1).setFontWeight('bold');
+  sh.getRange(1 + rowShift, 1 + colShift, textColumnA.length, 1).setFontWeight('bold');
   // Col A-B Border
-  sh.getRange(1 + rowShift, 1 + colShift, 9, 2)
-  .setBorder(true, true, null, true, true, true, mainBorderColor, SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
-  .setHorizontalAlignment('left');
+  sh.getRange(1 + rowShift, 1 + colShift, textColumnA.length, 2).setHorizontalAlignment('left')
+  .setBorder(false, true, false, true, true, true, mainBorderColor, SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
+  sh.getRange(1 + rowShift, 1 + colShift, 1, 1).setBorder(true, true, false, true, true, true, mainBorderColor, SpreadsheetApp.BorderStyle.SOLID_MEDIUM)
   // Control Panel
   sh.getRange(1 + rowShift, 2 + colShift, 1, 1).setBackground('#ECFDF5').setFontWeight('bold').setFontColor('#00C853')
-  .setBorder(true, true, null, true, true, true, '#00C853', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+  .setBorder(true, true, true, true, true, true, '#00C853', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
   // Folder Text Style
   sh.getRangeList([`${col2}2`, `${col2}4`, `${col2}6`, `${col2}7`]).setFontWeight('bold').setFontColor('#0000FF');
   sh.getRange(`${col2}9`).setFontColor('#0000FF');
@@ -143,7 +143,7 @@ function basicListFormat(sh, rowShift, colShift) {
 }
 
 /**
- * basicListFormat
+ * importedListFormat
  * LINK Sheet "Imported Files Block" Formatting
  */
 function importedListFormat(sh, rowShift, colShift) {
@@ -183,7 +183,7 @@ function importedListFormat(sh, rowShift, colShift) {
   sh.getRange(1 + rowShift, 1 + colShift, 1, colArrayLength)
     .setHorizontalAlignment('center')
     .setFontWeight('bold');
-  sh.getRange(1 + rowShift, 1 + colShift, getLastDataRow(sh, col1), colArrayLength).setBorder(true, true, true, true, true, true, mainBorderColor, SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+  sh.getRange(1 + rowShift, 1 + colShift, getLastDataRow(sh, col1), colArrayLength).setBorder(true, true, false, true, true, false, mainBorderColor, SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
 
   return textHeadersAI;
 }

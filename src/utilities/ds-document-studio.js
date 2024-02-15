@@ -9,69 +9,58 @@ function documentStudio(rowData) {
   const ss = SpreadsheetApp.getActive();
   const sh = ss.getActiveSheet();
 
-  var startTime = new Date().getTime(); var elapsedTime;
+  var startTime = new Date().getTime();
+  var elapsedTime;
 
-  let formData = [
-    rowData.dsActivate,
-    rowData.emailActivate,
-
-    rowData.templateID,
-    rowData.greenCells,
-
-    rowData.destinationFolder,
-    rowData.fileName,
-    rowData.exportFormat,
-    rowData.permission1,
-    rowData.permission2,
-    rowData.permission3,
-    rowData.numerationSwitch,
-
-    rowData.allDocuments
-  ];
-
-  let [dsActivate, emailActivate, templateID, greenCells, destinationFolder, fileName, exportFormat, permission1, permission2, permission3, numerationSwitch, allDocuments] = formData;
+  const {
+    dsActivate,
+    emailActivate,
+    templateID,
+    greenCells,
+    destinationFolder,
+    fileName,
+    exportFormat,
+    permission1,
+    permission2,
+    permission3,
+    numerationSwitch,
+    allDocuments
+  } = rowData;
 
   elapsedTime = (new Date().getTime() - startTime) / 1000; Logger.log(`Elapsed time before Basic Data, Files and Folders: ${elapsedTime} seconds.`);
 
-  /** Basic Data, Files and Folders **/
+  // Basic Data, Files and Folders
 
   let userMail = Session.getActiveUser().getEmail();
   let dateNow = Utilities.formatDate(new Date(), 'GMT+2', 'dd/MM/yyyy - HH:mm:ss');
 
-  let dataReturn = getGreenColumns(sh);
-  let [indexNameCell, indexUrlCell] = [
-    dataReturn.indexNameCell,
-    dataReturn.indexUrlCell,
-  ];
+  const { indexNameCell, indexUrlCell } = getGreenColumns(sh);
 
   Logger.log(`El index de File-links es: ${indexUrlCell}`);
 
   if (dsActivate) {
-    var {docID, destinationFolderFinale} = getDocumentData(greenCells, sh, templateID, destinationFolder, indexNameCell, indexUrlCell);
-
-    var mainTemplateFile = DriveApp.getFileById(docID);
-    var fileType = mainTemplateFile.getMimeType();
 
     var doc;
     var headerValues; 
     var value;
-
-    var requests = [];
-
     var columnaFechaArray = [];
+
+    var {docID, destinationFolderFinale} = getDocumentData(greenCells, sh, templateID, destinationFolder, indexNameCell, indexUrlCell);
+    var mainTemplateFile = DriveApp.getFileById(docID);
+    var fileType = mainTemplateFile.getMimeType();
 
     var lastColmn = sh.getLastColumn();
     var rows = sh.getDataRange().getValues();
 
+    elapsedTime = (new Date().getTime() - startTime) / 1000; Logger.log(`Elapsed time before Body Iteration: ${elapsedTime} seconds. rows.length: ${rows.length}`);
 
-      elapsedTime = (new Date().getTime() - startTime) / 1000; Logger.log(`Elapsed time before Body Iteration: ${elapsedTime} seconds.`);
-
-    /** Body Iteration **/
+    // Body Iteration
 
     for (var index = 1; index < rows.length; index++) {
-      var row = rows[index];
 
-      //Logger.log(`urlcell is ${row[indexUrlCell]} and allDocs is ${allDocuments}`)
+      SpreadsheetApp.flush();
+      var requests = [];
+      var row = rows[index];
       
       if (row[indexUrlCell] !== "" && allDocuments === false) {
         Logger.log(`ATENCIÓN: No se generará el documento correspondiente a la fila ${index}`)
@@ -91,24 +80,29 @@ function documentStudio(rowData) {
           doc = DocumentApp.openById(copyId);
           var body = doc.getBody();
 
-          var customWidth; var checkURL; var checkIMG; var imageID; var imageFile; var imageType; var image; var response; var width;
+          var customWidth;
+          var checkURL;
+          var checkIMG;
+          var imageID;
+          var imageFile;
+          var imageType;
+          var image;
+          var response;
+          var width;
 
-          for (var i = 0; i < indexNameCell - 1; i += 1) {
-            var headerValues = sh.getRange(1, i + 1).getValue();
+          for (var i = 0; i < indexNameCell - 1; i++) {
+            var headerValues = rows[0][i].toString();
             if (headerValues === "" || headerValues === null || headerValues.startsWith('[')) {
                 continue;
             }
-            value = sh.getRange(index + 1, i + 1).getValue().toString();
-            let output = [];
-            if (value.includes('{w=')) {
-              let t = value.split('{w=');
-              t.forEach((q) => {
-                output.push([q]);
-              });
-              value = output[0].toString();
-              width = parseInt(output[1].toString().replace('}', ''), 10).toFixed(0);
-              customWidth = true;
-            } else { customWidth = false; }
+
+            value = rows[index][i].toString();
+
+            var imgCustomSizeCheck = parseImageDimension(value);
+
+            if (imgCustomSizeCheck.customDimension) {
+              value = imgCustomSizeCheck.value
+            }
 
             let replaceText = `${`{{${headerValues}}}`}`;
             if (fileName.includes(replaceText)) { docNameWordArray[replaceText] = value; }
@@ -122,16 +116,12 @@ function documentStudio(rowData) {
                 imageType = imageFile.getMimeType();
 
                 if (imageType == 'JPEG', 'PNG', 'GIF') {
-                  imageFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+                  Logger.log(`Es una imagen con la ID ${imageID}`)
+                  //imageFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
                   image = DriveApp.getFileById(imageID).getBlob();
 
-                  if (customWidth == false) {
-                    //Logger.log(`Entraste a la imagen interna ${value}`)
-                    imageFromTextDocs(body, replaceText, image);
-                  } else {
-                    //Logger.log(`Entraste a la imagen interna custom ${value}`)
-                    imageFromTextDocsCustomWidth(body, replaceText, image, width);
-                  }
+                  imgCustomSizeCheck.customDimension ? imageFromTextDocsCustomDim(body, replaceText, image, imgCustomSizeCheck.dimension, imgCustomSizeCheck.number) : imageFromTextDocs(body, replaceText, image);
+
                 }
               } else if (checkIMG == true) {
                 response = UrlFetchApp.fetch(`${`${value}`}`);
@@ -142,7 +132,7 @@ function documentStudio(rowData) {
                   imageFromTextDocs(body, replaceText, image);
                 } else {
                   //Logger.log(`Entraste a la imagen externa custom ${value}`)
-                  imageFromTextDocsCustomWidth(body, replaceText, image, width);
+                  imageFromTextDocsCustomDim(body, replaceText, image, width);
                 }
               } else {
                 createDocsTextRequests(replaceText, value, requests)
@@ -350,10 +340,10 @@ function imageFromTextDocs(body, searchText, image) {
 }
 
 /**
- * imageFromTextDocsCustomWidth
+ * imageFromTextDocsCustomDim
  * Find and Replace Image Markers with Custom Size in a Google Doc File
  */
-function imageFromTextDocsCustomWidth(body, searchText, image, width) {
+function imageFromTextDocsCustomDim(body, searchText, image, dimension, size) {
   let next = body.findText(searchText);
   let atts = body.getAttributes();
   if (!next) return;
@@ -363,7 +353,28 @@ function imageFromTextDocsCustomWidth(body, searchText, image, width) {
   let w = img.getWidth();
   let h = img.getHeight();
   let sw = atts['PAGE_WIDTH'];
+  let sh = atts['PAGE_HEIGHT'];
 
+  if (dimension === "h") {
+    if (size > sh) {
+      img.setHeight(size);
+      img.setWidth((size * w) / h);
+    } else {
+      img.setHeight(size);
+      img.setWidth((size * w) / h);
+    }
+  } else if (dimension === "w") {
+    if (size > sw) {
+      img.setWidth(sw);
+      img.setHeight((sw * h) / w);
+    } else {
+      img.setWidth(size);
+      img.setHeight((size * h) / w);
+    }
+  }
+}
+
+/*
   if (width > sw) {
     img.setWidth(sw);
     img.setHeight((sw * h) / w);
@@ -371,17 +382,16 @@ function imageFromTextDocsCustomWidth(body, searchText, image, width) {
     img.setWidth(width);
     img.setHeight((width * h) / w);
   }
-}
-
+*/
 /**
  * createSlideTextRequests
  * Find and Replace Markers in a Google Slides File
  */
-function createDocsTextRequests(replaceText, value, requests) {
+function createDocsTextRequests(replacementText, value, requests) {
   requests.push({
     replaceAllText: {
       containsText: {
-        text: replaceText,
+        text: replacementText,
         matchCase: false,
       },
       replaceText: value,
@@ -1186,4 +1196,30 @@ async function esArchivoValido(url) {
   }
 }
 
+function parseImageDimension(value) {
 
+  let dimension = null;
+  let number = null;
+  let customDimension = false;
+
+  // Expresión regular para buscar el patrón {w=number} o {h=number}
+  const regex = /{(w|h)=(\d+)}/;
+
+  // Verificar si el valor coincide con el patrón
+  const match = value.match(regex);
+
+  if (match) {
+    dimension = match[1]; // 'w' para width o 'h' para height
+    number = parseInt(match[2], 10);
+    customDimension = true;
+
+    value = value.replace(regex, '').trim();
+  }
+
+  return {
+    value,
+    dimension,
+    number,
+    customDimension
+  };
+}

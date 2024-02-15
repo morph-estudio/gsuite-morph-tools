@@ -26,45 +26,51 @@ function morphFreezer(rowData, sheetSelection) {
   var dateNow = Utilities.formatDate(new Date(), 'GMT+2', 'dd/MM/yyyy - HH:mm:ss');
   var freezerDate = Utilities.formatDate(new Date(), 'GMT+2', 'yyyyMMdd');
   var destName = `${ss_name} - ${freezerDate} - CONGELADO`;
-  
-  var file = DriveApp.getFileById(ss_id);
-  var parentFolder = file.getParents();
-  var parentFolderID = parentFolder.next().getId();
-  var backupFolderSearch = DriveApp.getFolderById(parentFolderID);
 
   var { hyperlinkFontColor } = formatVariables(); // Necesario para formatear el color en la hoja LINK
   var excludedTabColors = ["#00ff00", "#ff0000", "#ffff00"]; // Si es un cuadro Morph, estos colores de hoja quedarán excluidos del archivo congelado
 
-  Logger.log(`FILE: ${ss_name}, FILEURL: ${file.getUrl()}, FILETYPE: ${filetype}`);
+  try {
+    var file = DriveApp.getFileById(ss_id);
+    var parentFolder = file.getParents();
+    var parentFolderID = parentFolder.next().getId();
+    var backupFolderSearch = DriveApp.getFolderById(parentFolderID);
 
-  // Inicialization of freezing process
+    // Inicialization of freezing process
 
-  elapsedTime = (new Date().getTime() - startTime) / 1000; Logger.log(`Elapsed time before get backup folder: ${elapsedTime} seconds.`);
+    elapsedTime = (new Date().getTime() - startTime) / 1000; Logger.log(`Elapsed time before get backup folder: ${elapsedTime} seconds.`);
 
-  var destination, destinationId, destinationFile, destinationSheets;
+    var destination, destinationId, destinationFile, destinationSheets;
 
-  // Automatically obtain the backup folder. If it is not found, the folder will be the same as the current file.
+    // Automatically obtain the backup folder. If it is not found, the folder will be the same as the current file.
 
-  var backupFolder, backupFolderId, backupFolderName;
-  let searchFor = 'title contains "Congelados"';
-  backupFolder = backupFolderSearch.searchFolders(searchFor);
+    var backupFolder, backupFolderId, backupFolderName;
+    let searchFor = 'title contains "Congelados"';
+    backupFolder = backupFolderSearch.searchFolders(searchFor);
 
-  if (!backupFolder.hasNext()) { // La carpeta no fue encontrada
-    var response = Browser.msgBox("Atención", "No se ha encontrado la carpeta para los archivos congelados. ¿Deseas crearla automáticamente?", Browser.Buttons.OK_CANCEL);
-    if (response == "cancel") {
-      throw new Error(`No se ha podido encontrar la carpeta de archivos congelados.`);
+    if (!backupFolder.hasNext()) { // La carpeta no fue encontrada
+      var response = Browser.msgBox("Atención", "No se ha encontrado la carpeta para los archivos congelados. ¿Deseas crearla automáticamente?", Browser.Buttons.OK_CANCEL);
+      if (response == "cancel") {
+        throw new Error(`No se ha podido encontrar la carpeta de archivos congelados.`);
+      }
+
+      var folderName = `${ss_name.substring(0, 6)}-A-CS-${searchFor.substring(16, searchFor.length - 1)}`; // Obtener el nombre de la carpeta desde la cadena de búsqueda
+      var newFolder = backupFolderSearch.createFolder(folderName);
+
+      backupFolderId = newFolder.getId();
+      backupFolder = DriveApp.getFolderById(backupFolderId);
+      backupFolder = [backupFolder]; // Actualizar la variable expFolder para usar la carpeta recién creada
+      
+    } else { // La carpeta fue encontrada
+      backupFolder = backupFolder.next();
+      backupFolderId = backupFolder.getId();
     }
-
-    var folderName = `${ss_name.substring(0, 6)}-A-CS-${searchFor.substring(16, searchFor.length - 1)}`; // Obtener el nombre de la carpeta desde la cadena de búsqueda
-    var newFolder = backupFolderSearch.createFolder(folderName);
-
-    backupFolderId = newFolder.getId();
-    backupFolder = DriveApp.getFolderById(backupFolderId);
-    backupFolder = [backupFolder]; // Actualizar la variable expFolder para usar la carpeta recién creada
-    
-  } else { // La carpeta fue encontrada
-    backupFolder = backupFolder.next();
-    backupFolderId = backupFolder.getId();
+  } catch (error) {
+    backupFolder = DriveApp.getRootFolder();
+    var backupFolderId = backupFolder.getId();
+    var noPermissionFolder = true;
+    functionErrors.push(`No se puede acceder a la carpeta de este archivo, por lo que el congelado se ha creado en "Mi Unidad".`)
+    // throw new Error(`Gsuite Morph Tools ha fallado o no tiene permisos para acceder a la carpeta de este archivo.`);
   }
 
   var backupFolderName = backupFolder.getName();
@@ -99,13 +105,16 @@ function morphFreezer(rowData, sheetSelection) {
 
   var visibleSheets, hiddenSheets;
 
-  if(esCuadro) {
-    visibleSheets = destinationSheets.filter(tempsheet => !tempsheet.isSheetHidden() && !excludedTabColors.includes(tempsheet.getTabColor()));
-    hiddenSheets = destinationSheets.filter(tempsheet => tempsheet.isSheetHidden() || excludedTabColors.includes(tempsheet.getTabColor()));
-  } else {
-    visibleSheets = destinationSheets.filter(tempsheet => !tempsheet.isSheetHidden());
-    hiddenSheets = destinationSheets.filter(tempsheet => tempsheet.isSheetHidden());
+  function isVisibleSheet(sheet, excludeColors) {
+    return !sheet.isSheetHidden() && !excludeColors.includes(sheet.getTabColor());
   }
+  
+  function isHiddenSheet(sheet, excludeColors) {
+    return sheet.isSheetHidden() || excludeColors.includes(sheet.getTabColor());
+  }
+
+  visibleSheets = destinationSheets.filter(sheet => isVisibleSheet(sheet, esCuadro ? excludedTabColors : []));
+  hiddenSheets = destinationSheets.filter(sheet => isHiddenSheet(sheet, esCuadro ? excludedTabColors : []));
 
   var requests;
 
@@ -147,31 +156,30 @@ function morphFreezer(rowData, sheetSelection) {
   Sheets.Spreadsheets.batchUpdate({spreadsheetId: ss_id, requests}, destinationId);
 
   elapsedTime = (new Date().getTime() - startTime) / 1000; Logger.log(`Elapsed time after frozen proccess: ${elapsedTime} seconds.`);
-
   SpreadsheetApp.flush();
 
-  // Si es un cuadro de exportación, formatear las hojas principales
+  // If it's an export file, format the main sheets
+
   if (filetype.toString() === "Exportación Superficies") {
-    formatearFileExportacion(destination);
-  } else { Logger.log("El archivo no es un cuadro de exportación"); }
+    formatExportFile(destination);
+  } else {
+    Logger.log("El archivo no es un cuadro de exportación.");
+  }
 
   // Move file to the destination folder
 
   if (esCuadro) {
-    if (backupFolderId !== undefined) {
-      DriveApp.getFolderById(backupFolderId).addFile(destinationFile);
-      destinationFile.getParents().next().removeFile(destinationFile);
-    } else {
-      DriveApp.getFolderById(parentFolderID).addFile(destinationFile);
-      destinationFile.getParents().next().removeFile(destinationFile);
-      functionErrors.push(`No se ha encontrado la carpeta 'PXXXXX-A-CS-Congelados' del proyecto, por lo que el archivo se ha guardado en la misma carpeta que el cuadro.`)
-    }
-  } else {
-    DriveApp.getFolderById(parentFolderID).addFile(destinationFile);
-    destinationFile.getParents().next().removeFile(destinationFile);
-  };
+    const targetFolderId = backupFolderId || parentFolderID;
+    moveFileToFolder(targetFolderId, destinationFile);
 
-  // Excel Conversion and LINK Sheet Data
+    if (!backupFolderId) {
+      functionErrors.push(`No se ha encontrado la carpeta 'PXXXXX-A-CS-Congelados' del proyecto, por lo que el archivo se ha guardado en la misma carpeta que el archivo principal.`);
+    }
+  } else if (!noPermissionFolder) {
+    moveFileToFolder(parentFolderID, destinationFile);
+  }
+
+  // Paste LINK-sheet DATA and Excel Conversion
 
   let excelUrl = `https://docs.google.com/feeds/download/spreadsheets/Export?key=${destinationId}&exportFormat=xlsx`;
 
@@ -188,8 +196,8 @@ function morphFreezer(rowData, sheetSelection) {
         sh.getRange(i + 1, 2).setValue(excelUrl).setFontColor(hyperlinkFontColor).setFontWeight('normal'); // Add XLSX download url to sheet;
       }
     }
-
     sh.activate();
+
   } else {
     let confirm = Browser.msgBox('Documento Excel', '¿Quieres crear una copia en formato Excel en la misma carpeta?', Browser.Buttons.OK_CANCEL);
     if (confirm == 'ok') {
@@ -198,7 +206,7 @@ function morphFreezer(rowData, sheetSelection) {
     }
   }
 
-  // Mostrar errores de ejecución del congelador
+  // Display execution errors to user
 
   if (functionErrors.length > 0) {
     var ui = SpreadsheetApp.getUi();
@@ -234,7 +242,7 @@ function exportToXLSS(fileName, url, parentFolderID) {
  * Formatea un archivo de destino para el cuadro de exportación durante el proceso de congelación.
  * @param {File} destinationFile - El archivo de destino que se formateará.
  */
-function formatearFileExportacion(destinationFile) {
+function formatExportFile(destinationFile) {
 
   var destinationSheets = destinationFile.getSheets();
   
@@ -322,7 +330,11 @@ function deleteColumnsInsideColumnGroup(sheet) {
 function morphFastFreezer() {
 }
 
-
+function moveFileToFolder(folderId, file) {
+  const folder = DriveApp.getFolderById(folderId);
+  folder.addFile(file);
+  file.getParents().next().removeFile(file);
+}
 
 
 

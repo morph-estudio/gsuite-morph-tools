@@ -2,6 +2,41 @@
 # Change Log
 Documentación de cambios del proyecto.
 
+## [ 3.1.3 ] - 2024/02/13
+
+### Fixed
+
+- Morph Document Studio: arreglado problema con la variable "const" que impedía ejecutar la herramienta
+- Optimización del código en el actualizador de cuadros: se ejecuta la misma función al seleccionar "Actualizar hoja LINK" que al ejecutarlo de forma normal.
+
+## [ 3.1.3 ] - 2024/02/13
+
+### Added
+
+- Morph Document Studio: ahora se puede elegir tanto la altura como la anchura de las imagenes que se añaden al documento con los snippets {w=anchura} y {h=altura} (antes solo se podía elegir la anchura).
+- Congelador de documentos: cuando no se tenga permisos para acceder a la carpeta del archivo, se generará el archivo congelado en "Mi Unidad".
+
+### Changed
+
+- Actualizador de cuadros: el selector de prefijo se ha cambiado por un selector de subcarpetas, es decir, hay que introducir el nombre de una subcarpeta dentro de ExpTXT y se añadirán los .txt de esa carpeta (sirve para seleccionar distintos sets de datos en un mismo proyecto, por ejemplo, cuando hay dos cuadros de superficies).
+
+### Fixed
+
+- Actualizador de cuadros: se ha añadido un check de "control de fallos" para las ocasiones en que se alcance la Quota de Google Drive para URLFetchApp.
+- Morph Document Studio: solucionado bug que ignoraba la primera columna de la hoja de datos al crear el documento.
+
+## [ 3.1.2 ] - 2024/02/09
+
+### Fixed
+
+- Arreglos menores en la aplicación.
+
+## [ 3.1.1 ] - 2024/02/07
+
+### Fixed
+
+- Solucionados problemas de programación en Morph Document Studio.
+
 ## [ 3.1.0 ] - 2024/02/01
 
 ### Added

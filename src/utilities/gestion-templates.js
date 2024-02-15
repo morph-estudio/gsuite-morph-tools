@@ -1049,20 +1049,20 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "nombre": "Plurifamiliar",
             "code": "plurifami",
             "settings": {
-              "minimumCuadro": ["cexpolink", "cuamedvar", "bctrespre", "materibim", "calprebim", "calpreglo", "calpreuni", "materibim", "materibim"],
-              "fullCuadro": ["cexpolink", "resconfig", "resvivtip", "resvivpla"],
+              "minimumCuadro": ["cexpolink", "cuamedvar", "bctrespre", "materibim", "calprebim", "calpreglo", "calpreuni", "xbddvaria", "xbddcompo", "xbddcompu", "xcypeestr", "xmedmater", "xmedmuroa", "xmedsuela", "xmedtecha"],
+              "fullCuadro": ["cexpolink", "cuamedvar", "bctrespre", "materibim", "calprebim", "calpreglo", "calpreuni", "xbddvaria", "xbddcompo", "xbddcompu", "xcypeestr", "xmedmater", "xmedmuroa", "xmedsuela", "xmedtecha"],
               "revitCuadro": [],
-              "hiddenSheets": ["resconfig", "resvivtip", "resvivpla"]
+              "hiddenSheets": ["xbddvaria", "xbddcompo", "xbddcompu", "xcypeestr", "xmedmater", "xmedmuroa", "xmedsuela", "xmedtecha"]
             }
           },
           {
             "nombre": "Unifamiliar",
             "code": "unifamili",
             "settings": {
-              "minimumCuadro": ["cexpolink", "resconfig", "resvivtip", "resvivpla"],
-              "fullCuadro": ["cexpolink", "resconfig", "resvivtip", "resvivpla"],
+              "minimumCuadro": ["cexpolink", "cuamedvar", "bctrespre", "materibim", "calprebim", "calpreglo", "calpreuni", "xbddvaria", "xbddcompo", "xbddcompu", "xcypeestr", "xmedmater", "xmedmuroa", "xmedsuela", "xmedtecha"],
+              "fullCuadro": ["cexpolink", "cuamedvar", "bctrespre", "materibim", "calprebim", "calpreglo", "calpreuni", "xbddvaria", "xbddcompo", "xbddcompu", "xcypeestr", "xmedmater", "xmedmuroa", "xmedsuela", "xmedtecha"],
               "revitCuadro": [],
-              "hiddenSheets": ["resconfig", "resvivtip", "resvivpla"]
+              "hiddenSheets": ["xbddvaria", "xbddcompo", "xbddcompu", "xcypeestr", "xmedmater", "xmedmuroa", "xmedsuela", "xmedtecha"]
             }
           }
         ],
@@ -1073,6 +1073,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "description": "Hoja de datos generales y conexión con otros cuadros",
             "tabColor": "#ffff00",
             "settings": {
+              "showInList": true,
             }
           },
           {
@@ -1081,6 +1082,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "description": "Hoja de configuración, datos y variables del cuadro de mediciones",
             "tabColor": "#00ff00",
             "settings": {
+              "showInList": true,
             }
           },
           {
@@ -1089,6 +1091,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "description": "Plantilla BC3 del presupuesto para importar en Presto",
             "tabColor": "#ff00ff",
             "settings": {
+              "showInList": true,
             }
           },
           {
@@ -1097,6 +1100,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "description": "Listado de materiales que vienen del modelo BIM",
             "tabColor": "#ff9900",
             "settings": {
+              "showInList": true,
             }
           },
           {
@@ -1105,6 +1109,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "description": "Hoja de control de los datos extraídos en BIM",
             "tabColor": "#1155cc",
             "settings": {
+              "showInList": true,
             }
           },
           {
@@ -1113,6 +1118,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "description": "Hoja de control general para mediciones BIM",
             "tabColor": "#1155cc",
             "settings": {
+              "showInList": true,
             }
           },
           {
@@ -1121,6 +1127,7 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "description": "Hoja de control general para mediciones BIM",
             "tabColor": "#1155cc",
             "settings": {
+              "showInList": true,
             }
           },
           {
@@ -1128,28 +1135,81 @@ function templateSheetConfigObject(booleanGetTipoArchivo, tipoArchivo) {
             "code": "xbddvaria",
             "description": "Hoja de conexión con la base de datos",
             "tabColor": "#00ff00",
-            "settings": { }
+            "settings": {
+              "showInList": true,
+            }
           },
           {
             "name": "X BDD Componentes",
             "code": "xbddcompo",
             "description": "Hoja de conexión con la base de datos",
             "tabColor": "#00ff00",
-            "settings": { }
+            "settings": {
+              "showInList": true,
+            }
           },
           {
             "name": "X BDD Compuestos",
             "code": "xbddcompu",
             "description": "Hoja de conexión con la base de datos",
             "tabColor": "#00ff00",
-            "settings": { }
+            "settings": {
+              "showInList": true,
+            }
           },
           {
             "name": "X CYPE_EST",
             "code": "xcypeestr",
             "description": "Hoja de conexión con la base de datos",
             "tabColor": "#00ff00",
-            "settings": { }
+            "settings": {
+              "showInList": true,
+            }
+          },
+          {
+            "name": "MED ID MATERIALES",
+            "code": "xmedmater",
+            "description": "Importación de datos de materiales",
+            "tabColor": "#00ff00",
+            "settings": {
+              "showInList": true,
+            }
+          },
+          {
+            "name": "MED ID MATERIALES",
+            "code": "xmedmater",
+            "description": "Importación de datos de materiales",
+            "tabColor": "#00ff00",
+            "settings": {
+              "showInList": true,
+            }
+          },
+          {
+            "name": "MED ID MUROS A",
+            "code": "xmedmuroa",
+            "description": "Importación de datos de muros",
+            "tabColor": "#00ff00",
+            "settings": {
+              "showInList": true,
+            }
+          },
+          {
+            "name": "MED ID SUELOS A",
+            "code": "xmedsuela",
+            "description": "Importación de datos de suelos",
+            "tabColor": "#00ff00",
+            "settings": {
+              "showInList": true,
+            }
+          },
+          {
+            "name": "MED ID TECHOS A",
+            "code": "xmedtecha",
+            "description": "Importación de datos de techos",
+            "tabColor": "#00ff00",
+            "settings": {
+              "showInList": true,
+            }
           },
         ],
         "secondarySheets": []

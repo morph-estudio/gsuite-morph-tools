@@ -1291,3 +1291,189 @@ function getDevPassword(headerName) {
   const devPassArray = getDatabaseColumn(headerName);
   return devPassArray;
 }
+
+
+
+
+
+
+
+/**
+ * getConectedSheetList
+ * Construct a exportedFilesList of sheets connected with ImportRange Formulas
+ */
+ function getConectedSheetList(rowShift, colShift, sheetName) {
+
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheets = ss.getSheets();
+  var importedSheets = [];
+
+  // Iterar sobre todas las hojas del documento
+
+  for (var i = 0; i < sheets.length; i++) {
+    let sheet = sheets[i];
+    let range = sheet.getRange("A1");
+    let formula = range.getFormula();
+    
+    // Si la celda A1 contiene una fórmula IMPORTRANGE, guarda la información en un objeto
+
+    if (formula.indexOf("IMPORTRANGE") !== -1) {
+      Logger.log(`formula: ${formula}`)
+      let sheetName = sheet.getName();
+      let targetGID = sheet.getSheetId();
+      let originFirstCellA1 = getFirstCellA1Notation(sheet); Logger.log(`originFirstCellA1: ${originFirstCellA1}`);
+
+      let formulaMatch, targetSpreadsheetURL, originSheetRange, arrayValues, originSheetName, referencedSheetRange
+
+      if (formula.toString().includes('https://')) {
+
+        formulaMatch = formula.match(/\bIMPORTRANGE\("([^"]+)";"([^"]+)"\)/i);
+        targetSpreadsheetURL = formulaMatch[1].trim();
+        originSheetRange = formulaMatch[2].trim();
+
+        arrayValues = originSheetRange.split('!');
+        originSheetName = arrayValues[0];
+        referencedSheetRange = arrayValues[1];
+
+      } else {
+
+        formulaMatch = formula.match(/\bIMPORTRANGE\(([^;)]+);[\"\']?([^\"\');]+)/i);
+        let firstArgument = formulaMatch[1].trim();
+        originSheetRange = formulaMatch[2].trim();
+
+        arrayValues = firstArgument.split('!');
+        originSheetName = arrayValues[0];
+        let originSheet = ss.getSheetByName(originSheetName)
+        targetSpreadsheetURL = originSheet.getRange(arrayValues[1]).getValue();
+
+        arrayValues = originSheetRange.split('!');
+        originSheetName = arrayValues[0];
+        referencedSheetRange = arrayValues[1];
+
+      }
+
+      Logger.log(`targetSpreadsheetURL: ${targetSpreadsheetURL}`); Logger.log(`originSheetName: ${originSheetName}`);
+
+      let originSpreadsheet = SpreadsheetApp.openById(getIdFromUrl(targetSpreadsheetURL.toString()));
+      let originSpreadsheetName = originSpreadsheet.getName();
+      let originGID = originSpreadsheet.getSheetByName(originSheetName).getSheetId();
+
+      importedSheets.push({
+        "originSpreadsheetName": originSpreadsheetName,
+        "originSheetName": originSheetName,
+        "originGID": originGID,
+        "targetSheetName": sheetName,
+        "targetGID": targetGID,
+        "targetSpreadsheetURL": targetSpreadsheetURL,
+        "originFirstCellA1": originFirstCellA1
+      });
+    }
+  }
+
+  Logger.log(`importedSheets: ${importedSheets}`);
+  
+  // Construir la lista de hojas conectadas
+
+  var exportedFilesList = [];
+  for (var i = 0; i < importedSheets.length; i++) {
+    let importedSheet = importedSheets[i];
+    targetSpreadsheetURL = importedSheet["targetSpreadsheetURL"]; Logger.log(`originSpreadsheetURLBeforeOpen: ${targetSpreadsheetURL}`);
+    var importedSpreadsheet = SpreadsheetApp.openById(getIdFromUrl(importedSheet["targetSpreadsheetURL"]));
+    var importedSpreadsheetName = importedSpreadsheet.getName();
+
+    var row = [
+      importedSpreadsheetName,
+      targetSpreadsheetURL,
+      `=HYPERLINK("${targetSpreadsheetURL}#gid=${importedSheet["originGID"]}";"${importedSheet["originSheetName"]}")`,
+      `=HYPERLINK("#gid=${importedSheet["targetGID"]}";"${importedSheet["targetSheetName"]}")`,
+      importedSheet["originFirstCellA1"],
+    ];
+
+    exportedFilesList.push(row);
+  }
+  
+  // Ordenar la lista alfabéticamente por nombre
+
+  exportedFilesList.sort(function(a, b) {
+    var nameA = a[0].toUpperCase();
+    var nameB = b[0].toUpperCase();
+    if (nameA < nameB) {
+      return -1;
+    }
+    if (nameA > nameB) {
+      return 1;
+    }
+    return 0;
+  });
+
+  
+  // Pegar la lista en la hoja "LINK"
+
+  var sh_link = ss.getSheetByName(sheetName) || ss.getSheetByName("LINKs");
+
+  let [textHeadersAC, colArray] = connectedListFormat(sh_link, rowShift, colShift);
+  exportedFilesList = [textHeadersAC.slice(0, -2), ...exportedFilesList];
+  let connectedSheetsListColumns = textHeadersAC.length;
+
+  let lastRow = sh_link.getLastRow();
+  let emptyChecker = checkIfSheetIsEmpty(sh_link); Logger.log(emptyChecker)
+
+  if (emptyChecker != true) {
+    sh_link.getRange(2 + rowShift, 1 + colShift, lastRow - rowShift, connectedSheetsListColumns).clearContent();
+    sh_link.getRange(1 + rowShift, 1 + colShift, lastRow - rowShift, connectedSheetsListColumns)
+      .setBorder(false, false, false, false, false, false, 'black', SpreadsheetApp.BorderStyle.SOLID_MEDIUM).setFontColor('#607D8B');
+  }
+
+  let listRange = sh_link.getRange(1 + rowShift, 1 + colShift, exportedFilesList.length, 5);
+
+  listRange.setValues(exportedFilesList);
+  deleteDuplicatedListObjects(sh_link, listRange, rowShift, colShift);
+
+  if(importedSheets.length > 0) {
+    let n;
+    for (var i = 0; i < importedSheets.length; i++) {
+      n = i + 2;
+      sh_link.getRange(rowShift + n, 6 + colShift)
+      .setFormula(`=IF(${numToCol(1 + colShift)}${n}<>"";IMPORTRANGE(CHAR(34)&${colArray[1]}${n}&CHAR(34);CHAR(39)&${colArray[2]}${n}&"'!"&${colArray[4]}${n});)`);
+      sh_link.getRange(rowShift + n, 7 + colShift)
+      .setFormula(`=IF(${colArray[0]}${rowShift + n}:${colArray[0]}<>"";IF(ISERROR(${colArray[5]}${rowShift + n}:${colArray[5]});"🟥";"🟩");"")`);
+    }
+  }
+
+  // List Format
+
+  sh_link.getRange(1 + rowShift, 1 + colShift, exportedFilesList.length, connectedSheetsListColumns).setBorder(true, true, true, true, true, true, '#b0bec5', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+  
+  // Limpiar filas y columnas sobrantes
+
+  let deleteRowIndex = getLastDataRowIndex(sh_link);
+  let maxRows = sh_link.getMaxRows();
+  if (maxRows > deleteRowIndex) sh_link.deleteRows(deleteRowIndex + 1, maxRows - deleteRowIndex);
+  removeEmptyColumns(sh_link);
+}
+
+
+
+/**
+ * deleteDuplicatedListObjects
+ * Borrar elementos duplicados en la lista de archivos conectados
+ */
+function deleteDuplicatedListObjects(sh, dataRange, rowShift, colShift) {
+  var data = dataRange.getValues();
+  var uniqueValues = {}; // Objeto para almacenar los valores únicos de "Archivos conectados"
+  
+  // Recorrer el array de datos
+  for (var i = 0; i < data.length; i++) {
+    var row = data[i];
+    var value = row[1];
+    
+    // Si el valor no está en el objeto, almacenarlo
+    if (!uniqueValues[value]) {
+      uniqueValues[value] = true;
+    } else {
+      // Si el valor ya está en el objeto, modificar las celdas
+      sh.getRange(i + rowShift + 1, 1 + colShift, 1, 1).clearContent(); // Borrar la columna "Archivos duplicados"
+      sh.getRange(i + rowShift + 1, 2 + colShift, 1, 1).setFontColor('#EFEFEF'); // Cambiar el color de la columna "Acción"
+    }
+  }
+}

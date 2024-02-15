@@ -41,26 +41,25 @@
       },
       {
         "userSymbol": "Calendar",
-        "version": "v3",
-        "serviceId": "calendar"
+        "serviceId": "calendar",
+        "version": "v3"
       },
       {
         "userSymbol": "BigQuery",
-        "version": "v2",
-        "serviceId": "bigquery"
+        "serviceId": "bigquery",
+        "version": "v2"
       }
     ],
     "libraries": [
       {
-        "userSymbol": "OAuth2",
-        "libraryId": "1B7FSrk5Zi6L1rSxxTDgDEUsPzlukDsi4KGuTMorsTQHhGBzBkMun4iDF",
-        "version": "41"
+        "userSymbol": "MorphLib",
+        "libraryId": "1N22iPgmncHnjTlJaMl5xS_XnR1OWY1GvK2nVrpO5vj-hptwL0Q-zqpbp",
+        "version": "1"
       },
       {
-        "userSymbol": "MorphLib",
-        "version": "1",
-        "libraryId": "1N22iPgmncHnjTlJaMl5xS_XnR1OWY1GvK2nVrpO5vj-hptwL0Q-zqpbp",
-        "developmentMode": false
+        "userSymbol": "OAuth2",
+        "version": "43",
+        "libraryId": "1B7FSrk5Zi6L1rSxxTDgDEUsPzlukDsi4KGuTMorsTQHhGBzBkMun4iDF"
       }
     ]
   }

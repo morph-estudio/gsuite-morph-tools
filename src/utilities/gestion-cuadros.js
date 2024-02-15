@@ -899,63 +899,7 @@ function eliminarRangosNombradosPorPrefijo(ss, prefijo) {
   }
 }
 
-function fechaformat() {
-  var fecha = `12/01/2024`
-  var fechaNueva = Utilities.formatDate(fecha, 'GMT', 'yyyy-MM-dd');
-  Logger.log(fechaNueva)
-}
 
-function sendToBigqueryDatabase() {
-
-  var histSheetname = 'hisexport';
-  var projectId = 'alsan-scripts';
-  var datasetId = 'medautocomparativo';
-  var tableId = 'historico';
-
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var hoja = ss.getSheetByName(histSheetname);
-  var rango = hoja.getDataRange();
-  var values = rango.getValues();
-
-  var rowsCSV = values.join("\n");
-  var data = Utilities.newBlob(rowsCSV, 'application/octet-stream');
-
-  function convertValuesToRows(data) {
-    var rows = [];  
-    var headers = values[0];
-
-    Logger.log(`headers: ${headers}`)
-
-    for (var i = 1, numColumns = data.length; i < numColumns; i++) {
-      var row = BigQuery.newTableDataInsertAllRequestRows();
-      row.json = data[i].reduce(function(obj, value, index) {
-        obj[headers[index]] = value;
-        return obj;
-      }, {});
-      rows.push(row);
-    }; 
-    Logger.log(`rows: ${rows}`)
-    return rows;
-  }
-
-  
-
-  function bigqueryInsertData(data, tableId) {
-    var insertAllRequest = BigQuery.newTableDataInsertAllRequest();
-    insertAllRequest.rows = convertValuesToRows(data);     
-    var response = BigQuery.Tabledata.insertAll(insertAllRequest, projectId, datasetId, tableId);
-    if (response.insertErrors) {
-      Logger.log(response.insertErrors);
-    }
-  }
-
-  try {
-    bigqueryInsertData(Utilities.parseCsv(data.getDataAsString()), tableId);
-  } catch (error) {
-    Logger.log('Error al enviar datos a BigQuery: ' + error.message);
-    throw new Error('Ha habido un error enviando los datos a la base de datos.');
-  }
-}
 
 
 function isDate(value) {

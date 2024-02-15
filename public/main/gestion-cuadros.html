@@ -68,14 +68,8 @@
         </div>
 
         <div class="input-group flex-nowrap update rounded-pill mb-2">
-          <span class="input-group-text prefixUpdateClassColor">Prefijo<span data-bs-toggle="tooltip" data-bs-placement="right" title="Por defecto se importarán los archivos con prefijo TXT (por ejemplo, TXT Sheets Ventanas), pero si usas un paquete de archivos con otro identificativo escribe aquí el prefijo"><i class="fa-regular fa-circle-question fa-questionstyle" style="color:#c0cbd1"></i></span></span> 
-          <input type="text" class="form-control shadow-none prefixUpdateClass" id="updatePrefixID" placeholder="TXT">
-        </div>
-
-        <div class="form-check form-switch">
-          <input class="form-check-input shadow-none prefixUpdateClass" type="checkbox" role="switch" id="prefix-all-switch" onclick="document.getElementById('updatePrefixID').disabled = this.checked">
-          <label class="form-check-label" style="position:relative;top:1px" for="prefix-all-switch">Ignorar prefijos</label> <span data-bs-toggle="tooltip" data-bs-placement="right" title="Añade todos los archivos de la carpeta 'ExpTXT' sin importar el prefijo.">
-          <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:2px"></i>
+          <span class="input-group-text prefixUpdateClassColor">Subcarpeta<span data-bs-toggle="tooltip" data-bs-placement="right" title="Por defecto se importarán los archivos de la carpeta ExpTXT, pero puedes crear una subcarpeta para otro pack de archivos y escribir aquí el nombre de la subcarpeta para importar esos archivos"><i class="fa-regular fa-circle-question fa-questionstyle" style="color:#c0cbd1"></i></span></span>
+          <input type="text" class="form-control shadow-none prefixUpdateClass" id="updatePrefixID" placeholder="OPC">
         </div>
 
         <div class="form-check form-switch">
@@ -88,11 +82,22 @@
       </div>
 
       <div class="form-check form-switch">
+        <input class="form-check-input shadow-none" type="checkbox" role="switch" id="quota-control">
+        <label class="form-check-label" style="position:relative;top:1px" for="quota-control">Control de fallos
+        <span data-bs-toggle="tooltip" data-bs-placement="right" title="Marcar esta casilla cuando se produzcan errores de 'quota' al actualizar y los administradores de la aplicación recomienden utilizarlo">
+        <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:0px"></i></label>
+      </div>
+
+      <!--
+
+      <div class="form-check form-switch">
         <input class="form-check-input shadow-none" type="checkbox" role="switch" id="update-historico">
         <label class="form-check-label" style="position:relative;top:1px" for="update-historico">Crear punto en histórico de superficies
         <span data-bs-toggle="tooltip" data-bs-placement="right" title="Todos los cuadros de superficies cuentan con una hoja HISTÓRICO Construidas donde registrar los cambios en el desarrollo del proyecto">
         <i class="fa-regular fa-circle-question fa-questionstyle" style="position: relative; top:2px"></i></label>
       </div>
+
+      -->
 
       <div id="" style="display: none;" class="formulaModPermission">
         <div class="form-check form-switch mt-2">
@@ -374,7 +379,8 @@
       <button class="btn btn-primary index i2 shadow-none w-100 centerScroll superficiesVisibilityControl" onclick="swalConfirm('refreshNamedRanges', 'Los rangos se han actualizado correctamente.', 'Se actualizarán los rangos nombrados. Por favor, no continúes si no sabes lo que estás haciendo...')"><i class="fa-solid fa-registered fa-margin fa-fw"></i>Actualizar rangos nombrados</button>
       <button class="btn btn-primary index i2 shadow-none w-100 centerScroll superficiesVisibilityControl" onclick="swalConfirm('historicoDeSuperficies', 'El punto histórico se ha añadido correctamente.', 'Se creará un punto temporal en el histórico de superficies. Confirma para continuar.')"><i class="fa-solid fa-clock-rotate-left fa-margin fa-fw"></i>Crear punto manual en el histórico de superficies</button>
       <button class="btn btn-primary index i2 shadow-none w-100 centerScroll medicionesVisibilityControl" onclick="swalConfirm('generarArchivoBC3', 'El archivo se ha generado correctamente.', 'Se generará un archivo BC3 con la información del proyecto. Confirma para continuar.')"><i class="fa-solid fa-filter-circle-dollar fa-margin fa-fw"></i>Generar archivo BC3 de importación para Presto</button>
-      <button class="btn btn-primary index i2 shadow-none w-100 centerScroll medicionesVisibilityControl" onclick="swalConfirm('sendToBigqueryDatabase', 'Los datos se han enviado a la base de datos.', 'El histórico actual se guardará en la base de datos de mediciones.')"><i class="fa-solid fa-database fa-margin fa-fw"></i>Enviar histórico actual a la base de datos</button>
+      <button class="btn btn-primary index i2 shadow-none w-100 centerScroll medicionesVisibilityControl" onclick="swalConfirm('sendToBigqueryDatabase', 'Los datos se han enviado a la base de datos.', 'El histórico actual se guardará en la base de datos de mediciones.')"><i class="fa-solid fa-database fa-margin fa-fw"></i>Enviar histórico actual a la base de datos en la nube</button>
+      <button class="btn btn-primary index i2 shadow-none w-100 centerScroll medicionesVisibilityControl" onclick="swalConfirm('sendToLocalCSV', 'Los datos se han guardado correctamente.', 'El histórico actual se guardará en un archivo local en la misma carpeta que este documento.', 'his_export', 'historicomed.csv')"><i class="fa-solid fa-database fa-margin fa-fw"></i>Enviar histórico actual a la base de datos local</button>
 
       <button class="btn btn-primary index i2 shadow-none w-100 centerScroll" onclick="swalConfirm('refreshFormulasInSelectedRow', 'Las fórmulas se han depurado.', 'Se borrarán y volverán a copiar las fórmulas de las primeras filas de la hoja.')"><i class="fa-solid fa-retweet fa-margin fa-fw"></i>Refrescar fila de fórmulas</button>
 
@@ -814,10 +820,10 @@ function updateButtonClicked(buttonID) {
     let updateLinkPage = document.getElementById("update-linkpage").checked;
     let keepSheetVisibility = document.getElementById("update-keepVisibility").checked;
     let updatePrefix = document.getElementById('updatePrefixID').value;
-    let prefixAll = document.getElementById("prefix-all-switch").checked;
     let updateDebugReport = document.getElementById("update-debugReport").checked;
 
-    let updateHistorico = document.getElementById("update-historico").checked;
+    // let updateHistorico = document.getElementById("update-historico").checked;
+    let quotaControl = document.getElementById("quota-control").checked;
     let updateBasic = document.getElementById("update-maindata").checked;
     let updateAI = document.getElementById("update-ai").checked;
     let updateAC = document.getElementById("update-ac").checked;
@@ -825,20 +831,16 @@ function updateButtonClicked(buttonID) {
     let btnID = 'Superficies';
     var rowData = {
           updatePrefix,
-          prefixAll,
           updateLinkPage,
           keepSheetVisibility,
           updateDebugReport,
-          updateHistorico,
+          // updateHistorico,
           updateBasic,
           updateAI,
-          updateAC
+          updateAC,
+          quotaControl
         }
-    if (updateLinkPage) {
-      swalConfirm('morphCSUpdater', 'El cuadro se ha actualizado correctamente.', 'Se actualizará la hoja LINK en el proceso de actualización. Confirma para continuar.', btnID, rowData);
-    } else {
-      swalConfirm('morphCSUpdaterDirect', 'El cuadro se ha actualizado correctamente.', 'Una vez ejecutado no se puede detener. Confirma para continuar.', rowData);
-    }
+    swalConfirm('morphCSUpdater', 'El cuadro se ha actualizado correctamente.', 'Se actualizará la hoja LINK en el proceso de actualización. Confirma para continuar.', btnID, rowData);
 
   } else if (buttonID === 'csFreezer') {
 
